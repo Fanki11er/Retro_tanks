@@ -1,5 +1,6 @@
 export const theme: Theme = {
   colors: {
+    lightGray: "rgba(217, 217, 217, 1)",
     darkBlue: "#010D26",
   },
   fontSizes: {},
@@ -13,6 +14,7 @@ export const theme: Theme = {
 
 export type Theme = {
   colors: {
+    lightGray: string;
     darkBlue: string;
   };
   fontSizes: {};
