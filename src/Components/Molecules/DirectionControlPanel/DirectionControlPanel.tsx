@@ -1,3 +1,6 @@
+import { useContext } from "react";
+import { GameContext } from "../../../Providers/GameProvider";
+import { Direction } from "../../../Types/Types";
 import {
   ArrowDown,
   ArrowLeft,
@@ -11,11 +14,15 @@ import {
   MiddleRow,
 } from "./DirectionControlPanel.styles";
 
-const DirectionControlPanel = () => {
+interface DirectionProps{
+  handleChangeDirection: (direction: Direction)=> void;
+}
+const DirectionControlPanel = (props: DirectionProps) => {
+ const {handleChangeDirection} = useContext(GameContext)
   return (
     <DirectionControlPanelWrapper>
       <EdgeRow>
-        <StyledControlButton>
+        <StyledControlButton onTouchStart={(e)=> {handleChangeDirection('Forwards') }} onTouchEnd={()=> handleChangeDirection('None')}>
           <ArrowUp />
         </StyledControlButton>
       </EdgeRow>

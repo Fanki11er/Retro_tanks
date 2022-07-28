@@ -1,45 +1,47 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { StyledCanvas } from "./Canvas.styles";
-import small_tank_image from "../../../assets/images/Light_tank.svg";
+import { Direction } from "../../../Types/Types";
+import { GameContext } from "../../../Providers/GameProvider";
 
-const Canvas = () => {
+interface CanvasProps{
+  playerTankDirection: Direction;
+}
+
+const Canvas = (props: CanvasProps) => {
+ 
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
-  const [playerSmallTank, setPlayerSmallTank] =
-    useState<HTMLImageElement | null>(null);
+  
+    const {playerTank} = useContext(GameContext);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const smallTankImage = useRef<HTMLImageElement | null>(null);
+
+
 
   useEffect(() => {
     if (canvasRef.current) {
       const renderCtx = canvasRef.current.getContext("2d");
+ 
 
       if (renderCtx) {
         setContext(renderCtx);
       }
+      
+       const animate = ()=> {
+        playerTank.update()
+        renderCtx?.clearRect(0,0, 312, 312);
+        renderCtx && playerTank.draw(renderCtx);
+        requestAnimationFrame(animate)
+       }
+       animate();
     }
 
-    if (context && playerSmallTank) {
-      context.drawImage(playerSmallTank, 200, 200);
-    }
-  }, [context, playerSmallTank]);
+  }, [context, playerTank]);
 
-  useEffect(() => {
-    if (smallTankImage.current) {
-      setPlayerSmallTank(smallTankImage.current);
-    }
-  }, []);
+ 
+  
 
   return (
-    <>
       <StyledCanvas ref={canvasRef} width={312} height={312} />
-      <img
-        src={small_tank_image}
-        ref={smallTankImage}
-        style={{ display: "none" }}
-        alt={"Player small tank"}
-      />
-    </>
   );
 };
 

@@ -1,3 +1,4 @@
+import { Direction } from "../../../Types/Types";
 import {
   BottomEdgePanel,
   LeftEdgePanel,
@@ -6,15 +7,18 @@ import {
 import Canvas from "../../Molecules/Canvas/Canvas";
 import RightGamePanel from "../../Molecules/RightGamePanel/RightGamePanel";
 import { BoardWrapper } from "./Board.styles";
-
-const Board = () => {
+interface BoardProps{
+  playerTankDirection: Direction
+}
+const Board = (props: BoardProps) => {
+  const {playerTankDirection} = props;
   return (
     <BoardWrapper>
       <LeftEdgePanel />
       <TopEdgePanel />
       <RightGamePanel />
       <BottomEdgePanel />
-      <Canvas />
+      <Canvas playerTankDirection={playerTankDirection}/>
     </BoardWrapper>
   );
 };
