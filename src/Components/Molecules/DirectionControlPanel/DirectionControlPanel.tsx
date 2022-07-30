@@ -27,15 +27,15 @@ const DirectionControlPanel = (props: DirectionProps) => {
         </StyledControlButton>
       </EdgeRow>
       <MiddleRow>
-        <StyledControlButton>
+        <StyledControlButton onTouchStart={(e)=> {handleChangeDirection("Left") }} onTouchEnd={()=> handleChangeDirection('None')}>
           <ArrowLeft />
         </StyledControlButton>
-        <StyledControlButton>
+        <StyledControlButton onTouchStart={(e)=> {handleChangeDirection('Right') }} onTouchEnd={()=> handleChangeDirection('None')}>
           <ArrowRight />
         </StyledControlButton>
       </MiddleRow>
       <EdgeRow>
-        <StyledControlButton>
+        <StyledControlButton  onTouchStart={(e)=> {handleChangeDirection('Backwards') }} onTouchEnd={()=> handleChangeDirection('None')}>
           <ArrowDown />
         </StyledControlButton>
       </EdgeRow>
