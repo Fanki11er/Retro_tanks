@@ -9,6 +9,7 @@ export class Tank {
   controls;
   textures: TankTextures;
   image;
+  isBlocked;
 
   constructor(xPos: number, yPos: number, width: number, height: number, textures: TankTextures) {
     this.xPos = xPos;
@@ -18,6 +19,7 @@ export class Tank {
     this.controls = new Controls();
     this.textures = textures;
     this.image = textures.topDirectionTexture;
+    this.isBlocked = false;
   }
 
   public draw(context: CanvasRenderingContext2D) {
@@ -25,21 +27,36 @@ export class Tank {
   }
 
   public update() {
+    this.checkForCollisionWithBorders();
+    this.checkForCollisionWithObjects(); //ToDo !!
+
     if (this.controls.forwards) {
       this.setImage(this.textures.topDirectionTexture);
-      this.yPos -= 0.2;
+
+      if (!this.isBlocked) {
+        this.yPos -= 0.2;
+      }
     }
     if (this.controls.backwards) {
       this.setImage(this.textures.downDirectionTexture);
-      this.yPos += 0.2;
+
+      if (!this.isBlocked) {
+        this.yPos += 0.2;
+      }
     }
     if (this.controls.left) {
-      this.xPos -= 0.2;
       this.setImage(this.textures.leftDirectionTexture);
+
+      if (!this.isBlocked) {
+        this.xPos -= 0.2;
+      }
     }
     if (this.controls.right) {
       this.setImage(this.textures.rightDirectionTexture);
-      this.xPos += 0.2;
+
+      if (!this.isBlocked) {
+        this.xPos += 0.2;
+      }
     }
   }
 
@@ -48,4 +65,35 @@ export class Tank {
       this.image = correctImage;
     }
   }
+
+  checkForCollisionWithBorders() {
+    this.isBlocked = false;
+    if (this.controls.forwards) {
+      if (this.yPos <= 0) {
+        this.isBlocked = true;
+        return;
+      }
+    }
+    if (this.controls.backwards) {
+      if (this.yPos + this.height >= 312) {
+        this.isBlocked = true;
+        return;
+      }
+    }
+    if (this.controls.left) {
+      if (this.xPos <= 0) {
+        this.isBlocked = true;
+        return;
+      }
+    }
+    if (this.controls.right) {
+      if (this.xPos + this.width >= 312) {
+        this.isBlocked = true;
+        return;
+      }
+    }
+  }
+
+  checkForCollisionWithObjects() {}
 }
+
