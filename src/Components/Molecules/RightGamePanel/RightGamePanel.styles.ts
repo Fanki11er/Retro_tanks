@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { StyledTheme } from "../../../GlobalStyles/theme";
+import styled from 'styled-components';
+import { StyledTheme } from '../../../GlobalStyles/theme';
 
 export const RightGamePanelWrapper = styled.div`
   width: 40px;
@@ -8,3 +8,4 @@ export const RightGamePanelWrapper = styled.div`
   grid-column: 3 /4;
   grid-row: 1 /3;
 `;
+

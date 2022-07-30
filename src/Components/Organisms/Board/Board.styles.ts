@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const BoardWrapper = styled.div`
   display: grid;
@@ -6,3 +6,4 @@ export const BoardWrapper = styled.div`
   grid-template-rows: 4px 312px 4px;
   background-color: black;
 `;
+

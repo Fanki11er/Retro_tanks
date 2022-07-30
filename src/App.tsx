@@ -1,7 +1,7 @@
-import { ThemeProvider } from "styled-components";
-import { GlobalStyles } from "./GlobalStyles/GlobalStyle";
-import { theme } from "./GlobalStyles/theme";
-import GameView from "./Views/GameView/GameView";
+import { ThemeProvider } from 'styled-components';
+import { GlobalStyles } from './GlobalStyles/GlobalStyle';
+import { theme } from './GlobalStyles/theme';
+import GameView from './Views/GameView/GameView';
 
 function App() {
   return (
@@ -13,3 +13,4 @@ function App() {
 }
 
 export default App;
+

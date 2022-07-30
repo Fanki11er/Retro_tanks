@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { StyledTheme } from "../../GlobalStyles/theme";
+import styled from 'styled-components';
+import { StyledTheme } from '../../GlobalStyles/theme';
 
 export const GameViewWrapper = styled.div`
   width: 100vw;
@@ -10,3 +10,4 @@ export const GameViewWrapper = styled.div`
   justify-content: center;
   align-items: center;
 `;
+
