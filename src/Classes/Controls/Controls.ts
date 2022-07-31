@@ -16,18 +16,31 @@ export class Controls {
     switch (direction) {
       case 'Forwards': {
         this.forwards = true;
+        this.left = false;
+        this.right = false;
+        this.backwards = false;
         break;
       }
       case 'Left': {
+        this.forwards = false;
         this.left = true;
+        this.right = false;
+        this.backwards = false;
         break;
       }
       case 'Right': {
+        this.forwards = false;
+        this.left = false;
         this.right = true;
+        this.backwards = false;
         break;
       }
       case 'Backwards': {
+        this.forwards = false;
+        this.left = false;
+        this.right = false;
         this.backwards = true;
+
         break;
       }
       case 'None': {
@@ -40,3 +53,4 @@ export class Controls {
     }
   }
 }
+

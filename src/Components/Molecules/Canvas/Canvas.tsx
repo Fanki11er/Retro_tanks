@@ -10,7 +10,7 @@ interface CanvasProps {
 const Canvas = (props: CanvasProps) => {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
 
-  const { playerTank } = useContext(GameContext);
+  const { playerTank, staticElements } = useContext(GameContext);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -26,11 +26,12 @@ const Canvas = (props: CanvasProps) => {
         playerTank.update();
         renderCtx?.clearRect(0, 0, 312, 312);
         renderCtx && playerTank.draw(renderCtx);
+        renderCtx && staticElements.draw(renderCtx);
         requestAnimationFrame(animate);
       };
       animate();
     }
-  }, [context, playerTank]);
+  }, [context, playerTank, staticElements]);
 
   return <StyledCanvas ref={canvasRef} width={312} height={312} />;
 };
