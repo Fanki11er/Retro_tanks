@@ -10,7 +10,7 @@ interface CanvasProps {
 const Canvas = (props: CanvasProps) => {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
 
-  const { playerTank, staticElements } = useContext(GameContext);
+  const { playerTank, staticElements, bulletObjects } = useContext(GameContext);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -27,6 +27,10 @@ const Canvas = (props: CanvasProps) => {
         renderCtx?.clearRect(0, 0, 312, 312);
         renderCtx && playerTank.draw(renderCtx);
         renderCtx && staticElements.draw(renderCtx);
+        renderCtx &&
+          bulletObjects.forEach((bullet) => {
+            bullet.draw(renderCtx);
+          });
         requestAnimationFrame(animate);
       };
       animate();

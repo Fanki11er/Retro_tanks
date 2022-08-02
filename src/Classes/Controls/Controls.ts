@@ -5,11 +5,13 @@ export class Controls {
   left;
   right;
   backwards;
+  lastDirection: Direction;
   constructor() {
     this.forwards = false;
     this.left = false;
     this.right = false;
     this.backwards = false;
+    this.lastDirection = 'Forwards';
   }
 
   public setDirection(direction: Direction) {
@@ -19,6 +21,7 @@ export class Controls {
         this.left = false;
         this.right = false;
         this.backwards = false;
+        this.lastDirection = 'Forwards';
         break;
       }
       case 'Left': {
@@ -26,6 +29,7 @@ export class Controls {
         this.left = true;
         this.right = false;
         this.backwards = false;
+        this.lastDirection = 'Left';
         break;
       }
       case 'Right': {
@@ -33,6 +37,7 @@ export class Controls {
         this.left = false;
         this.right = true;
         this.backwards = false;
+        this.lastDirection = 'Right';
         break;
       }
       case 'Backwards': {
@@ -40,6 +45,7 @@ export class Controls {
         this.left = false;
         this.right = false;
         this.backwards = true;
+        this.lastDirection = 'Backwards';
 
         break;
       }

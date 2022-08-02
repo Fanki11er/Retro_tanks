@@ -1,5 +1,7 @@
+import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
 import { TankTextures } from '../../Textures/TanksTextures/TanksTextures';
 import { StaticDrawable } from '../../Types/Types';
+import { Bullet } from '../Bullet/Bullet';
 import { Controls } from '../Controls/Controls';
 
 export class Tank {
@@ -12,8 +14,9 @@ export class Tank {
   image;
   isBlocked;
   staticObjects;
+  bullets;
 
-  constructor(xPos: number, yPos: number, width: number, height: number, textures: TankTextures, staticObjects: StaticDrawable[]) {
+  constructor(xPos: number, yPos: number, width: number, height: number, textures: TankTextures, staticObjects: StaticDrawable[], bullets: Bullet[]) {
     this.xPos = xPos;
     this.yPos = yPos;
     this.width = width;
@@ -23,6 +26,7 @@ export class Tank {
     this.image = textures.topDirectionTexture;
     this.isBlocked = false;
     this.staticObjects = staticObjects;
+    this.bullets = bullets;
   }
 
   public draw(context: CanvasRenderingContext2D) {
@@ -150,7 +154,6 @@ export class Tank {
     if (this.controls.right) {
       for (let i = 0; i < this.staticObjects.length; i++) {
         const collisionZone = this.staticObjects[i].getCollisionZone();
-        console.log(this.staticObjects.length);
         if (
           this.yPos < collisionZone.D.y &&
           this.yPos + this.height > collisionZone.A.y &&
@@ -162,6 +165,12 @@ export class Tank {
         }
       }
     }
+  }
+
+  fire() {
+    // todo: Compute position off bullet during shot
+    // todo: Add loading state
+    this.bullets.push(new Bullet(30, 30, 4, 4, this.controls.lastDirection, bulletTextures, this.staticObjects));
   }
 }
 
