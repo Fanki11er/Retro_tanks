@@ -1,6 +1,7 @@
 import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
 import { TankTextures } from '../../Textures/TanksTextures/TanksTextures';
 import { StaticDrawable } from '../../Types/Types';
+import { Coordinates } from '../BrickWall/BrickWall';
 import { Bullet } from '../Bullet/Bullet';
 import { Controls } from '../Controls/Controls';
 
@@ -15,6 +16,7 @@ export class Tank {
   isBlocked;
   staticObjects;
   bullets;
+  private isLoading;
 
   constructor(xPos: number, yPos: number, width: number, height: number, textures: TankTextures, staticObjects: StaticDrawable[], bullets: Bullet[]) {
     this.xPos = xPos;
@@ -27,6 +29,7 @@ export class Tank {
     this.isBlocked = false;
     this.staticObjects = staticObjects;
     this.bullets = bullets;
+    this.isLoading = false;
   }
 
   public draw(context: CanvasRenderingContext2D) {
@@ -168,9 +171,31 @@ export class Tank {
   }
 
   fire() {
-    // todo: Compute position off bullet during shot
-    // todo: Add loading state
-    this.bullets.push(new Bullet(30, 30, 4, 4, this.controls.lastDirection, bulletTextures, this.staticObjects));
+    if (!this.isLoading) {
+      const { x, y } = this.checkPositionOfTheBarrel();
+      this.bullets.push(new Bullet(x, y, 4, 4, this.controls.lastDirection, bulletTextures, this.staticObjects));
+      this.isLoading = true;
+      this.isLoading &&
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 1000);
+    }
+  }
+
+  private checkPositionOfTheBarrel() {
+    if (this.controls.lastDirection === 'Forwards') {
+      return new Coordinates(this.xPos + this.width / 2 - 2, this.yPos - 4);
+    }
+    if (this.controls.lastDirection === 'Backwards') {
+      return new Coordinates(this.xPos + this.width / 2 - 2, this.yPos + this.height);
+    }
+    if (this.controls.lastDirection === 'Left') {
+      return new Coordinates(this.xPos - 4, this.yPos + this.height / 2 - 2);
+    }
+    if (this.controls.lastDirection === 'Right') {
+      return new Coordinates(this.xPos + this.width, this.yPos + this.height / 2 - 2);
+    }
+    return new Coordinates(-20, -20);
   }
 }
 

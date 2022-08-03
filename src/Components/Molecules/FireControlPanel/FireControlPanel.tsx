@@ -8,7 +8,7 @@ const FireControlPanel = () => {
   const { handleShot } = useContext(GameContext);
   return (
     <FireControlPanelWrapper>
-      <StyledControlButton onTouchStart={() => handleShot()}>
+      <StyledControlButton onPointerDown={() => handleShot()}>
         <StyledEllipse />
       </StyledControlButton>
     </FireControlPanelWrapper>

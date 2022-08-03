@@ -1,13 +1,8 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { StyledCanvas } from './Canvas.styles';
-import { Direction } from '../../../Types/Types';
 import { GameContext } from '../../../Providers/GameProvider';
 
-interface CanvasProps {
-  playerTankDirection: Direction;
-}
-
-const Canvas = (props: CanvasProps) => {
+const Canvas = () => {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
 
   const { playerTank, staticElements, bulletObjects } = useContext(GameContext);
@@ -35,7 +30,7 @@ const Canvas = (props: CanvasProps) => {
       };
       animate();
     }
-  }, [context, playerTank, staticElements]);
+  }, [context, playerTank, staticElements, bulletObjects]);
 
   return <StyledCanvas ref={canvasRef} width={312} height={312} />;
 };
