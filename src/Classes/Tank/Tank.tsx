@@ -1,4 +1,5 @@
 import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
+import { explosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
 import { TankTextures } from '../../Textures/TanksTextures/TanksTextures';
 import { StaticDrawable } from '../../Types/Types';
 import { Coordinates } from '../BrickWall/BrickWall';
@@ -173,7 +174,7 @@ export class Tank {
   fire() {
     if (!this.isLoading) {
       const { x, y } = this.checkPositionOfTheBarrel();
-      this.bullets.push(new Bullet(x, y, 4, 4, this.controls.lastDirection, bulletTextures, this.staticObjects));
+      this.bullets.push(new Bullet(x, y, 4, 4, this.controls.lastDirection, bulletTextures, explosionTextures, this.staticObjects, this.bullets));
       this.isLoading = true;
       this.isLoading &&
         setTimeout(() => {

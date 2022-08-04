@@ -1,4 +1,5 @@
 import { BulletTextures } from '../../Textures/BulletTextures/BulletTextures';
+import { ExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
 import { CollisionZone, Direction, StaticDrawable } from '../../Types/Types';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 
@@ -8,12 +9,21 @@ export class Bullet {
   width;
   height;
   textures: BulletTextures;
+  explosionAnimationFrames = {
+    animationsFrames: [] as HTMLImageElement[],
+    index: 0,
+    counter: 0,
+    animationEnded: false,
+  };
   direction;
   image: HTMLImageElement | null = null;
   staticObjects;
   speed;
   collisionZone: CollisionZone;
-  // Todo: Add Collision zone
+  hit = false;
+  bullets;
+  // Todo: Add collisions with static elements
+  // Todo: Add explosions after collisions
 
   constructor(
     xPos: number,
@@ -22,7 +32,9 @@ export class Bullet {
     height: number,
     direction: Direction,
     textures: BulletTextures,
+    explosionTextures: ExplosionTextures,
     staticObjects: StaticDrawable[],
+    bullets: Bullet[],
   ) {
     this.xPos = xPos;
     this.yPos = yPos;
@@ -32,14 +44,23 @@ export class Bullet {
     this.direction = direction;
     this.setImageForDirection();
     this.staticObjects = staticObjects;
+    this.bullets = bullets;
     this.speed = 0.5;
     this.collisionZone = new ElementCollisionZone({ x: xPos, y: yPos }, 4, 4).getCollisionZone();
+    this.createExplosionAnimationFrames(explosionTextures);
   }
 
   public draw(context: CanvasRenderingContext2D) {
-    this.update();
-    this.checkForCollisionWithBorders();
-    this.image && context.drawImage(this.image, this.xPos, this.yPos);
+    if (!this.hit) {
+      this.update();
+      this.checkForCollisionWithBorders();
+      this.image && context.drawImage(this.image, this.xPos, this.yPos);
+    } else {
+      this.animateExplosion(20, context);
+    }
+    if (this.explosionAnimationFrames.animationEnded) {
+      this.bullets.pop();
+    }
   }
 
   setImageForDirection() {
@@ -87,6 +108,7 @@ export class Bullet {
     if (this.direction === 'Forwards') {
       if (this.yPos <= 0) {
         this.speed = 0;
+        this.hit = true;
         return;
       }
     }
@@ -104,6 +126,25 @@ export class Bullet {
       if (this.xPos + this.width >= 312) {
         return;
       }
+    }
+  }
+
+  private createExplosionAnimationFrames(explosionTextures: ExplosionTextures) {
+    this.explosionAnimationFrames.animationsFrames.push(explosionTextures.smallExplosionTexture);
+    this.explosionAnimationFrames.animationsFrames.push(explosionTextures.mediumExplosionTexture);
+    this.explosionAnimationFrames.animationsFrames.push(explosionTextures.smallExplosionTexture);
+  }
+  private animateExplosion(delay: number, ctx: CanvasRenderingContext2D) {
+    let image = this.explosionAnimationFrames.animationsFrames[this.explosionAnimationFrames.index];
+    if (this.explosionAnimationFrames.index < this.explosionAnimationFrames.animationsFrames.length) {
+      ctx.drawImage(image, 50, -10);
+    } else {
+      this.explosionAnimationFrames.animationEnded = true;
+    }
+
+    this.explosionAnimationFrames.counter += 1;
+    if (this.explosionAnimationFrames.counter % delay === 0) {
+      this.explosionAnimationFrames.index += 1;
     }
   }
 }
