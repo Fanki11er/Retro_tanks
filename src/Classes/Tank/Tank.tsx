@@ -142,7 +142,6 @@ export class Tank {
     if (this.controls.left) {
       for (let i = 0; i < this.staticObjects.length; i++) {
         const collisionZone = this.staticObjects[i].getCollisionZone();
-        console.log(this.staticObjects.length);
         if (
           this.yPos < collisionZone.D.y &&
           this.yPos + this.height > collisionZone.A.y &&

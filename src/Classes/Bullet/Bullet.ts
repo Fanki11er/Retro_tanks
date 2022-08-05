@@ -1,6 +1,8 @@
+import { v4 as uuidv4 } from 'uuid';
 import { BulletTextures } from '../../Textures/BulletTextures/BulletTextures';
 import { ExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
 import { CollisionZone, Direction, StaticDrawable } from '../../Types/Types';
+import { Coordinates } from '../BrickWall/BrickWall';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 
 export class Bullet {
@@ -14,6 +16,7 @@ export class Bullet {
     index: 0,
     counter: 0,
     animationEnded: false,
+    textureSize: 30,
   };
   direction;
   image: HTMLImageElement | null = null;
@@ -22,6 +25,7 @@ export class Bullet {
   collisionZone: CollisionZone;
   hit = false;
   bullets;
+  id;
   // Todo: Add collisions with static elements
   // Todo: Add explosions after collisions
 
@@ -48,18 +52,22 @@ export class Bullet {
     this.speed = 0.5;
     this.collisionZone = new ElementCollisionZone({ x: xPos, y: yPos }, 4, 4).getCollisionZone();
     this.createExplosionAnimationFrames(explosionTextures);
+    this.id = uuidv4();
   }
 
   public draw(context: CanvasRenderingContext2D) {
     if (!this.hit) {
       this.update();
       this.checkForCollisionWithBorders();
+      this.checkForCollisionWithObjects();
       this.image && context.drawImage(this.image, this.xPos, this.yPos);
     } else {
       this.animateExplosion(20, context);
     }
     if (this.explosionAnimationFrames.animationEnded) {
-      this.bullets.pop();
+      console.log(this.bullets.length, 'Before');
+      this.removeDestroyedBullet();
+      console.log(this.bullets.length, 'After');
     }
   }
 
@@ -114,16 +122,22 @@ export class Bullet {
     }
     if (this.direction === 'Backwards') {
       if (this.yPos + this.height >= 312) {
+        this.speed = 0;
+        this.hit = true;
         return;
       }
     }
     if (this.direction === 'Left') {
       if (this.xPos <= 0) {
+        this.speed = 0;
+        this.hit = true;
         return;
       }
     }
     if (this.direction === 'Right') {
       if (this.xPos + this.width >= 312) {
+        this.speed = 0;
+        this.hit = true;
         return;
       }
     }
@@ -137,7 +151,14 @@ export class Bullet {
   private animateExplosion(delay: number, ctx: CanvasRenderingContext2D) {
     let image = this.explosionAnimationFrames.animationsFrames[this.explosionAnimationFrames.index];
     if (this.explosionAnimationFrames.index < this.explosionAnimationFrames.animationsFrames.length) {
-      ctx.drawImage(image, 50, -10);
+      const explosionPosition = this.getExplosionPosition();
+      ctx.drawImage(
+        image,
+        explosionPosition.x,
+        explosionPosition.y,
+        this.explosionAnimationFrames.textureSize,
+        this.explosionAnimationFrames.textureSize,
+      );
     } else {
       this.explosionAnimationFrames.animationEnded = true;
     }
@@ -145,6 +166,112 @@ export class Bullet {
     this.explosionAnimationFrames.counter += 1;
     if (this.explosionAnimationFrames.counter % delay === 0) {
       this.explosionAnimationFrames.index += 1;
+    }
+  }
+
+  private getExplosionPosition(): Coordinates {
+    switch (this.direction) {
+      case 'Forwards': {
+        return { x: this.xPos - this.explosionAnimationFrames.textureSize / 2 + this.width / 2, y: this.yPos - 10 };
+      }
+      case 'Backwards': {
+        return {
+          x: this.xPos - this.explosionAnimationFrames.textureSize / 2 + this.width / 2,
+          y: this.yPos + this.height - this.explosionAnimationFrames.textureSize + 10,
+        };
+      }
+      case 'Left': {
+        return {
+          x: this.xPos - 10,
+          y: this.yPos - this.explosionAnimationFrames.textureSize / 2 + this.width / 2,
+        };
+      }
+
+      case 'Right': {
+        return {
+          x: this.xPos + this.width - this.explosionAnimationFrames.textureSize + 10,
+          y: this.yPos - this.explosionAnimationFrames.textureSize / 2 + this.width / 2,
+        };
+      }
+      default: {
+        return { x: -50, y: -50 };
+      }
+    }
+  }
+
+  private removeDestroyedBullet() {
+    const bulletIndex = this.bullets.findIndex((bullet) => {
+      return bullet.id === this.id;
+    });
+    if (bulletIndex >= 0) {
+      this.bullets.splice(bulletIndex, 1);
+    }
+  }
+
+  private checkForCollisionWithObjects() {
+    if (this.direction === 'Forwards') {
+      for (let i = 0; i < this.staticObjects.length; i++) {
+        const collisionZone = this.staticObjects[i].getCollisionZone();
+        console.log(this.staticObjects.length);
+        if (
+          this.xPos < collisionZone.B.x &&
+          this.xPos + this.width > collisionZone.A.x &&
+          this.yPos - 0.2 > collisionZone.A.y &&
+          this.yPos - 0.2 < collisionZone.D.y
+        ) {
+          this.speed = 0;
+          this.hit = true;
+          return;
+        }
+      }
+    }
+
+    if (this.direction === 'Backwards') {
+      for (let i = 0; i < this.staticObjects.length; i++) {
+        const collisionZone = this.staticObjects[i].getCollisionZone();
+        console.log(this.staticObjects.length);
+        if (
+          this.xPos < collisionZone.B.x &&
+          this.xPos + this.width > collisionZone.A.x &&
+          this.yPos + this.height + 0.2 > collisionZone.A.y &&
+          this.yPos + this.height + 0.2 < collisionZone.D.y
+        ) {
+          this.speed = 0;
+          this.hit = true;
+          return;
+        }
+      }
+    }
+
+    if (this.direction === 'Left') {
+      for (let i = 0; i < this.staticObjects.length; i++) {
+        const collisionZone = this.staticObjects[i].getCollisionZone();
+        if (
+          this.yPos < collisionZone.D.y &&
+          this.yPos + this.height > collisionZone.A.y &&
+          this.xPos - 0.2 < collisionZone.D.x &&
+          this.xPos - 0.2 > collisionZone.A.x
+        ) {
+          this.speed = 0;
+          this.hit = true;
+          return;
+        }
+      }
+    }
+    if (this.direction === 'Right') {
+      for (let i = 0; i < this.staticObjects.length; i++) {
+        const collisionZone = this.staticObjects[i].getCollisionZone();
+        if (
+          this.yPos < collisionZone.D.y &&
+          this.yPos + this.height > collisionZone.A.y &&
+          this.xPos + this.width + 0.2 > collisionZone.A.x &&
+          this.xPos + this.width + 0.2 < collisionZone.B.x
+        ) {
+          this.speed = 0;
+          this.hit = true;
+          return;
+        }
+      }
     }
   }
 }
