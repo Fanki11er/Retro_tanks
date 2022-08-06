@@ -41,41 +41,43 @@ export class Tank {
 
   public update() {
     this.isBlocked = false;
-    this.checkForCollisionWithBorders();
+    this.isBlocked = this.checkForCollisionWithBorders();
+
     if (!this.isBlocked) {
       this.isBlocked = Utils.checkForCollisionWithObjects(this.controls.direction, this.xPos, this.yPos, this.width, this.height, this.staticObjects);
-    }
-    if (this.isBlocked) {
-      return;
     }
 
     if (this.controls.direction === 'Forwards') {
       this.setImage(this.textures.topDirectionTexture);
 
-      if (this.controls.move) {
+      if (!this.isBlocked && this.controls.move) {
         this.yPos -= this.speed;
       }
+      return;
     }
     if (this.controls.direction === 'Backwards') {
       this.setImage(this.textures.downDirectionTexture);
 
-      if (this.controls.move) {
+      if (!this.isBlocked && this.controls.move) {
         this.yPos += this.speed;
       }
+      return;
     }
     if (this.controls.direction === 'Left') {
       this.setImage(this.textures.leftDirectionTexture);
 
-      if (this.controls.move) {
+      if (!this.isBlocked && this.controls.move) {
         this.xPos -= this.speed;
       }
+      return;
     }
     if (this.controls.direction === 'Right') {
       this.setImage(this.textures.rightDirectionTexture);
 
-      if (this.controls.move) {
+      if (!this.isBlocked && this.controls.move) {
         this.xPos += this.speed;
       }
+      return;
     }
   }
 
@@ -89,31 +91,58 @@ export class Tank {
     this.isBlocked = false;
     if (this.controls.direction === 'Forwards') {
       if (this.yPos <= 0) {
-        this.isBlocked = true;
-        return;
+        return true;
       }
     }
     if (this.controls.direction === 'Backwards') {
       if (this.yPos + this.height >= 312) {
-        this.isBlocked = true;
-        return;
+        return true;
       }
     }
     if (this.controls.direction === 'Left') {
       if (this.xPos <= 0) {
-        this.isBlocked = true;
-        return;
+        return true;
       }
     }
     if (this.controls.direction === 'Right') {
       if (this.xPos + this.width >= 312) {
-        this.isBlocked = true;
-        return;
+        return true;
       }
+    }
+    return false;
+  }
+
+  fire() {
+    if (!this.isLoading) {
+      const { x, y } = this.checkPositionOfTheBarrel();
+      this.bullets.push(new Bullet(x, y, 4, 4, this.controls.direction, bulletTextures, explosionTextures, this.staticObjects, this.bullets));
+      this.isLoading = true;
+      this.isLoading &&
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 1000);
     }
   }
 
-  checkForCollisionWithObjects() {
+  private checkPositionOfTheBarrel() {
+    if (this.controls.direction === 'Forwards') {
+      return new Coordinates(this.xPos + this.width / 2 - 2, this.yPos - 4);
+    }
+    if (this.controls.direction === 'Backwards') {
+      return new Coordinates(this.xPos + this.width / 2 - 2, this.yPos + this.height);
+    }
+    if (this.controls.direction === 'Left') {
+      return new Coordinates(this.xPos - 4, this.yPos + this.height / 2 - 2);
+    }
+    if (this.controls.direction === 'Right') {
+      return new Coordinates(this.xPos + this.width, this.yPos + this.height / 2 - 2);
+    }
+    return new Coordinates(-20, -20);
+  }
+}
+
+/*
+ checkForCollisionWithObjects() {
     if (this.controls.direction === 'Forwards') {
       for (let i = 0; i < this.staticObjects.length; i++) {
         const collisionZone = this.staticObjects[i].getCollisionZone();
@@ -174,33 +203,5 @@ export class Tank {
       }
     }
   }
-
-  fire() {
-    if (!this.isLoading) {
-      const { x, y } = this.checkPositionOfTheBarrel();
-      this.bullets.push(new Bullet(x, y, 4, 4, this.controls.direction, bulletTextures, explosionTextures, this.staticObjects, this.bullets));
-      this.isLoading = true;
-      this.isLoading &&
-        setTimeout(() => {
-          this.isLoading = false;
-        }, 1000);
-    }
-  }
-
-  private checkPositionOfTheBarrel() {
-    if (this.controls.direction === 'Forwards') {
-      return new Coordinates(this.xPos + this.width / 2 - 2, this.yPos - 4);
-    }
-    if (this.controls.direction === 'Backwards') {
-      return new Coordinates(this.xPos + this.width / 2 - 2, this.yPos + this.height);
-    }
-    if (this.controls.direction === 'Left') {
-      return new Coordinates(this.xPos - 4, this.yPos + this.height / 2 - 2);
-    }
-    if (this.controls.direction === 'Right') {
-      return new Coordinates(this.xPos + this.width, this.yPos + this.height / 2 - 2);
-    }
-    return new Coordinates(-20, -20);
-  }
-}
+*/
 
