@@ -1,9 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import { BulletTextures } from '../../Textures/BulletTextures/BulletTextures';
 import { ExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
-import { CollisionZone, Direction, StaticDrawable } from '../../Types/Types';
+import { /*CollisionZone,*/ Direction, StaticDrawable } from '../../Types/Types';
+import { Utils } from '../../Utils/Utils';
 import { Coordinates } from '../BrickWall/BrickWall';
-import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
+import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
+//import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 
 export class Bullet {
   private xPos;
@@ -11,23 +13,15 @@ export class Bullet {
   private width;
   private height;
   private textures: BulletTextures;
-  private explosionAnimationFrames = {
-    animationsFrames: [] as HTMLImageElement[],
-    index: 0,
-    counter: 0,
-    animationEnded: false,
-    textureSize: 30,
-  };
+  private explosionAnimationFrames;
   private direction;
   private image: HTMLImageElement | null = null;
   private staticObjects;
   private speed;
-  private collisionZone: CollisionZone;
+  // private collisionZone: CollisionZone;
   private hit = false;
   private bullets;
   private id;
-  // Todo: Add collisions with static elements
-  // Todo: Add explosions after collisions
 
   constructor(
     xPos: number,
@@ -49,25 +43,32 @@ export class Bullet {
     this.setImageForDirection();
     this.staticObjects = staticObjects;
     this.bullets = bullets;
+    this.explosionAnimationFrames = new ExplosionAnimationFrames(30);
     this.speed = 0.5;
-    this.collisionZone = new ElementCollisionZone({ x: xPos, y: yPos }, 4, 4).getCollisionZone();
+    // this.collisionZone = new ElementCollisionZone({ x: xPos, y: yPos }, 4, 4).getCollisionZone();
     this.createExplosionAnimationFrames(explosionTextures);
     this.id = uuidv4();
   }
 
   public draw(context: CanvasRenderingContext2D) {
+    // todo Make collision zone here and use it instead width height and all this staff
+    !this.hit && this.update();
     if (!this.hit) {
-      this.update();
-      this.checkForCollisionWithBorders();
-      this.checkForCollisionWithObjects();
-      this.image && context.drawImage(this.image, this.xPos, this.yPos);
-    } else {
-      this.animateExplosion(20, context);
+      this.hit = Utils.checkForCollisionWithBorders(this.direction, this.xPos, this.yPos, this.width, this.height, 312, 312);
     }
-    if (this.explosionAnimationFrames.animationEnded) {
-      console.log(this.bullets.length, 'Before');
-      this.removeDestroyedBullet();
-      console.log(this.bullets.length, 'After');
+    if (!this.hit) {
+      this.hit = Utils.checkForCollisionWithObjects(this.direction, this.xPos, this.yPos, this.width, this.height, this.staticObjects);
+    }
+    !this.hit && this.image && context.drawImage(this.image, this.xPos, this.yPos);
+
+    if (this.hit) {
+      // todo Get index of element, find it and check if its hitable
+      this.animateExplosion(20, context);
+      if (this.explosionAnimationFrames.animationEnded) {
+        console.log(this.bullets.length, 'Before');
+        this.removeDestroyedBullet();
+        console.log(this.bullets.length, 'After');
+      }
     }
   }
 
@@ -92,6 +93,7 @@ export class Bullet {
   }
 
   private update() {
+    console.log('Update');
     switch (this.direction) {
       case 'Forwards': {
         this.yPos -= this.speed;
@@ -108,37 +110,6 @@ export class Bullet {
       case 'Right': {
         this.xPos += this.speed;
         break;
-      }
-    }
-  }
-
-  private checkForCollisionWithBorders() {
-    if (this.direction === 'Forwards') {
-      if (this.yPos <= 0) {
-        this.speed = 0;
-        this.hit = true;
-        return;
-      }
-    }
-    if (this.direction === 'Backwards') {
-      if (this.yPos + this.height >= 312) {
-        this.speed = 0;
-        this.hit = true;
-        return;
-      }
-    }
-    if (this.direction === 'Left') {
-      if (this.xPos <= 0) {
-        this.speed = 0;
-        this.hit = true;
-        return;
-      }
-    }
-    if (this.direction === 'Right') {
-      if (this.xPos + this.width >= 312) {
-        this.speed = 0;
-        this.hit = true;
-        return;
       }
     }
   }

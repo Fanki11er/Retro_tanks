@@ -41,7 +41,7 @@ export class Tank {
 
   public update() {
     this.isBlocked = false;
-    this.isBlocked = this.checkForCollisionWithBorders();
+    this.isBlocked = Utils.checkForCollisionWithBorders(this.controls.direction, this.xPos, this.yPos, this.width, this.height, 312, 312);
 
     if (!this.isBlocked) {
       this.isBlocked = Utils.checkForCollisionWithObjects(this.controls.direction, this.xPos, this.yPos, this.width, this.height, this.staticObjects);
@@ -87,31 +87,6 @@ export class Tank {
     }
   }
 
-  checkForCollisionWithBorders() {
-    this.isBlocked = false;
-    if (this.controls.direction === 'Forwards') {
-      if (this.yPos <= 0) {
-        return true;
-      }
-    }
-    if (this.controls.direction === 'Backwards') {
-      if (this.yPos + this.height >= 312) {
-        return true;
-      }
-    }
-    if (this.controls.direction === 'Left') {
-      if (this.xPos <= 0) {
-        return true;
-      }
-    }
-    if (this.controls.direction === 'Right') {
-      if (this.xPos + this.width >= 312) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   fire() {
     if (!this.isLoading) {
       const { x, y } = this.checkPositionOfTheBarrel();
@@ -140,68 +115,4 @@ export class Tank {
     return new Coordinates(-20, -20);
   }
 }
-
-/*
- checkForCollisionWithObjects() {
-    if (this.controls.direction === 'Forwards') {
-      for (let i = 0; i < this.staticObjects.length; i++) {
-        const collisionZone = this.staticObjects[i].getCollisionZone();
-        if (
-          this.xPos < collisionZone.B.x &&
-          this.xPos + this.width > collisionZone.A.x &&
-          this.yPos - 0.2 > collisionZone.A.y &&
-          this.yPos - 0.2 < collisionZone.D.y
-        ) {
-          this.isBlocked = true;
-          return;
-        }
-      }
-    }
-
-    if (this.controls.direction === 'Backwards') {
-      for (let i = 0; i < this.staticObjects.length; i++) {
-        const collisionZone = this.staticObjects[i].getCollisionZone();
-        if (
-          this.xPos < collisionZone.B.x &&
-          this.xPos + this.width > collisionZone.A.x &&
-          this.yPos + this.height + 0.2 > collisionZone.A.y &&
-          this.yPos + this.height + 0.2 < collisionZone.D.y
-        ) {
-          this.isBlocked = true;
-          return;
-        }
-      }
-    }
-
-    if (this.controls.direction === 'Left') {
-      for (let i = 0; i < this.staticObjects.length; i++) {
-        const collisionZone = this.staticObjects[i].getCollisionZone();
-        if (
-          this.yPos < collisionZone.D.y &&
-          this.yPos + this.height > collisionZone.A.y &&
-          this.xPos - 0.2 < collisionZone.D.x &&
-          this.xPos - 0.2 > collisionZone.A.x
-        ) {
-          this.isBlocked = true;
-          return;
-        }
-      }
-    }
-
-    if (this.controls.direction === 'Right') {
-      for (let i = 0; i < this.staticObjects.length; i++) {
-        const collisionZone = this.staticObjects[i].getCollisionZone();
-        if (
-          this.yPos < collisionZone.D.y &&
-          this.yPos + this.height > collisionZone.A.y &&
-          this.xPos + this.width + 0.2 > collisionZone.A.x &&
-          this.xPos + this.width + 0.2 < collisionZone.B.x
-        ) {
-          this.isBlocked = true;
-          return;
-        }
-      }
-    }
-  }
-*/
 
