@@ -1,20 +1,26 @@
 import { Direction } from '../../Types/Types';
 
 export class Controls {
-  forwards;
-  left;
-  right;
-  backwards;
-  lastDirection: Direction;
+  move;
+  direction: Direction;
   constructor() {
-    this.forwards = false;
-    this.left = false;
-    this.right = false;
-    this.backwards = false;
-    this.lastDirection = 'Forwards';
+    this.direction = 'Forwards';
+    this.move = false;
   }
 
   public setDirection(direction: Direction) {
+    if (direction !== 'None') {
+      this.direction = direction;
+      this.move = true;
+      return;
+    }
+    this.move = false;
+  }
+}
+
+/*
+
+ public setDirection(direction: Direction) {
     switch (direction) {
       case 'Forwards': {
         this.forwards = true;
@@ -57,6 +63,5 @@ export class Controls {
         break;
       }
     }
-  }
-}
+  }*/
 

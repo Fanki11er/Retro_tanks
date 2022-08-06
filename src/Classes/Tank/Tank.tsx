@@ -12,6 +12,7 @@ export class Tank {
   width;
   height;
   controls;
+  private speed = 0.15;
   textures: TankTextures;
   image;
   isBlocked;
@@ -42,32 +43,32 @@ export class Tank {
     this.checkForCollisionWithBorders();
     this.checkForCollisionWithObjects();
 
-    if (this.controls.forwards) {
+    if (this.controls.direction === 'Forwards') {
       this.setImage(this.textures.topDirectionTexture);
 
-      if (!this.isBlocked) {
-        this.yPos -= 0.15;
+      if (!this.isBlocked && this.controls.move) {
+        this.yPos -= this.speed;
       }
     }
-    if (this.controls.backwards) {
+    if (this.controls.direction === 'Backwards') {
       this.setImage(this.textures.downDirectionTexture);
 
-      if (!this.isBlocked) {
-        this.yPos += 0.15;
+      if (!this.isBlocked && this.controls.move) {
+        this.yPos += this.speed;
       }
     }
-    if (this.controls.left) {
+    if (this.controls.direction === 'Left') {
       this.setImage(this.textures.leftDirectionTexture);
 
-      if (!this.isBlocked) {
-        this.xPos -= 0.15;
+      if (!this.isBlocked && this.controls.move) {
+        this.xPos -= this.speed;
       }
     }
-    if (this.controls.right) {
+    if (this.controls.direction === 'Right') {
       this.setImage(this.textures.rightDirectionTexture);
 
-      if (!this.isBlocked) {
-        this.xPos += 0.15;
+      if (!this.isBlocked && this.controls.move) {
+        this.xPos += this.speed;
       }
     }
   }
@@ -80,25 +81,25 @@ export class Tank {
 
   checkForCollisionWithBorders() {
     this.isBlocked = false;
-    if (this.controls.forwards) {
+    if (this.controls.direction === 'Forwards') {
       if (this.yPos <= 0) {
         this.isBlocked = true;
         return;
       }
     }
-    if (this.controls.backwards) {
+    if (this.controls.direction === 'Backwards') {
       if (this.yPos + this.height >= 312) {
         this.isBlocked = true;
         return;
       }
     }
-    if (this.controls.left) {
+    if (this.controls.direction === 'Left') {
       if (this.xPos <= 0) {
         this.isBlocked = true;
         return;
       }
     }
-    if (this.controls.right) {
+    if (this.controls.direction === 'Right') {
       if (this.xPos + this.width >= 312) {
         this.isBlocked = true;
         return;
@@ -107,10 +108,9 @@ export class Tank {
   }
 
   checkForCollisionWithObjects() {
-    if (this.controls.forwards) {
+    if (this.controls.direction === 'Forwards') {
       for (let i = 0; i < this.staticObjects.length; i++) {
         const collisionZone = this.staticObjects[i].getCollisionZone();
-        console.log(this.staticObjects.length);
         if (
           this.xPos < collisionZone.B.x &&
           this.xPos + this.width > collisionZone.A.x &&
@@ -123,10 +123,9 @@ export class Tank {
       }
     }
 
-    if (this.controls.backwards) {
+    if (this.controls.direction === 'Backwards') {
       for (let i = 0; i < this.staticObjects.length; i++) {
         const collisionZone = this.staticObjects[i].getCollisionZone();
-        console.log(this.staticObjects.length);
         if (
           this.xPos < collisionZone.B.x &&
           this.xPos + this.width > collisionZone.A.x &&
@@ -139,7 +138,7 @@ export class Tank {
       }
     }
 
-    if (this.controls.left) {
+    if (this.controls.direction === 'Left') {
       for (let i = 0; i < this.staticObjects.length; i++) {
         const collisionZone = this.staticObjects[i].getCollisionZone();
         if (
@@ -154,7 +153,7 @@ export class Tank {
       }
     }
 
-    if (this.controls.right) {
+    if (this.controls.direction === 'Right') {
       for (let i = 0; i < this.staticObjects.length; i++) {
         const collisionZone = this.staticObjects[i].getCollisionZone();
         if (
@@ -173,7 +172,7 @@ export class Tank {
   fire() {
     if (!this.isLoading) {
       const { x, y } = this.checkPositionOfTheBarrel();
-      this.bullets.push(new Bullet(x, y, 4, 4, this.controls.lastDirection, bulletTextures, explosionTextures, this.staticObjects, this.bullets));
+      this.bullets.push(new Bullet(x, y, 4, 4, this.controls.direction, bulletTextures, explosionTextures, this.staticObjects, this.bullets));
       this.isLoading = true;
       this.isLoading &&
         setTimeout(() => {
@@ -183,16 +182,16 @@ export class Tank {
   }
 
   private checkPositionOfTheBarrel() {
-    if (this.controls.lastDirection === 'Forwards') {
+    if (this.controls.direction === 'Forwards') {
       return new Coordinates(this.xPos + this.width / 2 - 2, this.yPos - 4);
     }
-    if (this.controls.lastDirection === 'Backwards') {
+    if (this.controls.direction === 'Backwards') {
       return new Coordinates(this.xPos + this.width / 2 - 2, this.yPos + this.height);
     }
-    if (this.controls.lastDirection === 'Left') {
+    if (this.controls.direction === 'Left') {
       return new Coordinates(this.xPos - 4, this.yPos + this.height / 2 - 2);
     }
-    if (this.controls.lastDirection === 'Right') {
+    if (this.controls.direction === 'Right') {
       return new Coordinates(this.xPos + this.width, this.yPos + this.height / 2 - 2);
     }
     return new Coordinates(-20, -20);

@@ -6,26 +6,26 @@ import { Coordinates } from '../BrickWall/BrickWall';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 
 export class Bullet {
-  xPos;
-  yPos;
-  width;
-  height;
-  textures: BulletTextures;
-  explosionAnimationFrames = {
+  private xPos;
+  private yPos;
+  private width;
+  private height;
+  private textures: BulletTextures;
+  private explosionAnimationFrames = {
     animationsFrames: [] as HTMLImageElement[],
     index: 0,
     counter: 0,
     animationEnded: false,
     textureSize: 30,
   };
-  direction;
-  image: HTMLImageElement | null = null;
-  staticObjects;
-  speed;
-  collisionZone: CollisionZone;
-  hit = false;
-  bullets;
-  id;
+  private direction;
+  private image: HTMLImageElement | null = null;
+  private staticObjects;
+  private speed;
+  private collisionZone: CollisionZone;
+  private hit = false;
+  private bullets;
+  private id;
   // Todo: Add collisions with static elements
   // Todo: Add explosions after collisions
 
@@ -71,7 +71,7 @@ export class Bullet {
     }
   }
 
-  setImageForDirection() {
+  private setImageForDirection() {
     switch (this.direction) {
       case 'Forwards': {
         this.image = this.textures.upDirectionTexture;
@@ -91,7 +91,7 @@ export class Bullet {
     }
   }
 
-  update() {
+  private update() {
     switch (this.direction) {
       case 'Forwards': {
         this.yPos -= this.speed;
@@ -112,7 +112,7 @@ export class Bullet {
     }
   }
 
-  checkForCollisionWithBorders() {
+  private checkForCollisionWithBorders() {
     if (this.direction === 'Forwards') {
       if (this.yPos <= 0) {
         this.speed = 0;
@@ -212,7 +212,6 @@ export class Bullet {
     if (this.direction === 'Forwards') {
       for (let i = 0; i < this.staticObjects.length; i++) {
         const collisionZone = this.staticObjects[i].getCollisionZone();
-        console.log(this.staticObjects.length);
         if (
           this.xPos < collisionZone.B.x &&
           this.xPos + this.width > collisionZone.A.x &&
@@ -229,7 +228,6 @@ export class Bullet {
     if (this.direction === 'Backwards') {
       for (let i = 0; i < this.staticObjects.length; i++) {
         const collisionZone = this.staticObjects[i].getCollisionZone();
-        console.log(this.staticObjects.length);
         if (
           this.xPos < collisionZone.B.x &&
           this.xPos + this.width > collisionZone.A.x &&
