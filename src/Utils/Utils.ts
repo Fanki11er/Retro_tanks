@@ -13,8 +13,7 @@ export class Utils {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
         if (xPos < collisionZone.B.x && xPos + width > collisionZone.A.x && yPos - 0.2 > collisionZone.A.y && yPos - 0.2 < collisionZone.D.y) {
-          //todo Check if object is hittable
-          return true;
+          return staticObjects[i].id;
         }
       }
     }
@@ -28,7 +27,7 @@ export class Utils {
           yPos + height + 0.2 > collisionZone.A.y &&
           yPos + height + 0.2 < collisionZone.D.y
         ) {
-          return true;
+          return staticObjects[i].id;
         }
       }
     }
@@ -37,7 +36,7 @@ export class Utils {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
         if (yPos < collisionZone.D.y && yPos + height > collisionZone.A.y && xPos - 0.2 < collisionZone.D.x && xPos - 0.2 > collisionZone.A.x) {
-          return true;
+          return staticObjects[i].id;
         }
       }
     }
@@ -51,11 +50,11 @@ export class Utils {
           xPos + width + 0.2 > collisionZone.A.x &&
           xPos + width + 0.2 < collisionZone.B.x
         ) {
-          return true;
+          return staticObjects[i].id;
         }
       }
     }
-    return false;
+    return '';
   }
 
   static checkForCollisionWithBorders(
@@ -69,25 +68,25 @@ export class Utils {
   ) {
     if (direction === 'Forwards') {
       if (yPos <= 0) {
-        return true;
+        return 'border';
       }
     }
     if (direction === 'Backwards') {
       if (yPos + height >= boardHeight) {
-        return true;
+        return 'border';
       }
     }
     if (direction === 'Left') {
       if (xPos <= 0) {
-        return true;
+        return 'border';
       }
     }
     if (direction === 'Right') {
       if (xPos + width >= boardWidth) {
-        return true;
+        return 'border';
       }
     }
-    return false;
+    return '';
   }
 }
 

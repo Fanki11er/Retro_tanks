@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import { BulletTextures } from '../../Textures/BulletTextures/BulletTextures';
 import { ExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
-import { /*CollisionZone,*/ Direction, StaticDrawable } from '../../Types/Types';
+import { AmmunitionType, Direction, StaticDrawable } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
 import { Coordinates } from '../BrickWall/BrickWall';
 import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
-//import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
+import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
 
 export class Bullet {
   private xPos;
@@ -18,10 +18,11 @@ export class Bullet {
   private image: HTMLImageElement | null = null;
   private staticObjects;
   private speed;
-  // private collisionZone: CollisionZone;
   private hit = false;
   private bullets;
   private id;
+  private ammunitionType;
+  private collisionWith = '';
 
   constructor(
     xPos: number,
@@ -33,6 +34,7 @@ export class Bullet {
     explosionTextures: ExplosionTextures,
     staticObjects: StaticDrawable[],
     bullets: Bullet[],
+    ammunitionType: AmmunitionType = 'Standard',
   ) {
     this.xPos = xPos;
     this.yPos = yPos;
@@ -45,29 +47,42 @@ export class Bullet {
     this.bullets = bullets;
     this.explosionAnimationFrames = new ExplosionAnimationFrames(30);
     this.speed = 0.5;
-    // this.collisionZone = new ElementCollisionZone({ x: xPos, y: yPos }, 4, 4).getCollisionZone();
     this.createExplosionAnimationFrames(explosionTextures);
+    this.ammunitionType = ammunitionType;
     this.id = uuidv4();
   }
 
   public draw(context: CanvasRenderingContext2D) {
-    // todo Make collision zone here and use it instead width height and all this staff
     !this.hit && this.update();
     if (!this.hit) {
-      this.hit = Utils.checkForCollisionWithBorders(this.direction, this.xPos, this.yPos, this.width, this.height, 312, 312);
+      this.hit = !!Utils.checkForCollisionWithBorders(this.direction, this.xPos, this.yPos, this.width, this.height, 312, 312);
     }
     if (!this.hit) {
-      this.hit = Utils.checkForCollisionWithObjects(this.direction, this.xPos, this.yPos, this.width, this.height, this.staticObjects);
+      this.collisionWith = Utils.checkForCollisionWithObjects(this.direction, this.xPos, this.yPos, this.width, this.height, this.staticObjects);
     }
     !this.hit && this.image && context.drawImage(this.image, this.xPos, this.yPos);
 
+    if (this.collisionWith && !this.hit) {
+      const collisionElementIndex = this.findHitElement(this.collisionWith);
+      if (collisionElementIndex >= 0) {
+        if (this.direction === 'Left' || this.direction === 'Right') {
+          this.hit = this.staticObjects[collisionElementIndex].processHit(
+            this.ammunitionType,
+            new BulletHitZone({ x: this.xPos, y: this.yPos }, 4, 4, 0, 10).getCollisionZone(),
+          );
+        } else {
+          this.hit = this.staticObjects[collisionElementIndex].processHit(
+            this.ammunitionType,
+            new BulletHitZone({ x: this.xPos, y: this.yPos }, 4, 4, 10, 0).getCollisionZone(),
+          );
+        }
+      }
+    }
+
     if (this.hit) {
-      // todo Get index of element, find it and check if its hitable
       this.animateExplosion(20, context);
       if (this.explosionAnimationFrames.animationEnded) {
-        console.log(this.bullets.length, 'Before');
         this.removeDestroyedBullet();
-        console.log(this.bullets.length, 'After');
       }
     }
   }
@@ -93,7 +108,6 @@ export class Bullet {
   }
 
   private update() {
-    console.log('Update');
     switch (this.direction) {
       case 'Forwards': {
         this.yPos -= this.speed;
@@ -179,69 +193,10 @@ export class Bullet {
     }
   }
 
-  private checkForCollisionWithObjects() {
-    if (this.direction === 'Forwards') {
-      for (let i = 0; i < this.staticObjects.length; i++) {
-        const collisionZone = this.staticObjects[i].getCollisionZone();
-        if (
-          this.xPos < collisionZone.B.x &&
-          this.xPos + this.width > collisionZone.A.x &&
-          this.yPos - 0.2 > collisionZone.A.y &&
-          this.yPos - 0.2 < collisionZone.D.y
-        ) {
-          this.speed = 0;
-          this.hit = true;
-          return;
-        }
-      }
-    }
-
-    if (this.direction === 'Backwards') {
-      for (let i = 0; i < this.staticObjects.length; i++) {
-        const collisionZone = this.staticObjects[i].getCollisionZone();
-        if (
-          this.xPos < collisionZone.B.x &&
-          this.xPos + this.width > collisionZone.A.x &&
-          this.yPos + this.height + 0.2 > collisionZone.A.y &&
-          this.yPos + this.height + 0.2 < collisionZone.D.y
-        ) {
-          this.speed = 0;
-          this.hit = true;
-          return;
-        }
-      }
-    }
-
-    if (this.direction === 'Left') {
-      for (let i = 0; i < this.staticObjects.length; i++) {
-        const collisionZone = this.staticObjects[i].getCollisionZone();
-        if (
-          this.yPos < collisionZone.D.y &&
-          this.yPos + this.height > collisionZone.A.y &&
-          this.xPos - 0.2 < collisionZone.D.x &&
-          this.xPos - 0.2 > collisionZone.A.x
-        ) {
-          this.speed = 0;
-          this.hit = true;
-          return;
-        }
-      }
-    }
-    if (this.direction === 'Right') {
-      for (let i = 0; i < this.staticObjects.length; i++) {
-        const collisionZone = this.staticObjects[i].getCollisionZone();
-        if (
-          this.yPos < collisionZone.D.y &&
-          this.yPos + this.height > collisionZone.A.y &&
-          this.xPos + this.width + 0.2 > collisionZone.A.x &&
-          this.xPos + this.width + 0.2 < collisionZone.B.x
-        ) {
-          this.speed = 0;
-          this.hit = true;
-          return;
-        }
-      }
-    }
+  private findHitElement(id: string) {
+    return this.staticObjects.findIndex((element) => {
+      return element.id === id;
+    });
   }
 }
 

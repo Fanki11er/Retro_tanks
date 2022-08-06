@@ -14,5 +14,11 @@ export type CollisionZone = {
 export interface StaticDrawable {
   draw: (ctx: CanvasRenderingContext2D) => void;
   getCollisionZone: () => CollisionZone;
+  id: string;
+  changed: boolean;
+  processHit: (ammunitionType: AmmunitionType, collisionZone: CollisionZone) => boolean;
 }
+
+export type AmmunitionType = 'Standard' | 'Heavy';
+export type WallCoordinates = Coordinates | null;
 

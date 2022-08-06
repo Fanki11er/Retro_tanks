@@ -16,7 +16,7 @@ export class Tank {
   private speed = 0.15;
   textures: TankTextures;
   image;
-  isBlocked;
+  isBlockedBy;
   staticObjects;
   bullets;
   private isLoading;
@@ -29,7 +29,7 @@ export class Tank {
     this.controls = new Controls();
     this.textures = textures;
     this.image = textures.topDirectionTexture;
-    this.isBlocked = false;
+    this.isBlockedBy = '';
     this.staticObjects = staticObjects;
     this.bullets = bullets;
     this.isLoading = false;
@@ -40,17 +40,24 @@ export class Tank {
   }
 
   public update() {
-    this.isBlocked = false;
-    this.isBlocked = Utils.checkForCollisionWithBorders(this.controls.direction, this.xPos, this.yPos, this.width, this.height, 312, 312);
+    this.isBlockedBy = '';
+    this.isBlockedBy = Utils.checkForCollisionWithBorders(this.controls.direction, this.xPos, this.yPos, this.width, this.height, 312, 312);
 
-    if (!this.isBlocked) {
-      this.isBlocked = Utils.checkForCollisionWithObjects(this.controls.direction, this.xPos, this.yPos, this.width, this.height, this.staticObjects);
+    if (!this.isBlockedBy) {
+      this.isBlockedBy = Utils.checkForCollisionWithObjects(
+        this.controls.direction,
+        this.xPos,
+        this.yPos,
+        this.width,
+        this.height,
+        this.staticObjects,
+      );
     }
 
     if (this.controls.direction === 'Forwards') {
       this.setImage(this.textures.topDirectionTexture);
 
-      if (!this.isBlocked && this.controls.move) {
+      if (!this.isBlockedBy && this.controls.move) {
         this.yPos -= this.speed;
       }
       return;
@@ -58,7 +65,7 @@ export class Tank {
     if (this.controls.direction === 'Backwards') {
       this.setImage(this.textures.downDirectionTexture);
 
-      if (!this.isBlocked && this.controls.move) {
+      if (!this.isBlockedBy && this.controls.move) {
         this.yPos += this.speed;
       }
       return;
@@ -66,7 +73,7 @@ export class Tank {
     if (this.controls.direction === 'Left') {
       this.setImage(this.textures.leftDirectionTexture);
 
-      if (!this.isBlocked && this.controls.move) {
+      if (!this.isBlockedBy && this.controls.move) {
         this.xPos -= this.speed;
       }
       return;
@@ -74,7 +81,7 @@ export class Tank {
     if (this.controls.direction === 'Right') {
       this.setImage(this.textures.rightDirectionTexture);
 
-      if (!this.isBlocked && this.controls.move) {
+      if (!this.isBlockedBy && this.controls.move) {
         this.xPos += this.speed;
       }
       return;
