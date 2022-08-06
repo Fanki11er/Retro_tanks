@@ -14,6 +14,7 @@ const DirectionControlPanel = () => {
             handleChangeDirection('Forwards');
           }}
           onPointerUp={() => handleChangeDirection('None')}
+          onPointerLeave={() => handleChangeDirection('None')}
         >
           <ArrowUp />
         </StyledControlButton>
@@ -24,6 +25,7 @@ const DirectionControlPanel = () => {
             handleChangeDirection('Left');
           }}
           onPointerUp={() => handleChangeDirection('None')}
+          onPointerLeave={() => handleChangeDirection('None')}
         >
           <ArrowLeft />
         </StyledControlButton>
@@ -32,6 +34,7 @@ const DirectionControlPanel = () => {
             handleChangeDirection('Right');
           }}
           onPointerUp={() => handleChangeDirection('None')}
+          onPointerLeave={() => handleChangeDirection('None')}
         >
           <ArrowRight />
         </StyledControlButton>
@@ -42,6 +45,7 @@ const DirectionControlPanel = () => {
             handleChangeDirection('Backwards');
           }}
           onPointerUp={() => handleChangeDirection('None')}
+          onPointerLeave={() => handleChangeDirection('None')}
         >
           <ArrowDown />
         </StyledControlButton>
