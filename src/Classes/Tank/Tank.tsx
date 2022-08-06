@@ -2,6 +2,7 @@ import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
 import { explosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
 import { TankTextures } from '../../Textures/TanksTextures/TanksTextures';
 import { StaticDrawable } from '../../Types/Types';
+import { Utils } from '../../Utils/Utils';
 import { Coordinates } from '../BrickWall/BrickWall';
 import { Bullet } from '../Bullet/Bullet';
 import { Controls } from '../Controls/Controls';
@@ -41,33 +42,38 @@ export class Tank {
   public update() {
     this.isBlocked = false;
     this.checkForCollisionWithBorders();
-    this.checkForCollisionWithObjects();
+    if (!this.isBlocked) {
+      this.isBlocked = Utils.checkForCollisionWithObjects(this.controls.direction, this.xPos, this.yPos, this.width, this.height, this.staticObjects);
+    }
+    if (this.isBlocked) {
+      return;
+    }
 
     if (this.controls.direction === 'Forwards') {
       this.setImage(this.textures.topDirectionTexture);
 
-      if (!this.isBlocked && this.controls.move) {
+      if (this.controls.move) {
         this.yPos -= this.speed;
       }
     }
     if (this.controls.direction === 'Backwards') {
       this.setImage(this.textures.downDirectionTexture);
 
-      if (!this.isBlocked && this.controls.move) {
+      if (this.controls.move) {
         this.yPos += this.speed;
       }
     }
     if (this.controls.direction === 'Left') {
       this.setImage(this.textures.leftDirectionTexture);
 
-      if (!this.isBlocked && this.controls.move) {
+      if (this.controls.move) {
         this.xPos -= this.speed;
       }
     }
     if (this.controls.direction === 'Right') {
       this.setImage(this.textures.rightDirectionTexture);
 
-      if (!this.isBlocked && this.controls.move) {
+      if (this.controls.move) {
         this.xPos += this.speed;
       }
     }
