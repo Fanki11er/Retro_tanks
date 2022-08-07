@@ -120,9 +120,9 @@ export class BrickWall implements StaticDrawable {
       if (
         this.coordinates[i] &&
         this.coordinates[i]!.x < collisionZone.B.x &&
-        this.coordinates[i]!.x + 6 > collisionZone.A.x &&
+        this.coordinates[i]!.x + 4 > collisionZone.A.x &&
         this.coordinates[i]!.y < collisionZone.C.y &&
-        this.coordinates[i]!.y + 6 > collisionZone.A.y
+        this.coordinates[i]!.y + 4 > collisionZone.A.y
       ) {
         this.coordinates[i] = null;
         hits = true;

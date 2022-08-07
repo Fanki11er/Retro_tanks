@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { BulletTextures } from '../../Textures/BulletTextures/BulletTextures';
 import { ExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
-import { AmmunitionType, Direction, StaticDrawable } from '../../Types/Types';
+import { AmmunitionType, CollisionZone, Direction, StaticDrawable } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
 import { Coordinates } from '../BrickWall/BrickWall';
 import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
@@ -63,18 +63,17 @@ export class Bullet {
     !this.hit && this.image && context.drawImage(this.image, this.xPos, this.yPos);
 
     if (this.collisionWith && !this.hit) {
-      const collisionElementIndex = this.findHitElement(this.collisionWith);
-      if (collisionElementIndex >= 0) {
-        if (this.direction === 'Left' || this.direction === 'Right') {
-          this.hit = this.staticObjects[collisionElementIndex].processHit(
-            this.ammunitionType,
-            new BulletHitZone({ x: this.xPos, y: this.yPos }, 4, 4, 0, 10).getCollisionZone(),
-          );
-        } else {
-          this.hit = this.staticObjects[collisionElementIndex].processHit(
-            this.ammunitionType,
-            new BulletHitZone({ x: this.xPos, y: this.yPos }, 4, 4, 10, 0).getCollisionZone(),
-          );
+      // todo Figure how destroy exactly in the center
+      const bulletHitZone =
+        this.direction === 'Left' || this.direction === 'Right'
+          ? new BulletHitZone({ x: this.xPos, y: this.yPos }, 4, 4, 0, 18).getCollisionZone()
+          : new BulletHitZone({ x: this.xPos, y: this.yPos }, 4, 4, 20, 0).getCollisionZone();
+      const elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
+
+      for (let i = 0; i < elementsInExplosionRange.length; i++) {
+        const collisionElementIndex = this.findHitElement(elementsInExplosionRange[i].id);
+        if (collisionElementIndex >= 0) {
+          this.hit = this.staticObjects[collisionElementIndex].processHit(this.ammunitionType, bulletHitZone);
         }
       }
     }
@@ -198,5 +197,89 @@ export class Bullet {
       return element.id === id;
     });
   }
+
+  checkForExplosionRange(bulletHitZone: CollisionZone) {
+    const collisions = [];
+    if (this.direction === 'Forwards') {
+      for (let i = 0; i < this.staticObjects.length; i++) {
+        const collisionZone = this.staticObjects[i].getCollisionZone();
+        if (
+          bulletHitZone.A.x < collisionZone.B.x &&
+          bulletHitZone.B.x > collisionZone.A.x &&
+          bulletHitZone.A.y > collisionZone.A.y &&
+          bulletHitZone.A.y < collisionZone.D.y
+        ) {
+          collisions.push(this.staticObjects[i]);
+        }
+      }
+
+      return collisions;
+    }
+
+    if (this.direction === 'Backwards') {
+      for (let i = 0; i < this.staticObjects.length; i++) {
+        const collisionZone = this.staticObjects[i].getCollisionZone();
+        if (
+          bulletHitZone.A.x < collisionZone.B.x &&
+          bulletHitZone.B.x > collisionZone.A.x &&
+          bulletHitZone.C.y > collisionZone.A.y &&
+          bulletHitZone.C.y < collisionZone.D.y
+        ) {
+          collisions.push(this.staticObjects[i]);
+        }
+      }
+      return collisions;
+    }
+
+    if (this.direction === 'Left') {
+      for (let i = 0; i < this.staticObjects.length; i++) {
+        const collisionZone = this.staticObjects[i].getCollisionZone();
+        if (
+          bulletHitZone.A.y < collisionZone.D.y &&
+          bulletHitZone.C.y > collisionZone.A.y &&
+          bulletHitZone.A.x < collisionZone.D.x &&
+          bulletHitZone.A.x > collisionZone.A.x
+        ) {
+          collisions.push(this.staticObjects[i]);
+        }
+      }
+      return collisions;
+    }
+
+    if (this.direction === 'Right') {
+      for (let i = 0; i < this.staticObjects.length; i++) {
+        const collisionZone = this.staticObjects[i].getCollisionZone();
+        if (
+          bulletHitZone.A.y < collisionZone.D.y &&
+          bulletHitZone.C.y > collisionZone.A.y &&
+          bulletHitZone.B.x > collisionZone.A.x &&
+          bulletHitZone.B.x < collisionZone.B.x
+        ) {
+          collisions.push(this.staticObjects[i]);
+        }
+      }
+      return collisions;
+    }
+    return [];
+  }
 }
+
+/*
+if (this.collisionWith && !this.hit) {
+      const collisionElementIndex = this.findHitElement(this.collisionWith);
+      if (collisionElementIndex >= 0) {
+        if (this.direction === 'Left' || this.direction === 'Right') {
+          this.hit = this.staticObjects[collisionElementIndex].processHit(
+            this.ammunitionType,
+            new BulletHitZone({ x: this.xPos, y: this.yPos }, 4, 4, 0, 10).getCollisionZone(),
+          );
+        } else {
+          this.hit = this.staticObjects[collisionElementIndex].processHit(
+            this.ammunitionType,
+            new BulletHitZone({ x: this.xPos, y: this.yPos }, 4, 4, 10, 0).getCollisionZone(),
+          );
+        }
+      }
+    }
+*/
 

@@ -9,9 +9,9 @@ export class BulletHitZone {
 
   constructor(startCoordinates: Coordinates, width: number, height: number, resizeWidth: number, resizeHeight: number) {
     this.A = new Coordinates(startCoordinates.x - resizeWidth / 2, startCoordinates.y - resizeHeight / 2);
-    this.B = new Coordinates(this.A.x + width + resizeWidth, this.A.y);
-    this.C = new Coordinates(this.A.x, this.A.y + height + resizeHeight);
-    this.D = new Coordinates(this.A.x + width + resizeWidth, this.A.y + height + resizeHeight);
+    this.B = new Coordinates(this.A.x + width / 2 + resizeWidth, this.A.y);
+    this.C = new Coordinates(this.A.x, this.A.y + height / 2 + resizeHeight);
+    this.D = new Coordinates(this.A.x + width / 2 + resizeWidth, this.A.y + height / 2 + resizeHeight);
   }
 
   getCollisionZone() {
