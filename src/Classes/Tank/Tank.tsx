@@ -36,7 +36,7 @@ export class Tank {
   }
 
   public draw(context: CanvasRenderingContext2D) {
-    context.drawImage(this.image, this.xPos, this.yPos);
+    context.drawImage(this.image, this.xPos, this.yPos, 22, 22);
   }
 
   public update() {
@@ -108,16 +108,16 @@ export class Tank {
 
   private checkPositionOfTheBarrel() {
     if (this.controls.direction === 'Forwards') {
-      return new Coordinates(this.xPos + this.width / 2 - 2, this.yPos - 4);
+      return new Coordinates(this.xPos + this.width / 2 - 1, this.yPos);
     }
     if (this.controls.direction === 'Backwards') {
-      return new Coordinates(this.xPos + this.width / 2 - 2, this.yPos + this.height);
+      return new Coordinates(this.xPos + this.width / 2 - 4, this.yPos + this.height - 4);
     }
     if (this.controls.direction === 'Left') {
-      return new Coordinates(this.xPos - 4, this.yPos + this.height / 2 - 2);
+      return new Coordinates(this.xPos, this.yPos + this.height / 2 - 1);
     }
     if (this.controls.direction === 'Right') {
-      return new Coordinates(this.xPos + this.width, this.yPos + this.height / 2 - 2);
+      return new Coordinates(this.xPos + this.width - 4, this.yPos + this.height / 2 - 4);
     }
     return new Coordinates(-20, -20);
   }

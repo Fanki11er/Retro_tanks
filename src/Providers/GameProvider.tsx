@@ -16,7 +16,7 @@ export const GameContext = createContext({
 
 const GameProvider = (props: PropsWithChildren<any>) => {
   const [bulletObjects, setBulletsObjects] = useState<Bullet[]>([]);
-  const [playerTank, setPlayerTank] = useState<Tank>(new Tank(156, 156, 24, 24, userSmallTankTextures, Level1.staticObjects, bulletObjects));
+  const [playerTank, setPlayerTank] = useState<Tank>(new Tank(200, 156, 22, 22, userSmallTankTextures, Level1.staticObjects, bulletObjects));
   const [staticElements, setStaticElements] = useState(new StaticElementsCanvas(312, 312, Level1.staticObjects));
 
   const handleChangeDirection = (direction: Direction) => {

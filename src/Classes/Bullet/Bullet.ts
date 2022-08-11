@@ -6,6 +6,7 @@ import { Utils } from '../../Utils/Utils';
 import { Coordinates } from '../BrickWall/BrickWall';
 import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
 import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
+import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 
 export class Bullet {
   private xPos;
@@ -63,19 +64,31 @@ export class Bullet {
     !this.hit && this.image && context.drawImage(this.image, this.xPos, this.yPos);
 
     if (this.collisionWith && !this.hit) {
-      // todo Figure how destroy exactly in the center
-      const bulletHitZone =
-        this.direction === 'Left' || this.direction === 'Right'
-          ? new BulletHitZone({ x: this.xPos, y: this.yPos }, 4, 4, 0, 18).getCollisionZone()
-          : new BulletHitZone({ x: this.xPos, y: this.yPos }, 4, 4, 20, 0).getCollisionZone();
-      const elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
+      let hitCoordinates;
+      const hitElementIndex = this.findHitElementIndex(this.collisionWith);
+      if (hitElementIndex < 0) {
+        return;
+      }
+      hitCoordinates = this.staticObjects[hitElementIndex].getPrecisionHitPlace(
+        new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
+        this.direction,
+      );
 
-      for (let i = 0; i < elementsInExplosionRange.length; i++) {
-        const collisionElementIndex = this.findHitElement(elementsInExplosionRange[i].id);
-        if (collisionElementIndex >= 0) {
-          this.hit = this.staticObjects[collisionElementIndex].processHit(this.ammunitionType, bulletHitZone);
+      if (hitCoordinates) {
+        const bulletHitZone =
+          this.direction === 'Left' || this.direction === 'Right'
+            ? new BulletHitZone(hitCoordinates, 4, 4, 10, 22).getCollisionZone()
+            : new BulletHitZone(hitCoordinates, 4, 4, 22, 10).getCollisionZone();
+        const elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
+        for (let i = 0; i < elementsInExplosionRange.length; i++) {
+          const collisionElementIndex = this.findHitElementIndex(elementsInExplosionRange[i].id);
+          if (collisionElementIndex >= 0) {
+            this.hit = this.staticObjects[collisionElementIndex].processHit(this.ammunitionType, bulletHitZone, this.yPos);
+          }
         }
       }
+
+      // todo Figure how destroy exactly in the center
     }
 
     if (this.hit) {
@@ -192,7 +205,7 @@ export class Bullet {
     }
   }
 
-  private findHitElement(id: string) {
+  private findHitElementIndex(id: string) {
     return this.staticObjects.findIndex((element) => {
       return element.id === id;
     });
@@ -204,10 +217,10 @@ export class Bullet {
       for (let i = 0; i < this.staticObjects.length; i++) {
         const collisionZone = this.staticObjects[i].getCollisionZone();
         if (
-          bulletHitZone.A.x < collisionZone.B.x &&
-          bulletHitZone.B.x > collisionZone.A.x &&
-          bulletHitZone.A.y > collisionZone.A.y &&
-          bulletHitZone.A.y < collisionZone.D.y
+          bulletHitZone.A.x <= collisionZone.B.x &&
+          bulletHitZone.B.x >= collisionZone.A.x &&
+          bulletHitZone.A.y >= collisionZone.A.y &&
+          bulletHitZone.A.y <= collisionZone.D.y
         ) {
           collisions.push(this.staticObjects[i]);
         }
@@ -220,10 +233,10 @@ export class Bullet {
       for (let i = 0; i < this.staticObjects.length; i++) {
         const collisionZone = this.staticObjects[i].getCollisionZone();
         if (
-          bulletHitZone.A.x < collisionZone.B.x &&
-          bulletHitZone.B.x > collisionZone.A.x &&
-          bulletHitZone.C.y > collisionZone.A.y &&
-          bulletHitZone.C.y < collisionZone.D.y
+          bulletHitZone.A.x <= collisionZone.B.x &&
+          bulletHitZone.B.x >= collisionZone.A.x &&
+          bulletHitZone.C.y >= collisionZone.A.y &&
+          bulletHitZone.C.y <= collisionZone.D.y
         ) {
           collisions.push(this.staticObjects[i]);
         }
@@ -235,10 +248,10 @@ export class Bullet {
       for (let i = 0; i < this.staticObjects.length; i++) {
         const collisionZone = this.staticObjects[i].getCollisionZone();
         if (
-          bulletHitZone.A.y < collisionZone.D.y &&
-          bulletHitZone.C.y > collisionZone.A.y &&
-          bulletHitZone.A.x < collisionZone.D.x &&
-          bulletHitZone.A.x > collisionZone.A.x
+          bulletHitZone.A.y <= collisionZone.D.y &&
+          bulletHitZone.C.y >= collisionZone.A.y &&
+          bulletHitZone.A.x <= collisionZone.D.x &&
+          bulletHitZone.A.x >= collisionZone.A.x
         ) {
           collisions.push(this.staticObjects[i]);
         }
@@ -250,10 +263,10 @@ export class Bullet {
       for (let i = 0; i < this.staticObjects.length; i++) {
         const collisionZone = this.staticObjects[i].getCollisionZone();
         if (
-          bulletHitZone.A.y < collisionZone.D.y &&
-          bulletHitZone.C.y > collisionZone.A.y &&
-          bulletHitZone.B.x > collisionZone.A.x &&
-          bulletHitZone.B.x < collisionZone.B.x
+          bulletHitZone.A.y <= collisionZone.D.y &&
+          bulletHitZone.C.y >= collisionZone.A.y &&
+          bulletHitZone.B.x >= collisionZone.A.x &&
+          bulletHitZone.B.x <= collisionZone.B.x
         ) {
           collisions.push(this.staticObjects[i]);
         }

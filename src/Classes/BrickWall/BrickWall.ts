@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { BrickTextures } from '../../Textures/BrickWall/BrickWallTexture';
-import { AmmunitionType, BoardElementType, CollisionZone, StaticDrawable, WallCoordinates } from '../../Types/Types';
+import { BrickTextures, brickWallRecipe } from '../../Textures/BrickWall/BrickWallTexture';
+import { AmmunitionType, BoardElementType, CollisionZone, Direction, StaticDrawable, WallCoordinates } from '../../Types/Types';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 
 export class Coordinates {
@@ -35,51 +35,52 @@ export class BrickWall implements StaticDrawable {
     this.type = type;
     this.coordinates = [];
     this.collisionZone = new ElementCollisionZone({ x: xPos, y: yPos }, this.width, this.height);
-    this.createArray(type);
+    this.createArray(type, 8, 8, 3);
   }
 
   public draw(ctx: CanvasRenderingContext2D) {
-    let even = false;
+    let row = 1;
+    let column = 1;
+    const parts = this.getParts();
     for (let i = 0; i < this.coordinates.length; i++) {
-      if (i % this.getParts() === 0) {
-        even = !even;
-      }
-
-      if (even) {
-        this.coordinates[i] &&
-          ctx.drawImage(
-            i % 2 !== 0 ? this.textures.brickLeftPartTexture : this.textures.brickRightPartTexture,
-            this.coordinates[i]!.x,
-            this.coordinates[i]!.y,
-          );
+      if (this.coordinates[i]) {
+        ctx.drawImage(this.getRowFromRecipe(row, column - 1), this.coordinates[i]!.x, this.coordinates[i]!.y);
+        column++;
+        if (column % (parts + 1) === 0) {
+          column = 1;
+        }
+        if ((i + 1) % parts === 0) {
+          row++;
+        }
       } else {
-        this.coordinates[i] &&
-          ctx.drawImage(
-            i % 2 !== 0 ? this.textures.brickRightPartTexture : this.textures.brickLeftPartTexture,
-            this.coordinates[i]!.x,
-            this.coordinates[i]!.y,
-          );
+        column++;
+        if (column % (parts + 1) === 0) {
+          column = 1;
+        }
+        if ((i + 1) % parts === 0) {
+          row++;
+        }
       }
     }
   }
 
-  private createArray(type: BoardElementType) {
+  private createArray(type: BoardElementType, rows: number, columns: number, textureSize: number) {
     switch (type) {
       case 'Full': {
-        for (let i = 0; i < 4; i++) {
-          for (let j = 0; j < 4; j++) {
-            const x = this.xPos + j * 6;
-            const y = this.yPos + i * 6;
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < columns; j++) {
+            const x = this.xPos + j * textureSize;
+            const y = this.yPos + i * textureSize;
             this.coordinates.push(new Coordinates(x, y));
           }
         }
         break;
       }
       case 'Vertically': {
-        for (let i = 0; i < 4; i++) {
-          for (let j = 0; j < 2; j++) {
-            const x = this.xPos + j * 6;
-            const y = this.yPos + i * 6;
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < columns / 2; j++) {
+            const x = this.xPos + j * 3;
+            const y = this.yPos + i * 3;
             this.coordinates.push(new Coordinates(x, y));
           }
         }
@@ -87,10 +88,10 @@ export class BrickWall implements StaticDrawable {
       }
 
       case 'Horizontally': {
-        for (let i = 0; i < 2; i++) {
-          for (let j = 0; j < 4; j++) {
-            const x = this.xPos + j * 6;
-            const y = this.yPos + i * 6;
+        for (let i = 0; i < rows / 2; i++) {
+          for (let j = 0; j < columns; j++) {
+            const x = this.xPos + j * 3;
+            const y = this.yPos + i * 3;
             this.coordinates.push(new Coordinates(x, y));
           }
         }
@@ -101,16 +102,18 @@ export class BrickWall implements StaticDrawable {
 
   private getParts() {
     if (this.type === 'Full' || this.type === 'Horizontally') {
-      return 4;
+      return 8;
     }
-    return 2;
+    return 4;
   }
 
   public getCollisionZone() {
     return this.collisionZone.getCollisionZone();
   }
 
-  public processHit(ammunitionType: AmmunitionType, collisionZone: CollisionZone) {
+  public processHit(ammunitionType: AmmunitionType, collisionZone: CollisionZone, yPos: number) {
+    console.log(yPos);
+    //!! Check bullet collision and then check with explosion size (because delete is to early)
     return this.deleteParts(collisionZone);
   }
 
@@ -120,20 +123,54 @@ export class BrickWall implements StaticDrawable {
       if (
         this.coordinates[i] &&
         this.coordinates[i]!.x < collisionZone.B.x &&
-        this.coordinates[i]!.x + 4 > collisionZone.A.x &&
+        this.coordinates[i]!.x + 3 > collisionZone.A.x &&
         this.coordinates[i]!.y < collisionZone.C.y &&
-        this.coordinates[i]!.y + 4 > collisionZone.A.y
+        this.coordinates[i]!.y + 3 > collisionZone.A.y
       ) {
         this.coordinates[i] = null;
         hits = true;
       }
     }
+    console.log(this.coordinates);
     if (hits) {
       this.changed = true;
       // todo Change size of collision zone after delete elements
       return true;
     }
     return false;
+  }
+
+  private getRowFromRecipe(row: number, column: number) {
+    if (row === 1 || row === 5) {
+      return brickWallRecipe[1][column];
+    }
+    if (row === 2 || row === 6) {
+      return brickWallRecipe[2][column];
+    }
+    if (row === 3 || row === 7) {
+      return brickWallRecipe[3][column];
+    }
+    if (row === 4 || row === 8) {
+      return brickWallRecipe[4][column];
+    }
+    return brickWallRecipe[1][0];
+  }
+
+  public getPrecisionHitPlace(collisionZone: CollisionZone, direction: Direction) {
+    for (let i = 0; i < this.coordinates.length; i++) {
+      if (
+        this.coordinates[i] &&
+        this.coordinates[i]!.x < collisionZone.B.x &&
+        this.coordinates[i]!.x + 3 > collisionZone.A.x &&
+        this.coordinates[i]!.y < collisionZone.C.y &&
+        this.coordinates[i]!.y + 3 > collisionZone.A.y
+      ) {
+        return direction === 'Left' || direction === 'Forwards'
+          ? { x: collisionZone.A.x, y: collisionZone.A.y }
+          : { x: collisionZone.D.x, y: collisionZone.D.y };
+      }
+    }
+    return null;
   }
 }
 
