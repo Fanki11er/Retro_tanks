@@ -54,18 +54,12 @@ export class Tank {
         this.staticObjects,
       );
       if (collisionWith.length) {
-        //const elementIndex = Utils.findHitElementIndex(collisionWith, this.staticObjects);
-        //console.log(elementIndex);
-        if (!collisionWith.length) {
-          return;
-        }
         for (let i = 0; i < collisionWith.length; i++) {
-          this.isBlockedBy = !!collisionWith[i].getPrecisionCollisionPlace(
-            new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
-            this.controls.direction,
-          );
-          if (this.isBlockedBy) {
-            //return;
+          if (!this.isBlockedBy) {
+            this.isBlockedBy = !!collisionWith[i].getPrecisionCollisionPlace(
+              new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
+              this.controls.direction,
+            );
           }
         }
       }

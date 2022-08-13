@@ -79,11 +79,23 @@ export class Bullet {
 
       if (hitCoordinates) {
         this.hit = true;
-        const bulletHitZone =
-          this.direction === 'Left' || this.direction === 'Right'
-            ? new BulletHitZone(hitCoordinates, 4, 4, 6, 22).getCollisionZone()
-            : new BulletHitZone(hitCoordinates, 4, 4, 22, 6).getCollisionZone();
-        const elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
+        let elementsInExplosionRange: StaticDrawable[] = [];
+        let bulletHitZone: CollisionZone;
+        if (this.direction === 'Forwards') {
+          bulletHitZone = new BulletHitZone(hitCoordinates, 0, 2, 22, 10).getCollisionZone();
+          elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
+        } else if (this.direction === 'Backwards') {
+          bulletHitZone = new BulletHitZone(hitCoordinates, 0, -2, 22, 10).getCollisionZone();
+          elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
+        } else if (this.direction === 'Left') {
+          bulletHitZone = new BulletHitZone(hitCoordinates, 2, 0, 10, 22).getCollisionZone();
+          elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
+        } else if (this.direction === 'Right') {
+          bulletHitZone = new BulletHitZone(hitCoordinates, -2, 0, 10, 22).getCollisionZone();
+          elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
+        } else {
+          bulletHitZone = new BulletHitZone(hitCoordinates, 0, 0, 6, 22).getCollisionZone();
+        }
 
         for (let i = 0; i < elementsInExplosionRange.length; i++) {
           const collisionElementIndex = Utils.findHitElementIndex(elementsInExplosionRange[i].id, this.staticObjects);
@@ -92,8 +104,6 @@ export class Bullet {
           }
         }
       }
-
-      // todo Figure how destroy exactly in the center
     }
     !this.hit && this.image && context.drawImage(this.image, this.xPos, this.yPos);
 
@@ -227,91 +237,5 @@ export class Bullet {
     }
     return collisions;
   }
-
-  /*checkForExplosionRange(bulletHitZone: CollisionZone) {
-    const collisions = [];
-    if (this.direction === 'Forwards') {
-      for (let i = 0; i < this.staticObjects.length; i++) {
-        const collisionZone = this.staticObjects[i].getCollisionZone();
-        if (
-          bulletHitZone.A.x <= collisionZone.B.x &&
-          bulletHitZone.B.x >= collisionZone.A.x &&
-          bulletHitZone.A.y >= collisionZone.A.y &&
-          bulletHitZone.A.y <= collisionZone.D.y
-        ) {
-          collisions.push(this.staticObjects[i]);
-        }
-      }
-
-      return collisions;
-    }
-
-    if (this.direction === 'Backwards') {
-      for (let i = 0; i < this.staticObjects.length; i++) {
-        const collisionZone = this.staticObjects[i].getCollisionZone();
-        if (
-          bulletHitZone.A.x <= collisionZone.B.x &&
-          bulletHitZone.B.x >= collisionZone.A.x &&
-          bulletHitZone.C.y >= collisionZone.A.y &&
-          bulletHitZone.C.y <= collisionZone.D.y
-        ) {
-          collisions.push(this.staticObjects[i]);
-        }
-      }
-      return collisions;
-    }
-
-    if (this.direction === 'Left') {
-      for (let i = 0; i < this.staticObjects.length; i++) {
-        const collisionZone = this.staticObjects[i].getCollisionZone();
-         console.log(bulletHitZone, 'BulletHitZone');
-        console.log(collisionZone, 'CollisionZone');
-        if (
-          bulletHitZone.A.y <= collisionZone.D.y &&
-          bulletHitZone.C.y >= collisionZone.A.y &&
-          bulletHitZone.A.x <= collisionZone.D.x &&
-          bulletHitZone.A.x >= collisionZone.A.x
-        ) {
-          collisions.push(this.staticObjects[i]);
-        }
-      }
-      return collisions;
-    }
-
-    if (this.direction === 'Right') {
-      for (let i = 0; i < this.staticObjects.length; i++) {
-        const collisionZone = this.staticObjects[i].getCollisionZone();
-        if (
-          bulletHitZone.A.y <= collisionZone.D.y &&
-          bulletHitZone.C.y >= collisionZone.A.y &&
-          bulletHitZone.B.x >= collisionZone.A.x &&
-          bulletHitZone.B.x <= collisionZone.B.x
-        ) {
-          collisions.push(this.staticObjects[i]);
-        }
-      }
-      return collisions;
-    }
-    return [];
-  }*/
 }
-
-/*
-if (this.collisionWith && !this.hit) {
-      const collisionElementIndex = this.findHitElement(this.collisionWith);
-      if (collisionElementIndex >= 0) {
-        if (this.direction === 'Left' || this.direction === 'Right') {
-          this.hit = this.staticObjects[collisionElementIndex].processHit(
-            this.ammunitionType,
-            new BulletHitZone({ x: this.xPos, y: this.yPos }, 4, 4, 0, 10).getCollisionZone(),
-          );
-        } else {
-          this.hit = this.staticObjects[collisionElementIndex].processHit(
-            this.ammunitionType,
-            new BulletHitZone({ x: this.xPos, y: this.yPos }, 4, 4, 10, 0).getCollisionZone(),
-          );
-        }
-      }
-    }
-*/
 

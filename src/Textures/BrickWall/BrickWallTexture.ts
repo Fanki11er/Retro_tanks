@@ -1,6 +1,3 @@
-//import brickLeftPartImage from '../../assets/images/Brick_left_part.png';
-//import brickRightPartImage from '../../assets/images/Brick_right_part.png';
-
 import brickLeftTopPartImage from '../../assets/images/Bricks/Brick_left_top.png';
 import brickLeftBottomPartImage from '../../assets/images/Bricks/Brick_left_bottom.png';
 import brickMiddleTopPartImage from '../../assets/images/Bricks/Brick_middle_top.png';
@@ -9,7 +6,7 @@ import brickRightTopPartImage from '../../assets/images/Bricks/Brick_right_top.p
 import brickRightBottomPartImage from '../../assets/images/Bricks/Brick_right_bottom.png';
 import { BrickWallRecipe } from '../../Types/Types';
 
-export class BrickTextures {
+class BrickTextures {
   brickLeftTopPartTexture: HTMLImageElement;
   brickLeftBottomPartTexture: HTMLImageElement;
   brickMiddleTopPartTexture: HTMLImageElement;
@@ -40,7 +37,7 @@ export class BrickTextures {
   }
 }
 
-export const brickTextures = new BrickTextures(
+const brickTextures = new BrickTextures(
   brickLeftTopPartImage,
   brickLeftBottomPartImage,
   brickMiddleTopPartImage,
@@ -92,20 +89,4 @@ export const brickWallRecipe = {
     brickTextures.brickRightBottomPartTexture,
   ],
 } as BrickWallRecipe;
-
-/*
-export class BrickTextures {
-  brickLeftPartTexture: HTMLImageElement;
-  brickRightPartTexture: HTMLImageElement;
-
-  constructor(brickLeftPartImageSrc: string, brickRightPartImageSrc: string) {
-    this.brickLeftPartTexture = new Image();
-    this.brickLeftPartTexture.src = brickLeftPartImageSrc;
-    this.brickRightPartTexture = new Image();
-    this.brickRightPartTexture.src = brickRightPartImageSrc;
-  }
-}
-
-export const brickTextures = new BrickTextures(brickLeftPartImage, brickRightPartImage);
-*/
 

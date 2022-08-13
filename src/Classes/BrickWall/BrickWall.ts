@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { BrickTextures, brickWallRecipe } from '../../Textures/BrickWall/BrickWallTexture';
-import { AmmunitionType, BoardElementType, CollisionZone, Direction, StaticDrawable, WallCoordinates } from '../../Types/Types';
+import { brickWallRecipe } from '../../Textures/BrickWall/BrickWallTexture';
+import { AmmunitionType, BoardElementType, BrickWallRecipe, CollisionZone, Direction, StaticDrawable, WallCoordinates } from '../../Types/Types';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 
 export class Coordinates {
@@ -22,16 +22,15 @@ export class BrickWall implements StaticDrawable {
   private type;
   private coordinates: WallCoordinates[];
   private collisionZone;
-  private damaged = false;
   public changed = false;
 
-  constructor(xPos: number, yPos: number, size: number, brickTextures: BrickTextures, type: BoardElementType) {
+  constructor(xPos: number, yPos: number, size: number, brickWallRecipe: BrickWallRecipe, type: BoardElementType) {
     this.id = uuidv4();
     this.xPos = xPos;
     this.yPos = yPos;
     this.width = type === 'Horizontally' || type === 'Full' ? size : size / 2;
     this.height = type === 'Vertically' || type === 'Full' ? size : size / 2;
-    this.textures = brickTextures;
+    this.textures = brickWallRecipe;
     this.type = type;
     this.coordinates = [];
     this.collisionZone = new ElementCollisionZone({ x: xPos, y: yPos }, this.width, this.height);
@@ -162,9 +161,19 @@ export class BrickWall implements StaticDrawable {
         this.coordinates[i]!.y <= collisionZone.C.y &&
         this.coordinates[i]!.y + 3 >= collisionZone.A.y
       ) {
-        return direction === 'Left' || direction === 'Forwards'
-          ? { x: collisionZone.A.x, y: collisionZone.A.y }
-          : { x: collisionZone.D.x, y: collisionZone.D.y };
+        if (direction === 'Forwards') {
+          return { x: collisionZone.A.x + 1, y: collisionZone.A.y };
+        }
+        if (direction === 'Backwards') {
+          return { x: collisionZone.C.x + 1, y: collisionZone.C.y };
+        }
+
+        if (direction === 'Left') {
+          return { x: collisionZone.A.x, y: collisionZone.A.y + 1 };
+        }
+        if (direction === 'Right') {
+          return { x: collisionZone.B.x, y: collisionZone.B.y + 1 };
+        }
       }
     }
     return null;
@@ -204,7 +213,7 @@ export class BrickWall implements StaticDrawable {
           this.coordinates[i]!.x <= collisionZone.B.x &&
           this.coordinates[i]!.x + 3 >= collisionZone.A.x &&
           this.coordinates[i]!.y + 0.2 < collisionZone.C.y &&
-          this.coordinates[i]!.y + 3 - 0.2 >= collisionZone.A.y
+          this.coordinates[i]!.y + 3 - 0.2 > collisionZone.A.y
         ) {
           return { x: collisionZone.A.x, y: collisionZone.A.y };
         }
@@ -217,13 +226,12 @@ export class BrickWall implements StaticDrawable {
           this.coordinates[i]!.x <= collisionZone.B.x &&
           this.coordinates[i]!.x + 3 >= collisionZone.A.x &&
           this.coordinates[i]!.y + 0.2 < collisionZone.C.y &&
-          this.coordinates[i]!.y + 3 - 0.2 >= collisionZone.A.y
+          this.coordinates[i]!.y + 3 - 0.2 > collisionZone.A.y
         ) {
           return { x: collisionZone.B.x, y: collisionZone.B.y };
         }
       }
     }
-
     return null;
   }
 }
