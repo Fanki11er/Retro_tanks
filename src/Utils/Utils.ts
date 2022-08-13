@@ -9,13 +9,15 @@ export class Utils {
     height: number,
     staticObjects: StaticDrawable[],
   ) {
+    const collisions: StaticDrawable[] = [];
     if (direction === 'Forwards') {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
         if (xPos + 0.2 < collisionZone.B.x && xPos + width - 0.2 > collisionZone.A.x && yPos >= collisionZone.A.y && yPos <= collisionZone.D.y) {
-          return staticObjects[i].id;
+          collisions.push(staticObjects[i]);
         }
       }
+      return collisions;
     }
 
     if (direction === 'Backwards') {
@@ -27,18 +29,20 @@ export class Utils {
           yPos + height >= collisionZone.A.y &&
           yPos + height <= collisionZone.D.y
         ) {
-          return staticObjects[i].id;
+          collisions.push(staticObjects[i]);
         }
       }
+      return collisions;
     }
 
     if (direction === 'Left') {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
         if (yPos + 0.2 < collisionZone.D.y && yPos + height - 0.2 > collisionZone.A.y && xPos <= collisionZone.D.x && xPos >= collisionZone.A.x) {
-          return staticObjects[i].id;
+          collisions.push(staticObjects[i]);
         }
       }
+      return collisions;
     }
 
     if (direction === 'Right') {
@@ -50,11 +54,12 @@ export class Utils {
           xPos + width >= collisionZone.A.x &&
           xPos + width <= collisionZone.B.x
         ) {
-          return staticObjects[i].id;
+          collisions.push(staticObjects[i]);
         }
       }
+      return collisions;
     }
-    return '';
+    return collisions;
   }
 
   static checkForCollisionWithBorders(

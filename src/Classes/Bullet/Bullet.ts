@@ -23,7 +23,7 @@ export class Bullet {
   private bullets;
   private id;
   private ammunitionType;
-  private collisionWith = '';
+  private collisionWith: StaticDrawable[] = [];
 
   constructor(
     xPos: number,
@@ -54,7 +54,7 @@ export class Bullet {
   }
 
   public draw(context: CanvasRenderingContext2D) {
-    this.collisionWith = '';
+    this.collisionWith = [];
     !this.hit && this.update();
     if (!this.hit) {
       this.hit = Utils.checkForCollisionWithBorders(this.direction, this.xPos, this.yPos, this.width, this.height, 312, 312);
@@ -63,13 +63,16 @@ export class Bullet {
       this.collisionWith = Utils.checkForCollisionWithObjects(this.direction, this.xPos, this.yPos, this.width, this.height, this.staticObjects);
     }
 
-    if (this.collisionWith && !this.hit) {
+    if (this.collisionWith.length && !this.hit) {
       let hitCoordinates;
-      const hitElementIndex = Utils.findHitElementIndex(this.collisionWith, this.staticObjects);
-      if (hitElementIndex < 0) {
+      //const hitElementIndex = Utils.findHitElementIndex(this.collisionWith, this.staticObjects);
+      /*if (hitElementIndex. < 0) {
+        return;
+      }*/
+      if (!this.collisionWith.length) {
         return;
       }
-      hitCoordinates = this.staticObjects[hitElementIndex].getPrecisionHitPlace(
+      hitCoordinates = this.collisionWith[0].getPrecisionHitPlace(
         new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
         this.direction,
       );
@@ -78,8 +81,8 @@ export class Bullet {
         this.hit = true;
         const bulletHitZone =
           this.direction === 'Left' || this.direction === 'Right'
-            ? new BulletHitZone(hitCoordinates, 4, 4, 6, 20).getCollisionZone()
-            : new BulletHitZone(hitCoordinates, 4, 4, 20, 6).getCollisionZone();
+            ? new BulletHitZone(hitCoordinates, 4, 4, 6, 22).getCollisionZone()
+            : new BulletHitZone(hitCoordinates, 4, 4, 22, 6).getCollisionZone();
         const elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
 
         for (let i = 0; i < elementsInExplosionRange.length; i++) {
