@@ -54,18 +54,18 @@ export class Bullet {
   }
 
   public draw(context: CanvasRenderingContext2D) {
+    this.collisionWith = '';
     !this.hit && this.update();
     if (!this.hit) {
-      this.hit = !!Utils.checkForCollisionWithBorders(this.direction, this.xPos, this.yPos, this.width, this.height, 312, 312);
+      this.hit = Utils.checkForCollisionWithBorders(this.direction, this.xPos, this.yPos, this.width, this.height, 312, 312);
     }
     if (!this.hit) {
       this.collisionWith = Utils.checkForCollisionWithObjects(this.direction, this.xPos, this.yPos, this.width, this.height, this.staticObjects);
     }
-    !this.hit && this.image && context.drawImage(this.image, this.xPos, this.yPos);
 
     if (this.collisionWith && !this.hit) {
       let hitCoordinates;
-      const hitElementIndex = this.findHitElementIndex(this.collisionWith);
+      const hitElementIndex = Utils.findHitElementIndex(this.collisionWith, this.staticObjects);
       if (hitElementIndex < 0) {
         return;
       }
@@ -75,21 +75,24 @@ export class Bullet {
       );
 
       if (hitCoordinates) {
+        this.hit = true;
         const bulletHitZone =
           this.direction === 'Left' || this.direction === 'Right'
-            ? new BulletHitZone(hitCoordinates, 4, 4, 10, 22).getCollisionZone()
-            : new BulletHitZone(hitCoordinates, 4, 4, 22, 10).getCollisionZone();
+            ? new BulletHitZone(hitCoordinates, 4, 4, 6, 20).getCollisionZone()
+            : new BulletHitZone(hitCoordinates, 4, 4, 20, 6).getCollisionZone();
         const elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
+
         for (let i = 0; i < elementsInExplosionRange.length; i++) {
-          const collisionElementIndex = this.findHitElementIndex(elementsInExplosionRange[i].id);
+          const collisionElementIndex = Utils.findHitElementIndex(elementsInExplosionRange[i].id, this.staticObjects);
           if (collisionElementIndex >= 0) {
-            this.hit = this.staticObjects[collisionElementIndex].processHit(this.ammunitionType, bulletHitZone, this.yPos);
+            this.staticObjects[collisionElementIndex].processHit(this.ammunitionType, bulletHitZone, this.yPos);
           }
         }
       }
 
       // todo Figure how destroy exactly in the center
     }
+    !this.hit && this.image && context.drawImage(this.image, this.xPos, this.yPos);
 
     if (this.hit) {
       this.animateExplosion(20, context);
@@ -205,13 +208,24 @@ export class Bullet {
     }
   }
 
-  private findHitElementIndex(id: string) {
-    return this.staticObjects.findIndex((element) => {
-      return element.id === id;
-    });
+  checkForExplosionRange(bulletHitZone: CollisionZone) {
+    const collisions = [];
+
+    for (let i = 0; i < this.staticObjects.length; i++) {
+      const collisionZone = this.staticObjects[i].getCollisionZone();
+      if (
+        bulletHitZone.A.x < collisionZone.B.x &&
+        bulletHitZone.B.x > collisionZone.A.x &&
+        bulletHitZone.A.y < collisionZone.C.y &&
+        bulletHitZone.C.y > collisionZone.A.y
+      ) {
+        collisions.push(this.staticObjects[i]);
+      }
+    }
+    return collisions;
   }
 
-  checkForExplosionRange(bulletHitZone: CollisionZone) {
+  /*checkForExplosionRange(bulletHitZone: CollisionZone) {
     const collisions = [];
     if (this.direction === 'Forwards') {
       for (let i = 0; i < this.staticObjects.length; i++) {
@@ -247,6 +261,8 @@ export class Bullet {
     if (this.direction === 'Left') {
       for (let i = 0; i < this.staticObjects.length; i++) {
         const collisionZone = this.staticObjects[i].getCollisionZone();
+         console.log(bulletHitZone, 'BulletHitZone');
+        console.log(collisionZone, 'CollisionZone');
         if (
           bulletHitZone.A.y <= collisionZone.D.y &&
           bulletHitZone.C.y >= collisionZone.A.y &&
@@ -274,7 +290,7 @@ export class Bullet {
       return collisions;
     }
     return [];
-  }
+  }*/
 }
 
 /*

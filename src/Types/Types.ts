@@ -18,6 +18,7 @@ export interface StaticDrawable {
   changed: boolean;
   processHit: (ammunitionType: AmmunitionType, collisionZone: CollisionZone, yPos: number) => boolean;
   getPrecisionHitPlace: (collisionZone: CollisionZone, direction: Direction) => WallCoordinates;
+  getPrecisionCollisionPlace: (collisionZone: CollisionZone, direction: Direction) => WallCoordinates;
 }
 
 export type AmmunitionType = 'Standard' | 'Heavy';

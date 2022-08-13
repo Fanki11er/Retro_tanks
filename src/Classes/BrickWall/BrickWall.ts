@@ -112,8 +112,6 @@ export class BrickWall implements StaticDrawable {
   }
 
   public processHit(ammunitionType: AmmunitionType, collisionZone: CollisionZone, yPos: number) {
-    console.log(yPos);
-    //!! Check bullet collision and then check with explosion size (because delete is to early)
     return this.deleteParts(collisionZone);
   }
 
@@ -122,16 +120,15 @@ export class BrickWall implements StaticDrawable {
     for (let i = 0; i < this.coordinates.length; i++) {
       if (
         this.coordinates[i] &&
-        this.coordinates[i]!.x < collisionZone.B.x &&
-        this.coordinates[i]!.x + 3 > collisionZone.A.x &&
-        this.coordinates[i]!.y < collisionZone.C.y &&
-        this.coordinates[i]!.y + 3 > collisionZone.A.y
+        this.coordinates[i]!.x <= collisionZone.B.x &&
+        this.coordinates[i]!.x + 3 >= collisionZone.A.x &&
+        this.coordinates[i]!.y <= collisionZone.C.y &&
+        this.coordinates[i]!.y + 3 >= collisionZone.A.y
       ) {
         this.coordinates[i] = null;
         hits = true;
       }
     }
-    console.log(this.coordinates);
     if (hits) {
       this.changed = true;
       // todo Change size of collision zone after delete elements
@@ -160,16 +157,73 @@ export class BrickWall implements StaticDrawable {
     for (let i = 0; i < this.coordinates.length; i++) {
       if (
         this.coordinates[i] &&
-        this.coordinates[i]!.x < collisionZone.B.x &&
-        this.coordinates[i]!.x + 3 > collisionZone.A.x &&
-        this.coordinates[i]!.y < collisionZone.C.y &&
-        this.coordinates[i]!.y + 3 > collisionZone.A.y
+        this.coordinates[i]!.x <= collisionZone.B.x &&
+        this.coordinates[i]!.x + 3 >= collisionZone.A.x &&
+        this.coordinates[i]!.y <= collisionZone.C.y &&
+        this.coordinates[i]!.y + 3 >= collisionZone.A.y
       ) {
         return direction === 'Left' || direction === 'Forwards'
           ? { x: collisionZone.A.x, y: collisionZone.A.y }
           : { x: collisionZone.D.x, y: collisionZone.D.y };
       }
     }
+    return null;
+  }
+
+  public getPrecisionCollisionPlace(collisionZone: CollisionZone, direction: Direction) {
+    if (direction === 'Forwards') {
+      for (let i = 0; i < this.coordinates.length; i++) {
+        if (
+          this.coordinates[i] &&
+          this.coordinates[i]!.x + 0.2 < collisionZone.B.x &&
+          this.coordinates[i]!.x + 3 - 0.2 > collisionZone.A.x &&
+          this.coordinates[i]!.y <= collisionZone.C.y &&
+          this.coordinates[i]!.y + 3 >= collisionZone.A.y
+        ) {
+          return { x: collisionZone.A.x, y: collisionZone.A.y };
+        }
+      }
+    }
+    if (direction === 'Backwards') {
+      for (let i = 0; i < this.coordinates.length; i++) {
+        if (
+          this.coordinates[i] &&
+          this.coordinates[i]!.x + 0.2 < collisionZone.B.x &&
+          this.coordinates[i]!.x + 3 - 0.2 > collisionZone.A.x &&
+          this.coordinates[i]!.y <= collisionZone.C.y &&
+          this.coordinates[i]!.y + 3 >= collisionZone.A.y
+        ) {
+          return { x: collisionZone.C.x, y: collisionZone.C.y };
+        }
+      }
+    }
+    if (direction === 'Left') {
+      for (let i = 0; i < this.coordinates.length; i++) {
+        if (
+          this.coordinates[i] &&
+          this.coordinates[i]!.x <= collisionZone.B.x &&
+          this.coordinates[i]!.x + 3 >= collisionZone.A.x &&
+          this.coordinates[i]!.y + 0.2 < collisionZone.C.y &&
+          this.coordinates[i]!.y + 3 - 0.2 >= collisionZone.A.y
+        ) {
+          return { x: collisionZone.A.x, y: collisionZone.A.y };
+        }
+      }
+    }
+    if (direction === 'Right') {
+      for (let i = 0; i < this.coordinates.length; i++) {
+        if (
+          this.coordinates[i] &&
+          this.coordinates[i]!.x <= collisionZone.B.x &&
+          this.coordinates[i]!.x + 3 >= collisionZone.A.x &&
+          this.coordinates[i]!.y + 0.2 < collisionZone.C.y &&
+          this.coordinates[i]!.y + 3 - 0.2 >= collisionZone.A.y
+        ) {
+          return { x: collisionZone.B.x, y: collisionZone.B.y };
+        }
+      }
+    }
+
     return null;
   }
 }

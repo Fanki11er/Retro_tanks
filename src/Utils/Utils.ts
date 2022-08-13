@@ -12,7 +12,7 @@ export class Utils {
     if (direction === 'Forwards') {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
-        if (xPos < collisionZone.B.x && xPos + width > collisionZone.A.x && yPos - 0.2 > collisionZone.A.y && yPos - 0.2 < collisionZone.D.y) {
+        if (xPos + 0.2 < collisionZone.B.x && xPos + width - 0.2 > collisionZone.A.x && yPos >= collisionZone.A.y && yPos <= collisionZone.D.y) {
           return staticObjects[i].id;
         }
       }
@@ -22,10 +22,10 @@ export class Utils {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
         if (
-          xPos < collisionZone.B.x &&
-          xPos + width > collisionZone.A.x &&
-          yPos + height + 0.2 > collisionZone.A.y &&
-          yPos + height + 0.2 < collisionZone.D.y
+          xPos + 0.2 < collisionZone.B.x &&
+          xPos + width - 0.2 > collisionZone.A.x &&
+          yPos + height >= collisionZone.A.y &&
+          yPos + height <= collisionZone.D.y
         ) {
           return staticObjects[i].id;
         }
@@ -35,7 +35,7 @@ export class Utils {
     if (direction === 'Left') {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
-        if (yPos < collisionZone.D.y && yPos + height > collisionZone.A.y && xPos - 0.2 < collisionZone.D.x && xPos - 0.2 > collisionZone.A.x) {
+        if (yPos + 0.2 < collisionZone.D.y && yPos + height - 0.2 > collisionZone.A.y && xPos <= collisionZone.D.x && xPos >= collisionZone.A.x) {
           return staticObjects[i].id;
         }
       }
@@ -45,10 +45,10 @@ export class Utils {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
         if (
-          yPos < collisionZone.D.y &&
-          yPos + height > collisionZone.A.y &&
-          xPos + width + 0.2 > collisionZone.A.x &&
-          xPos + width + 0.2 < collisionZone.B.x
+          yPos + 0.2 < collisionZone.D.y &&
+          yPos + height - 0.2 > collisionZone.A.y &&
+          xPos + width >= collisionZone.A.x &&
+          xPos + width <= collisionZone.B.x
         ) {
           return staticObjects[i].id;
         }
@@ -68,25 +68,31 @@ export class Utils {
   ) {
     if (direction === 'Forwards') {
       if (yPos <= 0) {
-        return 'border';
+        return true;
       }
     }
     if (direction === 'Backwards') {
       if (yPos + height >= boardHeight) {
-        return 'border';
+        return true;
       }
     }
     if (direction === 'Left') {
       if (xPos <= 0) {
-        return 'border';
+        return true;
       }
     }
     if (direction === 'Right') {
       if (xPos + width >= boardWidth) {
-        return 'border';
+        return true;
       }
     }
-    return '';
+    return false;
+  }
+
+  static findHitElementIndex(id: string, staticObjects: StaticDrawable[]) {
+    return staticObjects.findIndex((element) => {
+      return element.id === id;
+    });
   }
 }
 
