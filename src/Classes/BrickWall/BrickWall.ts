@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid';
-import { brickWallRecipe } from '../../Textures/BrickWall/BrickWallTexture';
 import { AmmunitionType, BoardElementType, BrickWallRecipe, CollisionZone, Direction, StaticDrawable, WallCoordinates } from '../../Types/Types';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 
@@ -18,23 +17,25 @@ export class BrickWall implements StaticDrawable {
   private yPos;
   private width;
   private height;
-  private textures;
+  private brickWallRecipe;
   private type;
   private coordinates: WallCoordinates[];
   private collisionZone;
   public changed = false;
+  private textureSize;
 
-  constructor(xPos: number, yPos: number, size: number, brickWallRecipe: BrickWallRecipe, type: BoardElementType) {
+  constructor(xPos: number, yPos: number, size: number, brickWallRecipe: BrickWallRecipe, type: BoardElementType, textureSize: number) {
     this.id = uuidv4();
     this.xPos = xPos;
     this.yPos = yPos;
     this.width = type === 'Horizontally' || type === 'Full' ? size : size / 2;
     this.height = type === 'Vertically' || type === 'Full' ? size : size / 2;
-    this.textures = brickWallRecipe;
+    this.brickWallRecipe = brickWallRecipe;
     this.type = type;
     this.coordinates = [];
     this.collisionZone = new ElementCollisionZone({ x: xPos, y: yPos }, this.width, this.height);
-    this.createArray(type, 8, 8, 3);
+    this.textureSize = textureSize;
+    this.createArray(type, size / textureSize, size / textureSize, textureSize);
   }
 
   public draw(ctx: CanvasRenderingContext2D) {
@@ -78,8 +79,8 @@ export class BrickWall implements StaticDrawable {
       case 'Vertically': {
         for (let i = 0; i < rows; i++) {
           for (let j = 0; j < columns / 2; j++) {
-            const x = this.xPos + j * 3;
-            const y = this.yPos + i * 3;
+            const x = this.xPos + j * textureSize;
+            const y = this.yPos + i * textureSize;
             this.coordinates.push(new Coordinates(x, y));
           }
         }
@@ -89,8 +90,8 @@ export class BrickWall implements StaticDrawable {
       case 'Horizontally': {
         for (let i = 0; i < rows / 2; i++) {
           for (let j = 0; j < columns; j++) {
-            const x = this.xPos + j * 3;
-            const y = this.yPos + i * 3;
+            const x = this.xPos + j * textureSize;
+            const y = this.yPos + i * textureSize;
             this.coordinates.push(new Coordinates(x, y));
           }
         }
@@ -100,10 +101,7 @@ export class BrickWall implements StaticDrawable {
   }
 
   private getParts() {
-    if (this.type === 'Full' || this.type === 'Horizontally') {
-      return 8;
-    }
-    return 4;
+    return this.width / this.textureSize;
   }
 
   public getCollisionZone() {
@@ -120,9 +118,9 @@ export class BrickWall implements StaticDrawable {
       if (
         this.coordinates[i] &&
         this.coordinates[i]!.x <= collisionZone.B.x &&
-        this.coordinates[i]!.x + 3 >= collisionZone.A.x &&
+        this.coordinates[i]!.x + this.textureSize >= collisionZone.A.x &&
         this.coordinates[i]!.y <= collisionZone.C.y &&
-        this.coordinates[i]!.y + 3 >= collisionZone.A.y
+        this.coordinates[i]!.y + this.textureSize >= collisionZone.A.y
       ) {
         this.coordinates[i] = null;
         hits = true;
@@ -138,18 +136,18 @@ export class BrickWall implements StaticDrawable {
 
   private getRowFromRecipe(row: number, column: number) {
     if (row === 1 || row === 5) {
-      return brickWallRecipe[1][column];
+      return this.brickWallRecipe[1][column];
     }
     if (row === 2 || row === 6) {
-      return brickWallRecipe[2][column];
+      return this.brickWallRecipe[2][column];
     }
     if (row === 3 || row === 7) {
-      return brickWallRecipe[3][column];
+      return this.brickWallRecipe[3][column];
     }
     if (row === 4 || row === 8) {
-      return brickWallRecipe[4][column];
+      return this.brickWallRecipe[4][column];
     }
-    return brickWallRecipe[1][0];
+    return this.brickWallRecipe[1][0];
   }
 
   public getPrecisionHitPlace(collisionZone: CollisionZone, direction: Direction) {
@@ -157,9 +155,9 @@ export class BrickWall implements StaticDrawable {
       if (
         this.coordinates[i] &&
         this.coordinates[i]!.x <= collisionZone.B.x &&
-        this.coordinates[i]!.x + 3 >= collisionZone.A.x &&
+        this.coordinates[i]!.x + this.textureSize >= collisionZone.A.x &&
         this.coordinates[i]!.y <= collisionZone.C.y &&
-        this.coordinates[i]!.y + 3 >= collisionZone.A.y
+        this.coordinates[i]!.y + this.textureSize >= collisionZone.A.y
       ) {
         if (direction === 'Forwards') {
           return { x: collisionZone.A.x + 1, y: collisionZone.A.y };
@@ -185,9 +183,9 @@ export class BrickWall implements StaticDrawable {
         if (
           this.coordinates[i] &&
           this.coordinates[i]!.x + 0.2 < collisionZone.B.x &&
-          this.coordinates[i]!.x + 3 - 0.2 > collisionZone.A.x &&
+          this.coordinates[i]!.x + this.textureSize - 0.2 > collisionZone.A.x &&
           this.coordinates[i]!.y <= collisionZone.C.y &&
-          this.coordinates[i]!.y + 3 >= collisionZone.A.y
+          this.coordinates[i]!.y + this.textureSize >= collisionZone.A.y
         ) {
           return { x: collisionZone.A.x, y: collisionZone.A.y };
         }
@@ -198,9 +196,9 @@ export class BrickWall implements StaticDrawable {
         if (
           this.coordinates[i] &&
           this.coordinates[i]!.x + 0.2 < collisionZone.B.x &&
-          this.coordinates[i]!.x + 3 - 0.2 > collisionZone.A.x &&
+          this.coordinates[i]!.x + this.textureSize - 0.2 > collisionZone.A.x &&
           this.coordinates[i]!.y <= collisionZone.C.y &&
-          this.coordinates[i]!.y + 3 >= collisionZone.A.y
+          this.coordinates[i]!.y + this.textureSize >= collisionZone.A.y
         ) {
           return { x: collisionZone.C.x, y: collisionZone.C.y };
         }
@@ -211,9 +209,9 @@ export class BrickWall implements StaticDrawable {
         if (
           this.coordinates[i] &&
           this.coordinates[i]!.x <= collisionZone.B.x &&
-          this.coordinates[i]!.x + 3 >= collisionZone.A.x &&
+          this.coordinates[i]!.x + this.textureSize >= collisionZone.A.x &&
           this.coordinates[i]!.y + 0.2 < collisionZone.C.y &&
-          this.coordinates[i]!.y + 3 - 0.2 > collisionZone.A.y
+          this.coordinates[i]!.y + this.textureSize - 0.2 > collisionZone.A.y
         ) {
           return { x: collisionZone.A.x, y: collisionZone.A.y };
         }
@@ -224,9 +222,9 @@ export class BrickWall implements StaticDrawable {
         if (
           this.coordinates[i] &&
           this.coordinates[i]!.x <= collisionZone.B.x &&
-          this.coordinates[i]!.x + 3 >= collisionZone.A.x &&
+          this.coordinates[i]!.x + this.textureSize >= collisionZone.A.x &&
           this.coordinates[i]!.y + 0.2 < collisionZone.C.y &&
-          this.coordinates[i]!.y + 3 - 0.2 > collisionZone.A.y
+          this.coordinates[i]!.y + this.textureSize - 0.2 > collisionZone.A.y
         ) {
           return { x: collisionZone.B.x, y: collisionZone.B.y };
         }

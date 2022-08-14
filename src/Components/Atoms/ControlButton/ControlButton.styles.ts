@@ -1,9 +1,9 @@
-import styled from "styled-components";
-import { StyledTheme } from "../../../GlobalStyles/theme";
+import styled from 'styled-components';
+import { StyledTheme } from '../../../GlobalStyles/theme';
 
 export const StyledControlButton = styled.button`
-  width: 50px;
-  height: 50px;
+  width: 65px;
+  height: 65px;
   border-radius: 50%;
   border: none;
   background-color: ${(props: StyledTheme) => props.theme.colors.lightGray};
@@ -11,3 +11,4 @@ export const StyledControlButton = styled.button`
   justify-content: center;
   align-items: center;
 `;
+

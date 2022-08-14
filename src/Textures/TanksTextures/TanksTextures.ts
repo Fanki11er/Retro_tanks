@@ -22,3 +22,4 @@ export class TankTextures {
 }
 
 export const userSmallTankTextures = new TankTextures(userSmallTankImageTop, userSmallTankImageDown, userSmallTankImageLeft, userSmallTankImageRight);
+

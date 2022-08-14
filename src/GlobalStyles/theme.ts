@@ -7,9 +7,9 @@ export const theme: Theme = {
   fontSizes: {},
 
   devices: {
-    small: `max-width: 720px`,
-    medium: `max-width: 1200px`,
-    large: 'max-width: 2500px',
+    small: `min-width: 640px`,
+    medium: `min-width: 1000px`,
+    large: 'min-width: 2500px',
   },
 };
 
