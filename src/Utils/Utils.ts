@@ -1,3 +1,4 @@
+import { Bullet } from '../Classes/Bullet/Bullet';
 import { Direction, StaticDrawable } from '../Types/Types';
 
 export class Utils {
@@ -98,6 +99,15 @@ export class Utils {
     return staticObjects.findIndex((element) => {
       return element.id === id;
     });
+  }
+
+  static removeDestroyedElement<T extends StaticDrawable | Bullet>(array: Array<T>, id: string) {
+    const elementIndex = array.findIndex((element) => {
+      return element.id! === id;
+    });
+    if (elementIndex >= 0) {
+      array.splice(elementIndex, 1);
+    }
   }
 }
 

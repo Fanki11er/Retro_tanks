@@ -1,4 +1,5 @@
 import { StaticDrawable } from '../../Types/Types';
+import { Utils } from '../../Utils/Utils';
 
 export class StaticElementsCanvas {
   width;
@@ -27,7 +28,10 @@ export class StaticElementsCanvas {
     this.canvasCtx?.clearRect(0, 0, 312, 312);
     if (this.canvasCtx) {
       for (let i = 0; i < this.staticObjects.length; i++) {
-        this.staticObjects[i].draw(this.canvasCtx);
+        if (this.staticObjects[i].isDestroyed) {
+          Utils.removeDestroyedElement(this.staticObjects, this.staticObjects[i].id);
+        }
+        this.staticObjects[i] && this.staticObjects[i].draw(this.canvasCtx);
       }
     }
   }

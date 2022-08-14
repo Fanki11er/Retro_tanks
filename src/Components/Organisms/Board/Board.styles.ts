@@ -17,7 +17,7 @@ export const BoardWrapper = styled.div`
     grid-row: 1/2;
   }
   @media screen and (${(props: StyledTheme) => props.theme.devices.medium}) {
-    transform: scale(2);
+    transform: scale(1.6);
     grid-column: 1/2;
     grid-row: 1/2;
   }

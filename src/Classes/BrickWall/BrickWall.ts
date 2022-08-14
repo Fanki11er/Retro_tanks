@@ -23,19 +23,22 @@ export class BrickWall implements StaticDrawable {
   private collisionZone;
   public changed = false;
   private textureSize;
+  private numberOfElements;
+  public isDestroyed = false;
 
   constructor(xPos: number, yPos: number, size: number, brickWallRecipe: BrickWallRecipe, type: BoardElementType, textureSize: number) {
     this.id = uuidv4();
     this.xPos = xPos;
     this.yPos = yPos;
-    this.width = type === 'Horizontally' || type === 'Full' ? size : size / 2;
-    this.height = type === 'Vertically' || type === 'Full' ? size : size / 2;
-    this.brickWallRecipe = brickWallRecipe;
     this.type = type;
+    this.width = this.type === 'Horizontally' || this.type === 'Full' ? size : size / 2;
+    this.height = this.type === 'Vertically' || this.type === 'Full' ? size : size / 2;
+    this.brickWallRecipe = brickWallRecipe;
     this.coordinates = [];
     this.collisionZone = new ElementCollisionZone({ x: xPos, y: yPos }, this.width, this.height);
     this.textureSize = textureSize;
-    this.createArray(type, size / textureSize, size / textureSize, textureSize);
+    this.numberOfElements = ((this.width / textureSize) * this.height) / textureSize;
+    this.createArray(size / textureSize, size / textureSize, textureSize);
   }
 
   public draw(ctx: CanvasRenderingContext2D) {
@@ -64,8 +67,8 @@ export class BrickWall implements StaticDrawable {
     }
   }
 
-  private createArray(type: BoardElementType, rows: number, columns: number, textureSize: number) {
-    switch (type) {
+  private createArray(rows: number, columns: number, textureSize: number) {
+    switch (this.type) {
       case 'Full': {
         for (let i = 0; i < rows; i++) {
           for (let j = 0; j < columns; j++) {
@@ -109,7 +112,12 @@ export class BrickWall implements StaticDrawable {
   }
 
   public processHit(ammunitionType: AmmunitionType, collisionZone: CollisionZone, yPos: number) {
-    return this.deleteParts(collisionZone);
+    this.deleteParts(collisionZone);
+    if (this.numberOfElements <= 0) {
+      this.isDestroyed = true;
+      return this.id;
+    }
+    return '';
   }
 
   private deleteParts(collisionZone: CollisionZone) {
@@ -123,15 +131,13 @@ export class BrickWall implements StaticDrawable {
         this.coordinates[i]!.y + this.textureSize >= collisionZone.A.y
       ) {
         this.coordinates[i] = null;
+        this.numberOfElements -= 1;
         hits = true;
       }
     }
     if (hits) {
       this.changed = true;
-      // todo Change size of collision zone after delete elements
-      return true;
     }
-    return false;
   }
 
   private getRowFromRecipe(row: number, column: number) {

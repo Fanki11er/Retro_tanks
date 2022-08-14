@@ -21,7 +21,7 @@ export class Bullet {
   private speed;
   private hit = false;
   private bullets;
-  private id;
+  public id;
   private ammunitionType;
   private collisionWith: StaticDrawable[] = [];
 
@@ -110,7 +110,7 @@ export class Bullet {
     if (this.hit) {
       this.animateExplosion(20, context);
       if (this.explosionAnimationFrames.animationEnded) {
-        this.removeDestroyedBullet();
+        Utils.removeDestroyedElement(this.bullets, this.id);
       }
     }
   }
@@ -212,14 +212,14 @@ export class Bullet {
     }
   }
 
-  private removeDestroyedBullet() {
+  /*private removeDestroyedBullet() {
     const bulletIndex = this.bullets.findIndex((bullet) => {
       return bullet.id === this.id;
     });
     if (bulletIndex >= 0) {
       this.bullets.splice(bulletIndex, 1);
     }
-  }
+  }*/
 
   checkForExplosionRange(bulletHitZone: CollisionZone) {
     const collisions = [];

@@ -16,7 +16,8 @@ export interface StaticDrawable {
   getCollisionZone: () => CollisionZone;
   id: string;
   changed: boolean;
-  processHit: (ammunitionType: AmmunitionType, collisionZone: CollisionZone, yPos: number) => boolean;
+  isDestroyed: boolean;
+  processHit: (ammunitionType: AmmunitionType, collisionZone: CollisionZone, yPos: number) => string;
   getPrecisionHitPlace: (collisionZone: CollisionZone, direction: Direction) => WallCoordinates;
   getPrecisionCollisionPlace: (collisionZone: CollisionZone, direction: Direction) => WallCoordinates;
 }
