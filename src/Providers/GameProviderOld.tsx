@@ -1,32 +1,42 @@
-import { createContext, PropsWithChildren, useCallback, useEffect, useRef } from 'react';
+import { createContext, PropsWithChildren, useCallback, useEffect, useState } from 'react';
+import { Tank } from '../Classes/Tank/Tank';
 import { Direction } from '../Types/Types';
+import { userSmallTankTextures } from '../Textures/TanksTextures/TanksTextures';
+import { StaticElementsCanvas } from '../Classes/StaticElementsCanvas/StaticElementsCanvas';
 import { level1 } from '../Levels/Levels';
-import { Game } from '../Classes/Game/Game';
+import { Bullet } from '../Classes/Bullet/Bullet';
+/*
 
 export const GameContext = createContext({
+  playerTank: new Tank(156, 156, 24, 24, userSmallTankTextures, level1.staticObjects, []),
   handleChangeDirection: (direction: Direction) => {},
   handleShot: () => {},
-  game: new Game(1, [level1]),
+  staticElements: new StaticElementsCanvas(312, 312, level1.staticObjects),
+  bulletObjects: [] as Bullet[],
 });
 
 const GameProvider = (props: PropsWithChildren<any>) => {
-  const { current: game } = useRef(new Game(1, [level1]));
-  //const test = game.current;
+  const [bulletObjects, setBulletsObjects] = useState<Bullet[]>([]);
+  const [playerTank, setPlayerTank] = useState<Tank>(new Tank(200, 156, 22, 22, userSmallTankTextures, level1.staticObjects, bulletObjects));
+  const [staticElements, setStaticElements] = useState(new StaticElementsCanvas(312, 312, level1.staticObjects));
 
   const handleChangeDirection = useCallback(
     (direction: Direction) => {
-      game.playerTanks[0].controls.setDirection(direction);
+      playerTank.controls.setDirection(direction);
+      setPlayerTank(playerTank);
     },
-    [game],
+    [playerTank],
   );
   const handleShot = useCallback(() => {
-    game.playerTanks[0].fire();
-  }, [game]);
+    playerTank && playerTank.fire();
+  }, [playerTank]);
 
   const context = {
+    playerTank,
+    staticElements,
     handleChangeDirection,
     handleShot,
-    game,
+    bulletObjects,
   };
 
   useEffect(() => {
@@ -73,4 +83,5 @@ const GameProvider = (props: PropsWithChildren<any>) => {
 };
 
 export default GameProvider;
+*/
 

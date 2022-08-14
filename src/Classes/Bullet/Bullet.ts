@@ -65,10 +65,6 @@ export class Bullet {
 
     if (this.collisionWith.length && !this.hit) {
       let hitCoordinates;
-      //const hitElementIndex = Utils.findHitElementIndex(this.collisionWith, this.staticObjects);
-      /*if (hitElementIndex. < 0) {
-        return;
-      }*/
       if (!this.collisionWith.length) {
         return;
       }
@@ -211,15 +207,6 @@ export class Bullet {
       }
     }
   }
-
-  /*private removeDestroyedBullet() {
-    const bulletIndex = this.bullets.findIndex((bullet) => {
-      return bullet.id === this.id;
-    });
-    if (bulletIndex >= 0) {
-      this.bullets.splice(bulletIndex, 1);
-    }
-  }*/
 
   checkForExplosionRange(bulletHitZone: CollisionZone) {
     const collisions = [];
