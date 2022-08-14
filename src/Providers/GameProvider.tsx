@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useState } from 'react';
+import { createContext, PropsWithChildren, useCallback, useEffect, useState } from 'react';
 import { Tank } from '../Classes/Tank/Tank';
 import { Direction } from '../Types/Types';
 import { userSmallTankTextures } from '../Textures/TanksTextures/TanksTextures';
@@ -19,13 +19,16 @@ const GameProvider = (props: PropsWithChildren<any>) => {
   const [playerTank, setPlayerTank] = useState<Tank>(new Tank(200, 156, 22, 22, userSmallTankTextures, Level1.staticObjects, bulletObjects));
   const [staticElements, setStaticElements] = useState(new StaticElementsCanvas(312, 312, Level1.staticObjects));
 
-  const handleChangeDirection = (direction: Direction) => {
-    playerTank.controls.setDirection(direction);
-    setPlayerTank(playerTank);
-  };
-  const handleShot = () => {
+  const handleChangeDirection = useCallback(
+    (direction: Direction) => {
+      playerTank.controls.setDirection(direction);
+      setPlayerTank(playerTank);
+    },
+    [playerTank],
+  );
+  const handleShot = useCallback(() => {
     playerTank && playerTank.fire();
-  };
+  }, [playerTank]);
 
   const context = {
     playerTank,
@@ -34,6 +37,46 @@ const GameProvider = (props: PropsWithChildren<any>) => {
     handleShot,
     bulletObjects,
   };
+
+  useEffect(() => {
+    const move = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowUp') {
+        handleChangeDirection('Forwards');
+        return;
+      }
+      if (e.key === 'ArrowDown') {
+        handleChangeDirection('Backwards');
+        return;
+      }
+      if (e.key === 'ArrowLeft') {
+        handleChangeDirection('Left');
+        return;
+      }
+      if (e.key === 'ArrowRight') {
+        handleChangeDirection('Right');
+        return;
+      }
+    };
+    const stopMove = (e: KeyboardEvent) => {
+      handleChangeDirection('None');
+    };
+    window.addEventListener('keydown', (e) => move(e));
+    window.addEventListener('keyup', (e) => stopMove(e));
+    return () => {
+      window.removeEventListener('keydown', (e) => move(e));
+      window.removeEventListener('keyup', (e) => stopMove(e));
+    };
+  }, [handleChangeDirection]);
+
+  useEffect(() => {
+    const hitFire = (e: KeyboardEvent) => {
+      if (e.key === ' ') {
+        handleShot();
+      }
+    };
+    window.addEventListener('keydown', (e) => hitFire(e));
+    return () => window.removeEventListener('keydown', (e) => hitFire(e));
+  }, [handleShot]);
 
   return <GameContext.Provider value={context}>{props.children}</GameContext.Provider>;
 };
