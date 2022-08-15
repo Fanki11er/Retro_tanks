@@ -7,22 +7,36 @@ import { Coordinates } from '../BrickWall/BrickWall';
 import { Bullet } from '../Bullet/Bullet';
 import { Controls } from '../Controls/Controls';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
+import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
+import { SpawnPointTextures } from '../SpawnPointTextures/SpawnPointTextures';
 
 export class Tank {
-  xPos;
-  yPos;
-  width;
-  height;
+  private xPos;
+  private yPos;
+  private width;
+  private height;
   controls;
   private speed = 0.15;
-  textures: TankTextures;
-  image;
-  isBlockedBy;
-  staticObjects;
-  bullets;
+  private textures: TankTextures;
+  private image;
+  private isBlockedBy;
+  private staticObjects;
+  private bullets;
   private isLoading;
+  private isSpawning;
+  private isResist;
+  private spawnAnimationFrames = new ExplosionAnimationFrames(22);
 
-  constructor(xPos: number, yPos: number, width: number, height: number, textures: TankTextures, staticObjects: StaticDrawable[], bullets: Bullet[]) {
+  constructor(
+    xPos: number,
+    yPos: number,
+    width: number,
+    height: number,
+    textures: TankTextures,
+    spawnTextures: SpawnPointTextures,
+    staticObjects: StaticDrawable[],
+    bullets: Bullet[],
+  ) {
     this.xPos = xPos;
     this.yPos = yPos;
     this.width = width;
@@ -34,10 +48,19 @@ export class Tank {
     this.staticObjects = staticObjects;
     this.bullets = bullets;
     this.isLoading = false;
+    this.isSpawning = true;
+    this.isResist = true;
+    this.spawnAnimationFrames.animationsFrames = spawnTextures.textures;
   }
 
   public draw(context: CanvasRenderingContext2D) {
-    context.drawImage(this.image, this.xPos, this.yPos, 22, 22);
+    if (this.isSpawning) {
+      this.animateSpawnPoint(50, context, this.xPos, this.yPos);
+    } else if (!this.isSpawning && this.isResist) {
+      context.drawImage(this.image, this.xPos, this.yPos, 22, 22);
+    } else {
+      context.drawImage(this.image, this.xPos, this.yPos, 22, 22);
+    }
   }
 
   public update() {
@@ -131,6 +154,20 @@ export class Tank {
       return new Coordinates(this.xPos + this.width - bulletWidth, this.yPos + this.height / 2 - 1);
     }
     return new Coordinates(-20, -20);
+  }
+  private animateSpawnPoint(delay: number, ctx: CanvasRenderingContext2D, xPos: number, yPos: number) {
+    let image = this.spawnAnimationFrames.animationsFrames[this.spawnAnimationFrames.index];
+    if (this.spawnAnimationFrames.index < this.spawnAnimationFrames.animationsFrames.length) {
+      ctx.drawImage(image, xPos, yPos, this.spawnAnimationFrames.textureSize, this.spawnAnimationFrames.textureSize);
+    } else {
+      this.spawnAnimationFrames.animationEnded = true;
+      this.isSpawning = false;
+    }
+
+    this.spawnAnimationFrames.counter += 1;
+    if (this.spawnAnimationFrames.counter % delay === 0) {
+      this.spawnAnimationFrames.index += 1;
+    }
   }
 }
 
