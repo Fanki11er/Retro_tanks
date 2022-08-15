@@ -57,7 +57,7 @@ export class Bullet {
     this.collisionWith = [];
     !this.hit && this.update();
     if (!this.hit) {
-      this.hit = Utils.checkForCollisionWithBorders(this.direction, this.xPos, this.yPos, this.width, this.height, 312, 312);
+      this.hit = Utils.checkForCollisionWithBorders(this.direction, this.xPos, this.yPos, this.width, this.height, 372, 320);
     }
     if (!this.hit) {
       this.collisionWith = Utils.checkForCollisionWithObjects(this.direction, this.xPos, this.yPos, this.width, this.height, this.staticObjects);

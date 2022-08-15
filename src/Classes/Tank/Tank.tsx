@@ -42,7 +42,7 @@ export class Tank {
 
   public update() {
     this.isBlockedBy = false;
-    this.isBlockedBy = Utils.checkForCollisionWithBorders(this.controls.direction, this.xPos, this.yPos, this.width, this.height, 312, 312);
+    this.isBlockedBy = Utils.checkForCollisionWithBorders(this.controls.direction, this.xPos, this.yPos, this.width, this.height, 372, 320);
 
     if (!this.isBlockedBy) {
       const collisionWith = Utils.checkForCollisionWithObjects(

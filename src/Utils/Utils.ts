@@ -73,22 +73,22 @@ export class Utils {
     boardHeight: number,
   ) {
     if (direction === 'Forwards') {
-      if (yPos <= 0) {
+      if (yPos <= 4) {
         return true;
       }
     }
     if (direction === 'Backwards') {
-      if (yPos + height >= boardHeight) {
+      if (yPos + height >= boardHeight - 4) {
         return true;
       }
     }
     if (direction === 'Left') {
-      if (xPos <= 0) {
+      if (xPos <= 20) {
         return true;
       }
     }
     if (direction === 'Right') {
-      if (xPos + width >= boardWidth) {
+      if (xPos + width >= boardWidth - 40) {
         return true;
       }
     }

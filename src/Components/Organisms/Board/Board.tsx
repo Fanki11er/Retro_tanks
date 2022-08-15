@@ -6,10 +6,6 @@ import { BoardWrapper } from './Board.styles';
 const Board = () => {
   return (
     <BoardWrapper>
-      <LeftEdgePanel />
-      <TopEdgePanel />
-      <RightGamePanel />
-      <BottomEdgePanel />
       <Canvas />
     </BoardWrapper>
   );
@@ -17,3 +13,9 @@ const Board = () => {
 
 export default Board;
 
+/*
+<LeftEdgePanel />
+      <TopEdgePanel />
+      <RightGamePanel />
+      <BottomEdgePanel />
+*/

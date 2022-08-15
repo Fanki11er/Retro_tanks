@@ -1,15 +1,22 @@
 import { userSmallTankTextures } from '../../Textures/TanksTextures/TanksTextures';
 import { Bullet } from '../Bullet/Bullet';
+import { Curtin } from '../Curtin/Curtin';
+import { GameInfoCanvas } from '../GameInfoCanvas/GameInfoCanvas';
 import { Level } from '../Level/Level';
 import { StaticElementsCanvas } from '../StaticElementsCanvas/StaticElementsCanvas';
 import { Tank } from '../Tank/Tank';
 
 export class Game {
+  gameStatus = 'Paused';
   bullets: Bullet[] = [];
   levels: Level[];
   playerTanks: Tank[] = [];
   staticObjectsCanvas: StaticElementsCanvas | null = null;
+  curtin = new Curtin(372, 320);
   currentLevel: number = 0;
+  gameInfo = new GameInfoCanvas(372, 320);
+
+  //!! Get height and width from the constructor
 
   constructor(players: 1 | 2, levels: Level[]) {
     this.levels = levels;
@@ -17,7 +24,8 @@ export class Game {
 
   startGame() {
     this.playerTanks.push(new Tank(200, 156, 22, 22, userSmallTankTextures, this.levels[this.currentLevel].staticObjects, this.bullets));
-    this.staticObjectsCanvas = new StaticElementsCanvas(312, 312, this.levels[this.currentLevel].staticObjects);
+    this.staticObjectsCanvas = new StaticElementsCanvas(372, 320, this.levels[this.currentLevel].staticObjects);
+    this.gameInfo.update(7);
   }
 }
 

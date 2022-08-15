@@ -17,20 +17,25 @@ const Canvas = () => {
       game.startGame();
       const animate = () => {
         game.playerTanks[0].update();
-        renderCtx?.clearRect(0, 0, 312, 312);
+        renderCtx?.clearRect(0, 0, 372, 320);
+        if (game.gameStatus === 'Paused') {
+          renderCtx && game.curtin.drawCurtin(renderCtx, 1);
+        }
+        renderCtx && game.gameInfo.draw(renderCtx);
         renderCtx && game.playerTanks[0].draw(renderCtx);
         renderCtx && game.staticObjectsCanvas && game.staticObjectsCanvas.draw(renderCtx);
         renderCtx &&
           game.bullets.forEach((bullet) => {
             bullet.draw(renderCtx);
           });
+
         requestAnimationFrame(animate);
       };
       animate();
     }
   }, [context, game]);
 
-  return <StyledCanvas ref={canvasRef} width={312} height={312} />;
+  return <StyledCanvas ref={canvasRef} width={372} height={320} />;
 };
 
 export default Canvas;

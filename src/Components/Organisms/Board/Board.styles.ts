@@ -3,8 +3,8 @@ import { StyledTheme } from '../../../GlobalStyles/theme';
 
 export const BoardWrapper = styled.div`
   display: grid;
-  grid-template-columns: 20px 312px 40px;
-  grid-template-rows: 4px 312px 4px;
+  //grid-template-columns: 20px 312px 40px;
+  //grid-template-rows: 4px 312px 4px;
   background-color: black;
   grid-column: 2/4;
   grid-row: 1/2;
@@ -23,3 +23,7 @@ export const BoardWrapper = styled.div`
   }
 `;
 
+/*
+grid-template-columns: 20px 312px 40px;
+  grid-template-rows: 4px 312px 4px;
+*/
