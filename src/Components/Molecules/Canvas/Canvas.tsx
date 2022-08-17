@@ -16,7 +16,7 @@ const Canvas = () => {
       }
       game.startGame();
       const animate = () => {
-        game.playerTanks[0] && game.playerTanks[0].update();
+        //game.playerTanks[0] && game.playerTanks[0].update();
         renderCtx?.clearRect(0, 0, 372, 320);
         if (game.gameStatus === 'Paused') {
           renderCtx && game.curtin.drawCurtin(renderCtx, 1, game.currentLevel);

@@ -8,11 +8,12 @@ import { Bullet } from '../Bullet/Bullet';
 import { Controls } from '../Controls/Controls';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
+import { IndestructibleTextures } from '../IndestructibleTextures/IndestructibleTextures';
 import { SpawnPointTextures } from '../SpawnPointTextures/SpawnPointTextures';
 
 export class Tank {
-  private xPos;
-  private yPos;
+  xPos;
+  yPos;
   private width;
   private height;
   controls;
@@ -24,8 +25,9 @@ export class Tank {
   private bullets;
   private isLoading;
   private isSpawning;
-  private isResist;
+  private isIndestructible = true;
   private spawnAnimationFrames = new ExplosionAnimationFrames(22);
+  private indestructibleAnimationFrames = new ExplosionAnimationFrames(26);
 
   constructor(
     xPos: number,
@@ -34,6 +36,7 @@ export class Tank {
     height: number,
     textures: TankTextures,
     spawnTextures: SpawnPointTextures,
+    indestructibleTextures: IndestructibleTextures,
     staticObjects: StaticDrawable[],
     bullets: Bullet[],
   ) {
@@ -49,16 +52,20 @@ export class Tank {
     this.bullets = bullets;
     this.isLoading = false;
     this.isSpawning = true;
-    this.isResist = true;
     this.spawnAnimationFrames.animationsFrames = spawnTextures.textures;
+    this.indestructibleAnimationFrames.animationsFrames = indestructibleTextures.textures;
+    this.madeIndestructible(4000);
   }
 
   public draw(context: CanvasRenderingContext2D) {
     if (this.isSpawning) {
       this.animateSpawnPoint(50, context, this.xPos, this.yPos);
-    } else if (!this.isSpawning && this.isResist) {
+    } else if (!this.isSpawning && this.isIndestructible) {
+      this.update();
       context.drawImage(this.image, this.xPos, this.yPos, 22, 22);
+      this.animateIndestructible(20, context, this.xPos, this.yPos);
     } else {
+      this.update();
       context.drawImage(this.image, this.xPos, this.yPos, 22, 22);
     }
   }
@@ -168,6 +175,29 @@ export class Tank {
     if (this.spawnAnimationFrames.counter % delay === 0) {
       this.spawnAnimationFrames.index += 1;
     }
+  }
+
+  private animateIndestructible(delay: number, ctx: CanvasRenderingContext2D, xPos: number, yPos: number) {
+    let image = this.indestructibleAnimationFrames.animationsFrames[this.indestructibleAnimationFrames.index];
+    if (this.isIndestructible) {
+      ctx.drawImage(image, xPos - 2, yPos - 2, this.indestructibleAnimationFrames.textureSize, this.indestructibleAnimationFrames.textureSize);
+    } else {
+      this.indestructibleAnimationFrames.animationEnded = true;
+    }
+    this.indestructibleAnimationFrames.counter += 1;
+    if (this.indestructibleAnimationFrames.counter % delay === 0) {
+      this.indestructibleAnimationFrames.index += 1;
+      if (this.indestructibleAnimationFrames.index === this.indestructibleAnimationFrames.animationsFrames.length) {
+        this.indestructibleAnimationFrames.index = 0;
+      }
+    }
+  }
+
+  private madeIndestructible(time: number) {
+    this.isIndestructible = true;
+    setTimeout(() => {
+      this.isIndestructible = false;
+    }, time);
   }
 }
 
