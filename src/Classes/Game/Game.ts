@@ -26,7 +26,7 @@ export class Game {
 
   startGame() {
     this.staticObjectsCanvas = new StaticElementsCanvas(372, 320, this.levels[this.currentLevel].staticObjects);
-    this.gameInfo.update(7);
+    this.gameInfo.update(20, 3, 3, 2, 1);
 
     setTimeout(() => {
       this.curtin.isBlocked = false;

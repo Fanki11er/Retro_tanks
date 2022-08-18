@@ -55,11 +55,12 @@ export class Tank {
     this.spawnAnimationFrames.animationsFrames = spawnTextures.textures;
     this.indestructibleAnimationFrames.animationsFrames = indestructibleTextures.textures;
     this.madeIndestructible(4000);
+    this.spawn(2500);
   }
 
   public draw(context: CanvasRenderingContext2D) {
     if (this.isSpawning) {
-      this.animateSpawnPoint(50, context, this.xPos, this.yPos);
+      this.animateSpawnPoint(20, context, this.xPos, this.yPos);
     } else if (!this.isSpawning && this.isIndestructible) {
       this.update();
       context.drawImage(this.image, this.xPos, this.yPos, 22, 22);
@@ -164,16 +165,18 @@ export class Tank {
   }
   private animateSpawnPoint(delay: number, ctx: CanvasRenderingContext2D, xPos: number, yPos: number) {
     let image = this.spawnAnimationFrames.animationsFrames[this.spawnAnimationFrames.index];
-    if (this.spawnAnimationFrames.index < this.spawnAnimationFrames.animationsFrames.length) {
+    if (this.isSpawning) {
       ctx.drawImage(image, xPos, yPos, this.spawnAnimationFrames.textureSize, this.spawnAnimationFrames.textureSize);
     } else {
       this.spawnAnimationFrames.animationEnded = true;
-      this.isSpawning = false;
     }
 
     this.spawnAnimationFrames.counter += 1;
     if (this.spawnAnimationFrames.counter % delay === 0) {
       this.spawnAnimationFrames.index += 1;
+      if (this.spawnAnimationFrames.index === this.spawnAnimationFrames.animationsFrames.length) {
+        this.spawnAnimationFrames.index = 0;
+      }
     }
   }
 
@@ -197,6 +200,13 @@ export class Tank {
     this.isIndestructible = true;
     setTimeout(() => {
       this.isIndestructible = false;
+    }, time);
+  }
+
+  private spawn(time: number) {
+    this.isSpawning = true;
+    setTimeout(() => {
+      this.isSpawning = false;
     }, time);
   }
 }

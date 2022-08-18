@@ -1,3 +1,5 @@
+import { enemyTankIcon, playerTankIcon, roundFlagIcon } from '../Icon/Icon';
+
 export class GameInfoCanvas {
   width;
   height;
@@ -19,11 +21,22 @@ export class GameInfoCanvas {
     ctx.drawImage(this.canvas, 0, 0);
   }
 
-  update(enemyTanksLeft: number = 0, playerLivesLeft: number = 0, roundNumber: number = 0, gameStatus: string = 'Pause') {
+  update(
+    enemyTanksLeft: number = 0,
+    player1LivesLeft: number = 0,
+    player2LivesLeft: number = 0,
+    players: number = 1,
+    roundNumber: number = 0,
+    gameStatus: string = 'Pause',
+  ) {
     this.canvasCtx?.clearRect(0, 0, this.width, this.height);
     this.drawBorders();
     this.drawEnemyTanksLeftInfo(enemyTanksLeft);
-    this.drawPlayerLivesLeft(2);
+    this.drawPlayerLivesLeft(player1LivesLeft);
+    if (players === 2) {
+      this.drawPlayerLivesLeft(player2LivesLeft, true);
+    }
+    this.drawRoundFlag(roundNumber);
   }
 
   private drawBorders() {
@@ -38,15 +51,14 @@ export class GameInfoCanvas {
 
   private drawEnemyTanksLeftInfo(enemyTanksLeft: number) {
     if (this.canvasCtx) {
-      const xAxis = 337;
+      const xAxis = 341;
       const yAxis = 30;
-      const size = 13;
-      const delta = 17;
+      const size = 10;
+      const delta = 12;
       let xOffset = 0;
       let yOffset = 0;
-      this.canvasCtx.fillStyle = 'red';
       for (let i = 0; i < enemyTanksLeft; i++) {
-        this.canvasCtx.fillRect(xAxis + xOffset, yAxis + yOffset, size, size);
+        this.canvasCtx.drawImage(enemyTankIcon.icon, xAxis + xOffset, yAxis + yOffset, size, size);
         xOffset += delta;
 
         if (xAxis + xOffset >= xAxis + delta * 2) {
@@ -57,13 +69,24 @@ export class GameInfoCanvas {
     }
   }
 
-  private drawPlayerLivesLeft(playerLivesLeft: number) {
+  private drawPlayerLivesLeft(playerLivesLeft: number, secondPlayer: boolean = false) {
+    const text = secondPlayer ? 'II P' : ' I P';
+    const offset = secondPlayer ? 35 : 0;
     if (this.canvasCtx) {
       this.canvasCtx.fillStyle = 'black';
       this.canvasCtx.font = 'bold 16px Arial';
-      this.canvasCtx.fillText(' I P', 342, 200, 30);
-      this.canvasCtx.fillRect(342, 202, 13, 13);
-      this.canvasCtx.fillText(`${playerLivesLeft}`, 355, 215, 30);
+      this.canvasCtx.fillText(text, 338, 200 + offset, 30);
+      this.canvasCtx.drawImage(playerTankIcon.icon, 340, 205 + offset, 10, 10);
+      this.canvasCtx.fillText(`${playerLivesLeft}`, 352, 215 + offset, 30);
+    }
+  }
+
+  private drawRoundFlag(roundNumber: number) {
+    if (this.canvasCtx) {
+      this.canvasCtx.fillStyle = 'black';
+      this.canvasCtx.font = 'bold 16px Arial';
+      this.canvasCtx.drawImage(roundFlagIcon.icon, 340, 270);
+      this.canvasCtx.fillText(`${roundNumber}`, 351, 300, 30);
     }
   }
 }
