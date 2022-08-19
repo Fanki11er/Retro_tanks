@@ -1,15 +1,14 @@
 import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { explosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
 import { TankTextures } from '../../Textures/TanksTextures/TanksTextures';
 import { StaticDrawable } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
+import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
 import { Coordinates } from '../BrickWall/BrickWall';
 import { Bullet } from '../Bullet/Bullet';
 import { Controls } from '../Controls/Controls';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
-import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
-import { IndestructibleTextures } from '../IndestructibleTextures/IndestructibleTextures';
-import { SpawnPointTextures } from '../SpawnPointTextures/SpawnPointTextures';
+import indestructibleTextures from '../IndestructibleTextures/IndestructibleTextures';
+import spawnPointTextures from '../SpawnPointTextures/SpawnPointTextures';
 
 export class Tank {
   xPos;
@@ -26,20 +25,10 @@ export class Tank {
   private isLoading;
   private isSpawning;
   private isIndestructible = true;
-  private spawnAnimationFrames = new ExplosionAnimationFrames(22);
-  private indestructibleAnimationFrames = new ExplosionAnimationFrames(26);
+  private spawnAnimationFrames;
+  private indestructibleAnimationFrames;
 
-  constructor(
-    xPos: number,
-    yPos: number,
-    width: number,
-    height: number,
-    textures: TankTextures,
-    spawnTextures: SpawnPointTextures,
-    indestructibleTextures: IndestructibleTextures,
-    staticObjects: StaticDrawable[],
-    bullets: Bullet[],
-  ) {
+  constructor(xPos: number, yPos: number, width: number, height: number, textures: TankTextures, staticObjects: StaticDrawable[], bullets: Bullet[]) {
     this.xPos = xPos;
     this.yPos = yPos;
     this.width = width;
@@ -52,19 +41,19 @@ export class Tank {
     this.bullets = bullets;
     this.isLoading = false;
     this.isSpawning = true;
-    this.spawnAnimationFrames.animationsFrames = spawnTextures.textures;
-    this.indestructibleAnimationFrames.animationsFrames = indestructibleTextures.textures;
+    this.spawnAnimationFrames = new AnimationFrames(spawnPointTextures.animationTexture, spawnPointTextures.textureSize);
+    this.indestructibleAnimationFrames = new AnimationFrames(indestructibleTextures.animationTexture, indestructibleTextures.textureSize);
     this.madeIndestructible(4000);
     this.spawn(2500);
   }
 
   public draw(context: CanvasRenderingContext2D) {
     if (this.isSpawning) {
-      this.animateSpawnPoint(20, context, this.xPos, this.yPos);
+      this.spawnAnimationFrames.animateFrames(20, context, this.xPos, this.yPos, this.isSpawning, 0);
     } else if (!this.isSpawning && this.isIndestructible) {
       this.update();
       context.drawImage(this.image, this.xPos, this.yPos, 22, 22);
-      this.animateIndestructible(20, context, this.xPos, this.yPos);
+      this.indestructibleAnimationFrames.animateFrames(15, context, this.xPos - 2, this.yPos - 2, this.isIndestructible, 0);
     } else {
       this.update();
       context.drawImage(this.image, this.xPos, this.yPos, 22, 22);
@@ -139,7 +128,7 @@ export class Tank {
   fire() {
     if (!this.isLoading) {
       const { x, y } = this.setPositionOfBullet(4);
-      this.bullets.push(new Bullet(x, y, 2, 2, this.controls.direction, bulletTextures, explosionTextures, this.staticObjects, this.bullets));
+      this.bullets.push(new Bullet(x, y, 2, 2, this.controls.direction, bulletTextures, this.staticObjects, this.bullets));
       this.isLoading = true;
       this.isLoading &&
         setTimeout(() => {
@@ -162,38 +151,6 @@ export class Tank {
       return new Coordinates(this.xPos + this.width - bulletWidth, this.yPos + this.height / 2 - 1);
     }
     return new Coordinates(-20, -20);
-  }
-  private animateSpawnPoint(delay: number, ctx: CanvasRenderingContext2D, xPos: number, yPos: number) {
-    let image = this.spawnAnimationFrames.animationsFrames[this.spawnAnimationFrames.index];
-    if (this.isSpawning) {
-      ctx.drawImage(image, xPos, yPos, this.spawnAnimationFrames.textureSize, this.spawnAnimationFrames.textureSize);
-    } else {
-      this.spawnAnimationFrames.animationEnded = true;
-    }
-
-    this.spawnAnimationFrames.counter += 1;
-    if (this.spawnAnimationFrames.counter % delay === 0) {
-      this.spawnAnimationFrames.index += 1;
-      if (this.spawnAnimationFrames.index === this.spawnAnimationFrames.animationsFrames.length) {
-        this.spawnAnimationFrames.index = 0;
-      }
-    }
-  }
-
-  private animateIndestructible(delay: number, ctx: CanvasRenderingContext2D, xPos: number, yPos: number) {
-    let image = this.indestructibleAnimationFrames.animationsFrames[this.indestructibleAnimationFrames.index];
-    if (this.isIndestructible) {
-      ctx.drawImage(image, xPos - 2, yPos - 2, this.indestructibleAnimationFrames.textureSize, this.indestructibleAnimationFrames.textureSize);
-    } else {
-      this.indestructibleAnimationFrames.animationEnded = true;
-    }
-    this.indestructibleAnimationFrames.counter += 1;
-    if (this.indestructibleAnimationFrames.counter % delay === 0) {
-      this.indestructibleAnimationFrames.index += 1;
-      if (this.indestructibleAnimationFrames.index === this.indestructibleAnimationFrames.animationsFrames.length) {
-        this.indestructibleAnimationFrames.index = 0;
-      }
-    }
   }
 
   private madeIndestructible(time: number) {

@@ -1,12 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { BulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { ExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
+import explosionTextures from '../../Textures/ExplosionTextures/ExplosionTextures';
 import { AmmunitionType, CollisionZone, Direction, StaticDrawable } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
 import { Coordinates } from '../BrickWall/BrickWall';
-import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
+//import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
 import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
+import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
 
 export class Bullet {
   private xPos;
@@ -32,7 +33,6 @@ export class Bullet {
     height: number,
     direction: Direction,
     textures: BulletTextures,
-    explosionTextures: ExplosionTextures,
     staticObjects: StaticDrawable[],
     bullets: Bullet[],
     ammunitionType: AmmunitionType = 'Standard',
@@ -46,9 +46,8 @@ export class Bullet {
     this.setImageForDirection();
     this.staticObjects = staticObjects;
     this.bullets = bullets;
-    this.explosionAnimationFrames = new ExplosionAnimationFrames(30);
+    this.explosionAnimationFrames = new AnimationFrames(explosionTextures.animationTexture, explosionTextures.textureSize);
     this.speed = 0.5;
-    this.createExplosionAnimationFrames(explosionTextures);
     this.ammunitionType = ammunitionType;
     this.id = uuidv4();
   }
@@ -104,7 +103,8 @@ export class Bullet {
     !this.hit && this.image && context.drawImage(this.image, this.xPos, this.yPos);
 
     if (this.hit) {
-      this.animateExplosion(20, context);
+      const explosionPosition = this.getExplosionPosition();
+      this.explosionAnimationFrames.animateFrames(20, context, explosionPosition.x, explosionPosition.y, false, 1);
       if (this.explosionAnimationFrames.animationEnded) {
         Utils.removeDestroyedElement(this.bullets, this.id);
       }
@@ -149,32 +149,6 @@ export class Bullet {
         this.xPos += this.speed;
         break;
       }
-    }
-  }
-
-  private createExplosionAnimationFrames(explosionTextures: ExplosionTextures) {
-    this.explosionAnimationFrames.animationsFrames.push(explosionTextures.smallExplosionTexture);
-    this.explosionAnimationFrames.animationsFrames.push(explosionTextures.mediumExplosionTexture);
-    this.explosionAnimationFrames.animationsFrames.push(explosionTextures.smallExplosionTexture);
-  }
-  private animateExplosion(delay: number, ctx: CanvasRenderingContext2D) {
-    let image = this.explosionAnimationFrames.animationsFrames[this.explosionAnimationFrames.index];
-    if (this.explosionAnimationFrames.index < this.explosionAnimationFrames.animationsFrames.length) {
-      const explosionPosition = this.getExplosionPosition();
-      ctx.drawImage(
-        image,
-        explosionPosition.x,
-        explosionPosition.y,
-        this.explosionAnimationFrames.textureSize,
-        this.explosionAnimationFrames.textureSize,
-      );
-    } else {
-      this.explosionAnimationFrames.animationEnded = true;
-    }
-
-    this.explosionAnimationFrames.counter += 1;
-    if (this.explosionAnimationFrames.counter % delay === 0) {
-      this.explosionAnimationFrames.index += 1;
     }
   }
 
