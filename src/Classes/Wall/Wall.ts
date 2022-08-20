@@ -8,17 +8,9 @@ import {
   StaticDrawable,
   WallCoordinates,
   MaterialType,
+  Coordinates,
 } from '../../Types/Types';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
-
-export class Coordinates {
-  x;
-  y;
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
-}
 
 export abstract class Wall implements StaticDrawable {
   public id;

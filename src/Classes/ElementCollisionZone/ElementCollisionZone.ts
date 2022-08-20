@@ -1,5 +1,4 @@
-import { CollisionZone } from '../../Types/Types';
-import { Coordinates } from '../BrickWall/BrickWall';
+import { CollisionZone, Coordinates } from '../../Types/Types';
 
 export class ElementCollisionZone {
   A: Coordinates;

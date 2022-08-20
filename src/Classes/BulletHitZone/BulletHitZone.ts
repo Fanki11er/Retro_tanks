@@ -1,5 +1,4 @@
-import { CollisionZone } from '../../Types/Types';
-import { Coordinates } from '../BrickWall/BrickWall';
+import { CollisionZone, Coordinates } from '../../Types/Types';
 
 export class BulletHitZone {
   A: Coordinates;
@@ -12,11 +11,6 @@ export class BulletHitZone {
     this.B = new Coordinates(startCoordinates.x + resizeWidth / 2 + translateX, this.A.y + translateY);
     this.C = new Coordinates(this.A.x, startCoordinates.y + resizeHeight / 2 + translateY);
     this.D = new Coordinates(startCoordinates.x + resizeWidth / 2 + translateX, startCoordinates.y + resizeHeight / 2 + translateY);
-    //console.log(startCoordinates);
-    //console.log(this.A);
-    //console.log(this.B);
-    //console.log(this.C);
-    //console.log(this.D);
   }
 
   getCollisionZone() {

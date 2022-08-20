@@ -1,8 +1,7 @@
 import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { StaticDrawable } from '../../Types/Types';
+import { Coordinates, StaticDrawable } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
 import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
-import { Coordinates } from '../BrickWall/BrickWall';
 import { Bullet } from '../Bullet/Bullet';
 import { ChangeDirectionTextures } from '../ChangeDirectionTextures/ChangeDirectionTextures';
 import { Controls } from '../Controls/Controls';

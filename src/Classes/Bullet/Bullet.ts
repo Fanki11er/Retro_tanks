@@ -1,10 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { BulletTextures } from '../../Textures/BulletTextures/BulletTextures';
 import explosionTextures from '../../Textures/ExplosionTextures/ExplosionTextures';
-import { AmmunitionType, CollisionZone, Direction, StaticDrawable } from '../../Types/Types';
+import { AmmunitionType, CollisionZone, Coordinates, Direction, StaticDrawable } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
-import { Coordinates } from '../BrickWall/BrickWall';
-//import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
 import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 import { AnimationFrames } from '../AnimationFrame/AnimationFrame';

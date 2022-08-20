@@ -1,10 +1,17 @@
-import { Coordinates } from '../Classes/BrickWall/BrickWall';
-
 export type Direction = 'Forwards' | 'Left' | 'Right' | 'Backwards' | 'None';
 
 export type BoardElementType = 'Full' | 'Horizontally' | 'Vertically';
 
 export type MaterialType = 'Brick' | 'Concrete';
+
+export class Coordinates {
+  x;
+  y;
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+}
 
 export type CollisionZone = {
   A: Coordinates;
