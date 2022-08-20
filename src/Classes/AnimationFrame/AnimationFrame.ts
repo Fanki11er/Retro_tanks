@@ -19,6 +19,7 @@ export class AnimationFrames {
     }
     this.counter += 1;
     if (this.counter % delay === 0) {
+      this.counter = 0;
       this.index += 1;
       if (this.index === this.animationsFrames.length) {
         this.index = 0;

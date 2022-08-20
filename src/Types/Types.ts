@@ -4,6 +4,8 @@ export type Direction = 'Forwards' | 'Left' | 'Right' | 'Backwards' | 'None';
 
 export type BoardElementType = 'Full' | 'Horizontally' | 'Vertically';
 
+export type MaterialType = 'Brick' | 'Concrete';
+
 export type CollisionZone = {
   A: Coordinates;
   B: Coordinates;
@@ -25,7 +27,7 @@ export interface StaticDrawable {
 export type AmmunitionType = 'Standard' | 'Heavy';
 export type WallCoordinates = Coordinates | null;
 
-export type BrickWallRecipe = {
+export type WallRecipe = {
   1: HTMLImageElement[];
   2: HTMLImageElement[];
   3: HTMLImageElement[];

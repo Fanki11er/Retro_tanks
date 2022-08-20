@@ -1,5 +1,15 @@
-import { BoardElementType, MaterialType, WallRecipe } from '../../Types/Types';
-import { Wall } from '../Wall/Wall';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  AmmunitionType,
+  BoardElementType,
+  WallRecipe,
+  CollisionZone,
+  Direction,
+  StaticDrawable,
+  WallCoordinates,
+  MaterialType,
+} from '../../Types/Types';
+import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 
 export class Coordinates {
   x;
@@ -10,33 +20,7 @@ export class Coordinates {
   }
 }
 
-export class BrickWall extends Wall {
-  protected materialType: MaterialType;
-  constructor(xPos: number, yPos: number, size: number, wallRecipe: WallRecipe, type: BoardElementType, textureSize: number) {
-    super(xPos, yPos, size, wallRecipe, type, textureSize);
-    this.materialType = 'Brick';
-  }
-
-  protected getRowFromRecipe(row: number, column: number) {
-    if (row === 1 || row === 5) {
-      return this.wallRecipe[1][column];
-    }
-    if (row === 2 || row === 6) {
-      return this.wallRecipe[2][column];
-    }
-    if (row === 3 || row === 7) {
-      return this.wallRecipe[3][column];
-    }
-    if (row === 4 || row === 8) {
-      return this.wallRecipe[4][column];
-    }
-    return this.wallRecipe[1][0];
-  }
-}
-
-/*
-
-export class BrickWall implements StaticDrawable {
+export abstract class Wall implements StaticDrawable {
   public id;
   protected xPos;
   protected yPos;
@@ -44,6 +28,7 @@ export class BrickWall implements StaticDrawable {
   protected height;
   protected wallRecipe;
   protected type;
+  protected abstract materialType: MaterialType;
   protected coordinates: WallCoordinates[];
   protected collisionZone;
   public changed = false;
@@ -137,7 +122,13 @@ export class BrickWall implements StaticDrawable {
   }
 
   public processHit(ammunitionType: AmmunitionType, collisionZone: CollisionZone, yPos: number) {
-    this.deleteParts(collisionZone);
+    if ((this.materialType === 'Brick' && ammunitionType === 'Standard') || ammunitionType === 'Heavy') {
+      this.deleteParts(collisionZone);
+    }
+    if (this.materialType === 'Concrete' && ammunitionType === 'Heavy') {
+      this.deleteParts(collisionZone);
+    }
+
     if (this.numberOfElements <= 0) {
       this.isDestroyed = true;
       return this.id;
@@ -163,22 +154,6 @@ export class BrickWall implements StaticDrawable {
     if (hits) {
       this.changed = true;
     }
-  }
-
-  protected getRowFromRecipe(row: number, column: number) {
-    if (row === 1 || row === 5) {
-      return this.wallRecipe[1][column];
-    }
-    if (row === 2 || row === 6) {
-      return this.wallRecipe[2][column];
-    }
-    if (row === 3 || row === 7) {
-      return this.wallRecipe[3][column];
-    }
-    if (row === 4 || row === 8) {
-      return this.wallRecipe[4][column];
-    }
-    return this.wallRecipe[1][0];
   }
 
   public getPrecisionHitPlace(collisionZone: CollisionZone, direction: Direction) {
@@ -263,5 +238,7 @@ export class BrickWall implements StaticDrawable {
     }
     return null;
   }
-}*/
+
+  protected abstract getRowFromRecipe(row: number, column: number): HTMLImageElement;
+}
 

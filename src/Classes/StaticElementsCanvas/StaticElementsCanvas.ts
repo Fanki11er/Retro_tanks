@@ -25,7 +25,7 @@ export class StaticElementsCanvas {
   }
 
   update() {
-    this.canvasCtx?.clearRect(0, 0, 312, 312);
+    this.canvasCtx?.clearRect(20, 4, 312, 312);
     if (this.canvasCtx) {
       for (let i = 0; i < this.staticObjects.length; i++) {
         if (this.staticObjects[i].isDestroyed) {

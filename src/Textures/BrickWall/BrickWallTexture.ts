@@ -4,7 +4,7 @@ import brickMiddleTopPartImage from '../../assets/images/Bricks/Brick_middle_top
 import brickMiddleBottomPartImage from '../../assets/images/Bricks/Brick_middle_bottom.png';
 import brickRightTopPartImage from '../../assets/images/Bricks/Brick_right_top.png';
 import brickRightBottomPartImage from '../../assets/images/Bricks/Brick_right_bottom.png';
-import { BrickWallRecipe } from '../../Types/Types';
+import { WallRecipe } from '../../Types/Types';
 
 class BrickTextures {
   brickLeftTopPartTexture: HTMLImageElement;
@@ -88,5 +88,5 @@ export const brickWallRecipe = {
     brickTextures.brickRightBottomPartTexture,
     brickTextures.brickRightBottomPartTexture,
   ],
-} as BrickWallRecipe;
+} as WallRecipe;
 

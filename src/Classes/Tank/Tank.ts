@@ -17,7 +17,7 @@ export class Tank {
   private width;
   private height;
   controls;
-  private speed = 0.15;
+  private speed = 0.25;
   private image;
   private isBlockedBy;
   private staticObjects;
@@ -62,15 +62,16 @@ export class Tank {
       this.spawnAnimationFrames.animateFrames(20, context, this.xPos, this.yPos, this.isSpawning, 0);
     } else if (!this.isSpawning && this.isIndestructible) {
       this.update();
-      context.drawImage(this.image, this.xPos, this.yPos, 22, 22);
+      context.drawImage(this.image, this.xPos, this.yPos, 20, 20);
       this.indestructibleAnimationFrames.animateFrames(15, context, this.xPos - 2, this.yPos - 2, this.isIndestructible, 0);
     } else {
       this.update();
-      context.drawImage(this.image, this.xPos, this.yPos, 22, 22);
+      context.drawImage(this.image, this.xPos, this.yPos, 20, 20);
     }
   }
 
   public update() {
+    const moveAnimationSpeed = 15;
     this.isBlockedBy = false;
     this.isBlockedBy = Utils.checkForCollisionWithBorders(this.controls.direction, this.xPos, this.yPos, this.width, this.height, 372, 320);
 
@@ -96,7 +97,7 @@ export class Tank {
     }
 
     if (this.controls.direction === 'Forwards') {
-      this.setImage(this.moveAnimation.setImage(this.controls.direction, this.controls.move, 10));
+      this.setImage(this.moveAnimation.setImage(this.controls.direction, this.controls.move, moveAnimationSpeed));
 
       if (!this.isBlockedBy && this.controls.move) {
         this.yPos -= this.speed;
@@ -104,7 +105,7 @@ export class Tank {
       return;
     }
     if (this.controls.direction === 'Backwards') {
-      this.setImage(this.moveAnimation.setImage(this.controls.direction, this.controls.move, 10));
+      this.setImage(this.moveAnimation.setImage(this.controls.direction, this.controls.move, moveAnimationSpeed));
 
       if (!this.isBlockedBy && this.controls.move) {
         this.yPos += this.speed;
@@ -112,7 +113,7 @@ export class Tank {
       return;
     }
     if (this.controls.direction === 'Left') {
-      this.setImage(this.moveAnimation.setImage(this.controls.direction, this.controls.move, 10));
+      this.setImage(this.moveAnimation.setImage(this.controls.direction, this.controls.move, moveAnimationSpeed));
 
       if (!this.isBlockedBy && this.controls.move) {
         this.xPos -= this.speed;
@@ -120,7 +121,7 @@ export class Tank {
       return;
     }
     if (this.controls.direction === 'Right') {
-      this.setImage(this.moveAnimation.setImage(this.controls.direction, this.controls.move, 10));
+      this.setImage(this.moveAnimation.setImage(this.controls.direction, this.controls.move, moveAnimationSpeed));
 
       if (!this.isBlockedBy && this.controls.move) {
         this.xPos += this.speed;
@@ -138,7 +139,7 @@ export class Tank {
   fire() {
     if (!this.isLoading) {
       const { x, y } = this.setPositionOfBullet(4);
-      this.bullets.push(new Bullet(x, y, 2, 2, this.controls.direction, bulletTextures, this.staticObjects, this.bullets));
+      this.bullets.push(new Bullet(x, y, 2, 2, this.controls.direction, bulletTextures, this.staticObjects, this.bullets, 'Standard'));
       this.isLoading = true;
       this.isLoading &&
         setTimeout(() => {

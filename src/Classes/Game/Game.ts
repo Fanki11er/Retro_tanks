@@ -28,7 +28,7 @@ export class Game {
 
     setTimeout(() => {
       this.curtin.isBlocked = false;
-      this.playerTanks.push(new Tank(200, 156, 22, 22, player1smallTankTextures, this.levels[this.currentLevel].staticObjects, this.bullets));
+      this.playerTanks.push(new Tank(200, 156, 20, 20, player1smallTankTextures, this.levels[this.currentLevel].staticObjects, this.bullets));
     }, 1000);
   }
 }
