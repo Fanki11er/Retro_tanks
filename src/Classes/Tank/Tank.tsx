@@ -1,14 +1,15 @@
 import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { TankTextures } from '../../Textures/TanksTextures/TanksTextures';
 import { StaticDrawable } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
 import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
 import { Coordinates } from '../BrickWall/BrickWall';
 import { Bullet } from '../Bullet/Bullet';
+import { ChangeDirectionTextures } from '../ChangeDirectionTextures/ChangeDirectionTextures';
 import { Controls } from '../Controls/Controls';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 import indestructibleTextures from '../IndestructibleTextures/IndestructibleTextures';
 import spawnPointTextures from '../SpawnPointTextures/SpawnPointTextures';
+import { TankMoveAnimation } from '../TankMoveAnimation/TankMoveAnimation';
 
 export class Tank {
   xPos;
@@ -17,7 +18,6 @@ export class Tank {
   private height;
   controls;
   private speed = 0.15;
-  private textures: TankTextures;
   private image;
   private isBlockedBy;
   private staticObjects;
@@ -27,15 +27,23 @@ export class Tank {
   private isIndestructible = true;
   private spawnAnimationFrames;
   private indestructibleAnimationFrames;
+  private moveAnimation;
 
-  constructor(xPos: number, yPos: number, width: number, height: number, textures: TankTextures, staticObjects: StaticDrawable[], bullets: Bullet[]) {
+  constructor(
+    xPos: number,
+    yPos: number,
+    width: number,
+    height: number,
+    textures: ChangeDirectionTextures,
+    staticObjects: StaticDrawable[],
+    bullets: Bullet[],
+  ) {
     this.xPos = xPos;
     this.yPos = yPos;
     this.width = width;
     this.height = height;
     this.controls = new Controls();
-    this.textures = textures;
-    this.image = textures.topDirectionTexture;
+    this.image = textures.forwardDirectionTextures[0];
     this.isBlockedBy = false;
     this.staticObjects = staticObjects;
     this.bullets = bullets;
@@ -43,6 +51,8 @@ export class Tank {
     this.isSpawning = true;
     this.spawnAnimationFrames = new AnimationFrames(spawnPointTextures.animationTexture, spawnPointTextures.textureSize);
     this.indestructibleAnimationFrames = new AnimationFrames(indestructibleTextures.animationTexture, indestructibleTextures.textureSize);
+    this.moveAnimation = new TankMoveAnimation(textures);
+
     this.madeIndestructible(4000);
     this.spawn(2500);
   }
@@ -86,7 +96,7 @@ export class Tank {
     }
 
     if (this.controls.direction === 'Forwards') {
-      this.setImage(this.textures.topDirectionTexture);
+      this.setImage(this.moveAnimation.setImage(this.controls.direction, this.controls.move, 10));
 
       if (!this.isBlockedBy && this.controls.move) {
         this.yPos -= this.speed;
@@ -94,7 +104,7 @@ export class Tank {
       return;
     }
     if (this.controls.direction === 'Backwards') {
-      this.setImage(this.textures.downDirectionTexture);
+      this.setImage(this.moveAnimation.setImage(this.controls.direction, this.controls.move, 10));
 
       if (!this.isBlockedBy && this.controls.move) {
         this.yPos += this.speed;
@@ -102,7 +112,7 @@ export class Tank {
       return;
     }
     if (this.controls.direction === 'Left') {
-      this.setImage(this.textures.leftDirectionTexture);
+      this.setImage(this.moveAnimation.setImage(this.controls.direction, this.controls.move, 10));
 
       if (!this.isBlockedBy && this.controls.move) {
         this.xPos -= this.speed;
@@ -110,7 +120,7 @@ export class Tank {
       return;
     }
     if (this.controls.direction === 'Right') {
-      this.setImage(this.textures.rightDirectionTexture);
+      this.setImage(this.moveAnimation.setImage(this.controls.direction, this.controls.move, 10));
 
       if (!this.isBlockedBy && this.controls.move) {
         this.xPos += this.speed;

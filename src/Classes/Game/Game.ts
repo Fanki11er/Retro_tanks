@@ -1,9 +1,8 @@
-import { userSmallTankTextures } from '../../Textures/TanksTextures/TanksTextures';
+import { player1smallTankTextures } from '../../Textures/TanksTextures/TanksTextures';
 import { Bullet } from '../Bullet/Bullet';
 import { Curtin } from '../Curtin/Curtin';
 import { GameInfoCanvas } from '../GameInfoCanvas/GameInfoCanvas';
 import { Level } from '../Level/Level';
-//import { spawnPointTextures } from '../SpawnPointTextures/SpawnPointTextures';
 import { StaticElementsCanvas } from '../StaticElementsCanvas/StaticElementsCanvas';
 import { Tank } from '../Tank/Tank';
 
@@ -29,7 +28,7 @@ export class Game {
 
     setTimeout(() => {
       this.curtin.isBlocked = false;
-      this.playerTanks.push(new Tank(200, 156, 22, 22, userSmallTankTextures, this.levels[this.currentLevel].staticObjects, this.bullets));
+      this.playerTanks.push(new Tank(200, 156, 22, 22, player1smallTankTextures, this.levels[this.currentLevel].staticObjects, this.bullets));
     }, 1000);
   }
 }
