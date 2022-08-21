@@ -14,8 +14,8 @@ const Canvas = () => {
       if (renderCtx) {
         setContext(renderCtx);
       }
-      game.startGame();
-      const animate = () => {
+      game.startGame(renderCtx!);
+      /*const animate = () => {
         //game.playerTanks[0] && game.playerTanks[0].update();
         renderCtx?.clearRect(0, 0, 372, 320);
         if (game.gameStatus === 'Paused') {
@@ -31,7 +31,7 @@ const Canvas = () => {
 
         requestAnimationFrame(animate);
       };
-      animate();
+      animate();*/
     }
   }, [context, game]);
 

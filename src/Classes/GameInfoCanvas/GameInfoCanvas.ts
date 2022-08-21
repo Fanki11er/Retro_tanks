@@ -89,5 +89,16 @@ export class GameInfoCanvas {
       this.canvasCtx.fillText(`${roundNumber}`, 351, 300, 30);
     }
   }
+
+  /*public drawGameOverInfo() {
+    const text = 'GAME OVER';
+    const fontSize = 30;
+    if (this.canvasCtx) {
+      this.canvasCtx.fillStyle = 'red';
+      this.canvasCtx.font = `bold ${fontSize}px Arial`;
+      const textMetrics = this.canvasCtx.measureText(text);
+      this.canvasCtx.fillText(text, this.width / 2 - textMetrics.width / 2 - 10, this.height / 2 - fontSize / 2 + fontSize, 200);
+    }
+  }*/
 }
 

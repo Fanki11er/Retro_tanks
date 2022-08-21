@@ -15,9 +15,5 @@ const concreteTextures = new ConcreteTextures(ConcreteWallImage);
 
 export const concreteWallRecipe = {
   1: [concreteTextures.elementTexture],
-  2: [],
-
-  3: [],
-  4: [],
 } as WallRecipe;
 

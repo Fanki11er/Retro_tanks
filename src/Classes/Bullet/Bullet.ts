@@ -65,9 +65,12 @@ export class Bullet {
       if (!this.collisionWith.length) {
         return;
       }
-      hitCoordinates = this.collisionWith[0].getPrecisionHitPlace(
+      //hitCoordinates = this.collisionWith[0].getPrecisionHitPlace(
+      hitCoordinates = Utils.getPrecisionHitPlace(
         new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
         this.direction,
+        this.collisionWith[0].getInnerCoordinates(),
+        this.collisionWith[0].getTextureSize(),
       );
 
       if (hitCoordinates) {

@@ -23,21 +23,27 @@ export type CollisionZone = {
 export interface StaticDrawable {
   draw: (ctx: CanvasRenderingContext2D) => void;
   getCollisionZone: () => CollisionZone;
+  getInnerCoordinates: () => WallCoordinates[];
+  getTextureSize: () => number;
   id: string;
   changed: boolean;
   isDestroyed: boolean;
   processHit: (ammunitionType: AmmunitionType, collisionZone: CollisionZone, yPos: number) => string;
-  getPrecisionHitPlace: (collisionZone: CollisionZone, direction: Direction) => WallCoordinates;
+  //getPrecisionHitPlace: (collisionZone: CollisionZone, direction: Direction) => WallCoordinates;
   getPrecisionCollisionPlace: (collisionZone: CollisionZone, direction: Direction) => WallCoordinates;
 }
 
 export type AmmunitionType = 'Standard' | 'Heavy';
 export type WallCoordinates = Coordinates | null;
 
-export type WallRecipe = {
+/*export type WallRecipe = {
   1: HTMLImageElement[];
   2: HTMLImageElement[];
   3: HTMLImageElement[];
   4: HTMLImageElement[];
+};*/
+
+export type WallRecipe = {
+  [k: number]: HTMLImageElement[];
 };
 

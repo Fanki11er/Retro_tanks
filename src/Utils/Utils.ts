@@ -1,5 +1,5 @@
 import { Bullet } from '../Classes/Bullet/Bullet';
-import { Direction, StaticDrawable } from '../Types/Types';
+import { CollisionZone, Direction, StaticDrawable, WallCoordinates } from '../Types/Types';
 
 export class Utils {
   static checkForCollisionWithObjects(
@@ -108,6 +108,89 @@ export class Utils {
     if (elementIndex >= 0) {
       array.splice(elementIndex, 1);
     }
+  }
+
+  /*static getPrecisionCollisionPlace(collisionZone: CollisionZone, direction: Direction, coordinates: WallCoordinates[], textureSize: number) {
+    if (direction === 'Forwards') {
+      for (let i = 0; i < coordinates.length; i++) {
+        if (
+          coordinates[i] &&
+          coordinates[i]!.x + 0.2 < collisionZone.B.x &&
+          coordinates[i]!.x + textureSize - 0.2 > collisionZone.A.x &&
+          coordinates[i]!.y <= collisionZone.C.y &&
+          coordinates[i]!.y + textureSize >= collisionZone.A.y
+        ) {
+          return { x: collisionZone.A.x, y: collisionZone.A.y };
+        }
+      }
+    }
+    if (direction === 'Backwards') {
+      for (let i = 0; coordinates.length; i++) {
+        if (
+          coordinates[i] &&
+          coordinates[i]!.x + 0.2 < collisionZone.B.x &&
+          coordinates[i]!.x + textureSize - 0.2 > collisionZone.A.x &&
+          coordinates[i]!.y <= collisionZone.C.y &&
+          coordinates[i]!.y + textureSize >= collisionZone.A.y
+        ) {
+          return { x: collisionZone.C.x, y: collisionZone.C.y };
+        }
+      }
+    }
+    if (direction === 'Left') {
+      for (let i = 0; coordinates.length; i++) {
+        if (
+          coordinates[i] &&
+          coordinates[i]!.x <= collisionZone.B.x &&
+          coordinates[i]!.x + textureSize >= collisionZone.A.x &&
+          coordinates[i]!.y + 0.2 < collisionZone.C.y &&
+          coordinates[i]!.y + textureSize - 0.2 > collisionZone.A.y
+        ) {
+          return { x: collisionZone.A.x, y: collisionZone.A.y };
+        }
+      }
+    }
+    if (direction === 'Right') {
+      for (let i = 0; i < coordinates.length; i++) {
+        if (
+          coordinates[i] &&
+          coordinates[i]!.x <= collisionZone.B.x &&
+          coordinates[i]!.x + textureSize >= collisionZone.A.x &&
+          coordinates[i]!.y + 0.2 < collisionZone.C.y &&
+          coordinates[i]!.y + textureSize - 0.2 > collisionZone.A.y
+        ) {
+          return { x: collisionZone.B.x, y: collisionZone.B.y };
+        }
+      }
+    }
+    return null;
+  }*/
+
+  static getPrecisionHitPlace(collisionZone: CollisionZone, direction: Direction, coordinates: WallCoordinates[], textureSize: number) {
+    for (let i = 0; i < coordinates.length; i++) {
+      if (
+        coordinates[i] &&
+        coordinates[i]!.x <= collisionZone.B.x &&
+        coordinates[i]!.x + textureSize >= collisionZone.A.x &&
+        coordinates[i]!.y <= collisionZone.C.y &&
+        coordinates[i]!.y + textureSize >= collisionZone.A.y
+      ) {
+        if (direction === 'Forwards') {
+          return { x: collisionZone.A.x + 1, y: collisionZone.A.y };
+        }
+        if (direction === 'Backwards') {
+          return { x: collisionZone.C.x + 1, y: collisionZone.C.y };
+        }
+
+        if (direction === 'Left') {
+          return { x: collisionZone.A.x, y: collisionZone.A.y + 1 };
+        }
+        if (direction === 'Right') {
+          return { x: collisionZone.B.x, y: collisionZone.B.y + 1 };
+        }
+      }
+    }
+    return null;
   }
 }
 

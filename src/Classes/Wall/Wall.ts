@@ -148,7 +148,7 @@ export abstract class Wall implements StaticDrawable {
     }
   }
 
-  public getPrecisionHitPlace(collisionZone: CollisionZone, direction: Direction) {
+  /*public getPrecisionHitPlace(collisionZone: CollisionZone, direction: Direction) {
     for (let i = 0; i < this.coordinates.length; i++) {
       if (
         this.coordinates[i] &&
@@ -173,6 +173,13 @@ export abstract class Wall implements StaticDrawable {
       }
     }
     return null;
+  }*/
+
+  getInnerCoordinates() {
+    return this.coordinates;
+  }
+  getTextureSize() {
+    return this.textureSize;
   }
 
   public getPrecisionCollisionPlace(collisionZone: CollisionZone, direction: Direction) {

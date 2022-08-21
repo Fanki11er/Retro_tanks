@@ -7,6 +7,7 @@ export class StaticElementsCanvas {
   canvas;
   canvasCtx;
   staticObjects: StaticDrawable[];
+  isEagleDestroyed = false;
 
   constructor(width: number, height: number, levelStaticElements: StaticDrawable[]) {
     this.width = width;
@@ -28,8 +29,11 @@ export class StaticElementsCanvas {
     this.canvasCtx?.clearRect(20, 4, 312, 312);
     if (this.canvasCtx) {
       for (let i = 0; i < this.staticObjects.length; i++) {
-        if (this.staticObjects[i].isDestroyed) {
+        if (this.staticObjects[i].isDestroyed && this.staticObjects[i].id !== 'Eagle') {
           Utils.removeDestroyedElement(this.staticObjects, this.staticObjects[i].id);
+        }
+        if (this.staticObjects[i].isDestroyed && this.staticObjects[i].id === 'Eagle') {
+          this.isEagleDestroyed = true;
         }
         this.staticObjects[i] && this.staticObjects[i].draw(this.canvasCtx);
       }
