@@ -1,5 +1,6 @@
-//import { v4 as uuidv4 } from 'uuid';
-import { AmmunitionType, CollisionZone, Coordinates, Direction, StaticDrawable } from '../../Types/Types';
+import { largeExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
+import { StaticDrawable } from '../../Types/Types';
+import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
 import { eagleTextures } from '../EagleTextures/EagleTextures';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 
@@ -13,6 +14,7 @@ export class Eagle implements StaticDrawable {
   textures = eagleTextures;
   collisionZone;
   changed;
+  explosionAnimationFrames;
 
   constructor(xPos: number, yPos: number, size: number) {
     this.id = 'Eagle';
@@ -23,6 +25,7 @@ export class Eagle implements StaticDrawable {
     this.changed = false;
     this.isDestroyed = false;
     this.collisionZone = new ElementCollisionZone({ x: xPos, y: yPos }, this.width, this.height);
+    this.explosionAnimationFrames = new AnimationFrames(largeExplosionTextures.animationTexture, largeExplosionTextures.textureSize);
   }
 
   public draw(ctx: CanvasRenderingContext2D) {
@@ -30,6 +33,10 @@ export class Eagle implements StaticDrawable {
       ctx.drawImage(eagleTextures.notDamagedTexture, this.xPos, this.yPos);
     } else {
       ctx.drawImage(eagleTextures.damagedTexture, this.xPos, this.yPos);
+      this.explosionAnimationFrames.animateFrames(20, ctx, this.xPos, this.yPos, false, 1);
+      if (!this.explosionAnimationFrames.animationEnded) {
+        this.changed = true;
+      }
     }
   }
 

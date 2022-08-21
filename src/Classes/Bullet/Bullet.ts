@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { BulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import explosionTextures from '../../Textures/ExplosionTextures/ExplosionTextures';
+import { smallExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
 import { AmmunitionType, CollisionZone, Coordinates, Direction, StaticDrawable } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
 import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
@@ -44,7 +44,7 @@ export class Bullet {
     this.setImageForDirection();
     this.staticObjects = staticObjects;
     this.bullets = bullets;
-    this.explosionAnimationFrames = new AnimationFrames(explosionTextures.animationTexture, explosionTextures.textureSize);
+    this.explosionAnimationFrames = new AnimationFrames(smallExplosionTextures.animationTexture, smallExplosionTextures.textureSize);
     this.speed = 0.5;
     this.ammunitionType = ammunitionType;
     this.id = uuidv4();

@@ -4,10 +4,16 @@ import largeExplosionImage from '../../assets/images/Explosions/Explosion_large.
 import veryLargeExplosionImage from '../../assets/images/Explosions/Explosion_very_large.png';
 import { AnimationTextures } from '../../Classes/AnimationTextures/AnimationTextures';
 
-const explosionTextures = new AnimationTextures(30);
-explosionTextures.addTextures(smallExplosionImage);
-explosionTextures.addTextures(mediumExplosionImage);
-explosionTextures.addTextures(largeExplosionImage);
-explosionTextures.addTextures(veryLargeExplosionImage);
-export default explosionTextures;
+const smallExplosionTextures = new AnimationTextures(30);
+smallExplosionTextures.addTextures(smallExplosionImage);
+smallExplosionTextures.addTextures(mediumExplosionImage);
+smallExplosionTextures.addTextures(largeExplosionImage);
+
+const largeExplosionTextures = new AnimationTextures(30);
+largeExplosionTextures.addTextures(smallExplosionImage);
+largeExplosionTextures.addTextures(mediumExplosionImage);
+largeExplosionTextures.addTextures(largeExplosionImage);
+largeExplosionTextures.addTextures(veryLargeExplosionImage);
+
+export { smallExplosionTextures, largeExplosionTextures };
 
