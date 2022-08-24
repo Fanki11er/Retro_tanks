@@ -1,5 +1,5 @@
 import { Bullet } from '../Classes/Bullet/Bullet';
-import { CollisionZone, Direction, StaticDrawable, WallCoordinates } from '../Types/Types';
+import { BoardElementType, CollisionZone, Direction, MaterialType, StaticDrawable, StaticObjectsRecipe, WallCoordinates } from '../Types/Types';
 
 export class Utils {
   static checkForCollisionWithObjects(
@@ -191,6 +191,15 @@ export class Utils {
       }
     }
     return null;
+  }
+
+  static makeStaticObjectRecipe(material: MaterialType, xPos: number, yPos: number, layoutType: BoardElementType): StaticObjectsRecipe {
+    return {
+      material,
+      xPos,
+      yPos,
+      layoutType,
+    };
   }
 }
 

@@ -1,9 +1,8 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { StyledCanvas } from './Canvas.styles';
 import { GameContext } from '../../../Providers/GameProvider';
 
 const Canvas = () => {
-  const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const { game } = useContext(GameContext);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -11,29 +10,35 @@ const Canvas = () => {
   useEffect(() => {
     if (canvasRef.current) {
       const renderCtx = canvasRef.current.getContext('2d');
-      if (renderCtx) {
-        setContext(renderCtx);
-      }
-      game.startGame(renderCtx!);
-      /*const animate = () => {
-        //game.playerTanks[0] && game.playerTanks[0].update();
+      const animate = () => {
         renderCtx?.clearRect(0, 0, 372, 320);
-        if (game.gameStatus === 'Paused') {
-          renderCtx && game.curtin.drawCurtin(renderCtx, 1, game.currentLevel);
+        if (game.gameStatus === 'Started' || game.gameStatus === 'ShowingResults') {
+          renderCtx && game.curtin.drawCurtin(renderCtx, 1, game.currentLevelNumber);
+          /*if (!game.curtin.isClosed) {
+            game.gameStatus = 'Started';
+          }*/
         }
+        if (game.staticObjectsCanvas?.isEagleDestroyed) {
+          game.gameStatus = 'GameOver';
+          renderCtx && game.gameOverAnimation.animate(renderCtx, 5);
+        }
+
         renderCtx && game.gameInfo.draw(renderCtx);
-        game.playerTanks[0] && renderCtx && game.playerTanks[0].draw(renderCtx);
+        game.player1Tanks && renderCtx && game.player1Tanks.draw(renderCtx);
         renderCtx && game.staticObjectsCanvas && game.staticObjectsCanvas.draw(renderCtx);
-        renderCtx &&
+        /*renderCtx &&
           game.bullets.forEach((bullet) => {
             bullet.draw(renderCtx);
-          });
+          });*/
+        renderCtx && game.renderBullets(renderCtx);
+        renderCtx && game.renderExplosions(renderCtx);
 
         requestAnimationFrame(animate);
       };
-      animate();*/
+
+      animate();
     }
-  }, [context, game]);
+  }, [game]);
 
   return <StyledCanvas ref={canvasRef} width={372} height={320} />;
 };

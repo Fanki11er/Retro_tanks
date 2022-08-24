@@ -6,6 +6,7 @@ import { Utils } from '../../Utils/Utils';
 import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
+import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
 
 export class Bullet {
   private xPos;
@@ -13,7 +14,7 @@ export class Bullet {
   private width;
   private height;
   private textures: BulletTextures;
-  private explosionAnimationFrames;
+  //private explosionAnimationFrames;
   private direction;
   private image: HTMLImageElement | null = null;
   private staticObjects;
@@ -23,6 +24,7 @@ export class Bullet {
   public id;
   private ammunitionType;
   private collisionWith: StaticDrawable[] = [];
+  private explosions: ExplosionAnimationFrames[];
 
   constructor(
     xPos: number,
@@ -33,6 +35,7 @@ export class Bullet {
     textures: BulletTextures,
     staticObjects: StaticDrawable[],
     bullets: Bullet[],
+    explosions: ExplosionAnimationFrames[],
     ammunitionType: AmmunitionType = 'Standard',
   ) {
     this.xPos = xPos;
@@ -44,7 +47,8 @@ export class Bullet {
     this.setImageForDirection();
     this.staticObjects = staticObjects;
     this.bullets = bullets;
-    this.explosionAnimationFrames = new AnimationFrames(smallExplosionTextures.animationTexture, smallExplosionTextures.textureSize);
+    // this.explosionAnimationFrames = new AnimationFrames(smallExplosionTextures.animationTexture, smallExplosionTextures.textureSize);
+    this.explosions = explosions;
     this.speed = 0.5;
     this.ammunitionType = ammunitionType;
     this.id = uuidv4();
@@ -105,10 +109,19 @@ export class Bullet {
 
     if (this.hit) {
       const explosionPosition = this.getExplosionPosition();
-      this.explosionAnimationFrames.animateFrames(20, context, explosionPosition.x, explosionPosition.y, false, 1);
-      if (this.explosionAnimationFrames.animationEnded) {
-        Utils.removeDestroyedElement(this.bullets, this.id);
-      }
+      this.explosions.push(
+        new ExplosionAnimationFrames(
+          smallExplosionTextures.animationTexture,
+          smallExplosionTextures.textureSize,
+          20,
+          explosionPosition.x,
+          explosionPosition.y,
+        ),
+      );
+      //this.explosionAnimationFrames.animateFrames(20, context, explosionPosition.x, explosionPosition.y, false, 1);
+      //if (this.explosionAnimationFrames.animationEnded) {
+      Utils.removeDestroyedElement(this.bullets, this.id);
+      // }
     }
   }
 
@@ -156,25 +169,25 @@ export class Bullet {
   private getExplosionPosition(): Coordinates {
     switch (this.direction) {
       case 'Forwards': {
-        return { x: this.xPos - this.explosionAnimationFrames.textureSize / 2 + this.width / 2, y: this.yPos - 10 };
+        return { x: this.xPos - smallExplosionTextures.textureSize / 2 + this.width / 2, y: this.yPos - 10 };
       }
       case 'Backwards': {
         return {
-          x: this.xPos - this.explosionAnimationFrames.textureSize / 2 + this.width / 2,
-          y: this.yPos + this.height - this.explosionAnimationFrames.textureSize + 10,
+          x: this.xPos - smallExplosionTextures.textureSize / 2 + this.width / 2,
+          y: this.yPos + this.height - smallExplosionTextures.textureSize + 10,
         };
       }
       case 'Left': {
         return {
           x: this.xPos - 10,
-          y: this.yPos - this.explosionAnimationFrames.textureSize / 2 + this.width / 2,
+          y: this.yPos - smallExplosionTextures.textureSize / 2 + this.width / 2,
         };
       }
 
       case 'Right': {
         return {
-          x: this.xPos + this.width - this.explosionAnimationFrames.textureSize + 10,
-          y: this.yPos - this.explosionAnimationFrames.textureSize / 2 + this.width / 2,
+          x: this.xPos + this.width - smallExplosionTextures.textureSize + 10,
+          y: this.yPos - smallExplosionTextures.textureSize / 2 + this.width / 2,
         };
       }
       default: {

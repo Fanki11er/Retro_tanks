@@ -31,8 +31,7 @@ export class StaticElementsCanvas {
       for (let i = 0; i < this.staticObjects.length; i++) {
         if (this.staticObjects[i].isDestroyed && this.staticObjects[i].id !== 'Eagle') {
           Utils.removeDestroyedElement(this.staticObjects, this.staticObjects[i].id);
-        }
-        if (this.staticObjects[i].isDestroyed && this.staticObjects[i].id === 'Eagle') {
+        } else if (this.staticObjects[i].isDestroyed && this.staticObjects[i].id === 'Eagle') {
           this.isEagleDestroyed = true;
         }
         this.staticObjects[i] && this.staticObjects[i].draw(this.canvasCtx);
@@ -43,8 +42,8 @@ export class StaticElementsCanvas {
   checkForChanges() {
     for (let i = 0; i < this.staticObjects.length; i++) {
       if (this.staticObjects[i].changed) {
-        this.staticObjects[i].changed = false;
         this.update();
+        this.staticObjects[i].changed = false;
         return;
       }
     }

@@ -1,26 +1,27 @@
 import { createContext, PropsWithChildren, useCallback, useEffect, useRef } from 'react';
 import { Direction } from '../Types/Types';
-import { level1 } from '../Levels/Levels';
+//import { level1 } from '../Levels/Levels';
 import { Game } from '../Classes/Game/Game';
+import { levels } from '../Levels/Levels';
 
 export const GameContext = createContext({
   handleChangeDirection: (direction: Direction) => {},
   handleShot: () => {},
-  game: new Game(1, [level1]),
+  game: new Game(1, levels),
 });
 
 const GameProvider = (props: PropsWithChildren<any>) => {
-  const { current: game } = useRef(new Game(1, [level1]));
+  const { current: game } = useRef(new Game(1, levels));
   //const test = game.current;
 
   const handleChangeDirection = useCallback(
     (direction: Direction) => {
-      game.playerTanks[0].controls.setDirection(direction);
+      game.player1Tanks && game.player1Tanks.controls.setDirection(direction);
     },
     [game],
   );
   const handleShot = useCallback(() => {
-    game.playerTanks[0].fire();
+    game.player1Tanks && game.player1Tanks.fire();
   }, [game]);
 
   const context = {

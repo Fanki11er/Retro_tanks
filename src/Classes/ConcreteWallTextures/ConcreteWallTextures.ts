@@ -14,6 +14,8 @@ class ConcreteTextures {
 const concreteTextures = new ConcreteTextures(ConcreteWallImage);
 
 export const concreteWallRecipe = {
+  textureSize: 12,
+  elementSize: 24,
   1: [concreteTextures.elementTexture],
 } as WallRecipe;
 

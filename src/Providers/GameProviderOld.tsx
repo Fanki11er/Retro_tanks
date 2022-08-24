@@ -3,7 +3,7 @@ import { Tank } from '../Classes/Tank/Tank';
 import { Direction } from '../Types/Types';
 //import { userSmallTankTextures } from '../Textures/TanksTextures/TanksTextures';
 import { StaticElementsCanvas } from '../Classes/StaticElementsCanvas/StaticElementsCanvas';
-import { level1 } from '../Levels/Levels';
+//import { level1 } from '../Levels/Levels';
 import { Bullet } from '../Classes/Bullet/Bullet';
 /*
 

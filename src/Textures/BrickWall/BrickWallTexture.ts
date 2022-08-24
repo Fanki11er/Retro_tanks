@@ -47,6 +47,8 @@ const brickTextures = new BrickTextures(
 );
 
 export const brickWallRecipe = {
+  textureSize: 3,
+  elementSize: 24,
   1: [
     brickTextures.brickRightTopPartTexture,
     brickTextures.brickRightTopPartTexture,

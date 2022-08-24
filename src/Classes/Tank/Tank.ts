@@ -7,6 +7,7 @@ import { Bullet } from '../Bullet/Bullet';
 import { ChangeDirectionTextures } from '../ChangeDirectionTextures/ChangeDirectionTextures';
 import { Controls } from '../Controls/Controls';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
+import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
 import indestructibleTextures from '../IndestructibleTextures/IndestructibleTextures';
 import spawnPointTextures from '../SpawnPointTextures/SpawnPointTextures';
 import { TankMoveAnimation } from '../TankMoveAnimation/TankMoveAnimation';
@@ -28,6 +29,7 @@ export class Tank {
   private spawnAnimationFrames;
   private indestructibleAnimationFrames;
   private moveAnimation;
+  private explosions: ExplosionAnimationFrames[];
 
   constructor(
     xPos: number,
@@ -37,6 +39,7 @@ export class Tank {
     textures: ChangeDirectionTextures,
     staticObjects: StaticDrawable[],
     bullets: Bullet[],
+    explosions: ExplosionAnimationFrames[],
   ) {
     this.xPos = xPos;
     this.yPos = yPos;
@@ -52,6 +55,7 @@ export class Tank {
     this.spawnAnimationFrames = new AnimationFrames(spawnPointTextures.animationTexture, spawnPointTextures.textureSize);
     this.indestructibleAnimationFrames = new AnimationFrames(indestructibleTextures.animationTexture, indestructibleTextures.textureSize);
     this.moveAnimation = new TankMoveAnimation(textures);
+    this.explosions = explosions;
 
     this.madeIndestructible(4000);
     this.spawn(2500);
@@ -142,12 +146,14 @@ export class Tank {
   fire() {
     if (!this.isLoading) {
       const { x, y } = this.setPositionOfBullet(4);
-      this.bullets.push(new Bullet(x, y, 2, 2, this.controls.direction, bulletTextures, this.staticObjects, this.bullets, 'Standard'));
+      this.bullets.push(
+        new Bullet(x, y, 2, 2, this.controls.direction, bulletTextures, this.staticObjects, this.bullets, this.explosions, 'Standard'),
+      );
       this.isLoading = true;
       this.isLoading &&
         setTimeout(() => {
           this.isLoading = false;
-        }, 1000);
+        }, 500);
     }
   }
 

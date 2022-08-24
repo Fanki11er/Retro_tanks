@@ -4,6 +4,8 @@ export type BoardElementType = 'Full' | 'Horizontally' | 'Vertically';
 
 export type MaterialType = 'Brick' | 'Concrete';
 
+export type EnemyTankTypes = 'Small';
+
 export class Coordinates {
   x;
   y;
@@ -44,6 +46,27 @@ export type WallCoordinates = Coordinates | null;
 };*/
 
 export type WallRecipe = {
+  textureSize: number;
+  elementSize: number;
   [k: number]: HTMLImageElement[];
+};
+
+export type LevelRecipe = {
+  staticObjectsRecipe: StaticObjectsRecipe[];
+  eagle: EagleRecipe;
+  eagleBorders: StaticObjectsRecipe[];
+};
+
+export type StaticObjectsRecipe = {
+  material: MaterialType;
+  xPos: number;
+  yPos: number;
+  layoutType: BoardElementType;
+};
+
+export type EagleRecipe = {
+  xPos: number;
+  yPos: number;
+  size: number;
 };
 

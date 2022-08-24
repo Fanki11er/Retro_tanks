@@ -33,10 +33,6 @@ export class Eagle implements StaticDrawable {
       ctx.drawImage(eagleTextures.notDamagedTexture, this.xPos, this.yPos);
     } else {
       ctx.drawImage(eagleTextures.damagedTexture, this.xPos, this.yPos);
-      this.explosionAnimationFrames.animateFrames(20, ctx, this.xPos, this.yPos, false, 1);
-      if (!this.explosionAnimationFrames.animationEnded) {
-        this.changed = true;
-      }
     }
   }
 
