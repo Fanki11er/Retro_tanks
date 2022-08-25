@@ -1,6 +1,5 @@
-import { Direction } from 'readline';
 import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { CollisionZone, Coordinates, StaticDrawable } from '../../Types/Types';
+import { Coordinates, StaticDrawable } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
 import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
 import { Bullet } from '../Bullet/Bullet';
@@ -92,11 +91,8 @@ export class Tank {
         for (let i = 0; i < collisionWith.length; i++) {
           if (!this.isBlockedBy) {
             this.isBlockedBy = !!collisionWith[i].getPrecisionCollisionPlace(
-              //this.isBlockedBy = !!Utils.getPrecisionCollisionPlace(
               new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
               this.controls.direction,
-              /*collisionWith[i].getInnerCoordinates(),
-              3,*/
             );
           }
         }
@@ -144,7 +140,7 @@ export class Tank {
   }
 
   fire() {
-    if (!this.isLoading) {
+    if (!this.isLoading && !this.isSpawning) {
       const { x, y } = this.setPositionOfBullet(4);
       this.bullets.push(
         new Bullet(x, y, 2, 2, this.controls.direction, bulletTextures, this.staticObjects, this.bullets, this.explosions, 'Standard'),

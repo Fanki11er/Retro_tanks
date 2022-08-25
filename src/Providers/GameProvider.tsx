@@ -1,6 +1,5 @@
 import { createContext, PropsWithChildren, useCallback, useEffect, useRef } from 'react';
 import { Direction } from '../Types/Types';
-//import { level1 } from '../Levels/Levels';
 import { Game } from '../Classes/Game/Game';
 import { levels } from '../Levels/Levels';
 
@@ -12,7 +11,6 @@ export const GameContext = createContext({
 
 const GameProvider = (props: PropsWithChildren<any>) => {
   const { current: game } = useRef(new Game(1, levels));
-  //const test = game.current;
 
   const handleChangeDirection = useCallback(
     (direction: Direction) => {
@@ -50,7 +48,9 @@ const GameProvider = (props: PropsWithChildren<any>) => {
       }
     };
     const stopMove = (e: KeyboardEvent) => {
-      handleChangeDirection('None');
+      if (e.key !== ' ') {
+        handleChangeDirection('None');
+      }
     };
     window.addEventListener('keydown', (e) => move(e));
     window.addEventListener('keyup', (e) => stopMove(e));
