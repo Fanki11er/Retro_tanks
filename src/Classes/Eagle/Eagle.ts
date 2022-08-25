@@ -1,8 +1,8 @@
 import { largeExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
 import { StaticDrawable } from '../../Types/Types';
-import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
 import { eagleTextures } from '../EagleTextures/EagleTextures';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
+import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
 
 export class Eagle implements StaticDrawable {
   id;
@@ -14,9 +14,9 @@ export class Eagle implements StaticDrawable {
   textures = eagleTextures;
   collisionZone;
   changed;
-  explosionAnimationFrames;
+  private explosions;
 
-  constructor(xPos: number, yPos: number, size: number) {
+  constructor(xPos: number, yPos: number, size: number, explosions: ExplosionAnimationFrames[]) {
     this.id = 'Eagle';
     this.xPos = xPos;
     this.yPos = yPos;
@@ -25,7 +25,7 @@ export class Eagle implements StaticDrawable {
     this.changed = false;
     this.isDestroyed = false;
     this.collisionZone = new ElementCollisionZone({ x: xPos, y: yPos }, this.width, this.height);
-    this.explosionAnimationFrames = new AnimationFrames(largeExplosionTextures.animationTexture, largeExplosionTextures.textureSize);
+    this.explosions = explosions;
   }
 
   public draw(ctx: CanvasRenderingContext2D) {
@@ -51,6 +51,9 @@ export class Eagle implements StaticDrawable {
   }
 
   processHit() {
+    this.explosions.push(
+      new ExplosionAnimationFrames(largeExplosionTextures.animationTexture, largeExplosionTextures.textureSize, 20, this.xPos, this.yPos),
+    );
     this.isDestroyed = true;
     this.changed = true;
     return '';

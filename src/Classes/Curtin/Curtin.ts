@@ -13,6 +13,7 @@ export class Curtin {
 
   drawCurtin(canvasCtx: CanvasRenderingContext2D, delay: number, stage: number) {
     if (canvasCtx) {
+      //canvasCtx.globalCompositeOperation = 'source-over';
       canvasCtx.clearRect(0, 0, this.width, this.height);
       canvasCtx.fillStyle = 'rgba(127, 127, 127, 1)';
       canvasCtx.fillRect(0, 0, this.width, this.height / 2 - this.offset);

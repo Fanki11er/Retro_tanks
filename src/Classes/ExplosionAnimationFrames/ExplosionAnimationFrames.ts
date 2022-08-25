@@ -15,6 +15,7 @@ export class ExplosionAnimationFrames extends Animation {
   animateFrames(ctx: CanvasRenderingContext2D) {
     let image = this.animationsFrames[this.index];
     if (this.index < this.animationsFrames.length) {
+      ctx!.globalCompositeOperation = 'source-over';
       ctx.drawImage(image, this.xPos, this.yPos, this.textureSize, this.textureSize);
     } else {
       this.animationEnded = true;

@@ -1,7 +1,6 @@
 import { brickWallRecipe } from '../../Textures/BrickWall/BrickWallTexture';
 import { player1smallTankTextures } from '../../Textures/TanksTextures/TanksTextures';
 import { LevelRecipe, StaticDrawable } from '../../Types/Types';
-import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
 import { BrickWall } from '../BrickWall/BrickWall';
 import { Bullet } from '../Bullet/Bullet';
 import { ConcreteWall } from '../ConcreteWall/ConcreteWall';
@@ -43,7 +42,6 @@ export class Game {
       this.player1Tanks = new Tank(116, 292, 20, 20, player1smallTankTextures, this.staticObjects, this.bullets, this.explosions);
     }, 1000);
     this.gameStatus = 'Started';
-    // this.animate(this.renderCtx);
   }
 
   renderBullets(renderCtx: CanvasRenderingContext2D) {
@@ -62,32 +60,9 @@ export class Game {
     }
   }
 
-  /*animate(renderCtx: CanvasRenderingContext2D) {
-    renderCtx?.clearRect(0, 0, 372, 320);
-    if (this.staticObjectsCanvas?.isEagleDestroyed) {
-      this.gameStatus = 'GameOver';
-    }
-    if (this.gameStatus === 'Paused') {
-      renderCtx && this.curtin.drawCurtin(renderCtx, 1, this.currentLevelNumber);
-    }
-    if (this.gameStatus === 'GameOver') {
-      this.gameOverAnimation.animate(renderCtx, 5);
-    }
-
-    renderCtx && this.gameInfo.draw(renderCtx);
-    this.playerTanks[0] && renderCtx && this.playerTanks[0].draw(renderCtx);
-    renderCtx && this.staticObjectsCanvas && this.staticObjectsCanvas.draw(renderCtx);
-    renderCtx &&
-      this.bullets.forEach((bullet) => {
-        bullet.draw(renderCtx);
-      });
-
-    requestAnimationFrame(() => this.animate(renderCtx));
-  }*/
-
   createStaticObjects() {
     const { eagle } = this.levelsRecipe[this.currentLevelNumber];
-    this.staticObjects.push(new Eagle(eagle.xPos, eagle.yPos, eagle.size));
+    this.staticObjects.push(new Eagle(eagle.xPos, eagle.yPos, eagle.size, this.explosions));
     for (let i = 0; i < this.levelsRecipe[this.currentLevelNumber].staticObjectsRecipe.length; i++) {
       const { material, xPos, yPos, layoutType } = this.levelsRecipe[this.currentLevelNumber].staticObjectsRecipe[i];
       if (material === 'Brick') {

@@ -12,6 +12,7 @@ const Canvas = () => {
       const renderCtx = canvasRef.current.getContext('2d');
       const animate = () => {
         renderCtx?.clearRect(0, 0, 372, 320);
+
         if (game.gameStatus === 'Started' || game.gameStatus === 'ShowingResults') {
           renderCtx && game.curtin.drawCurtin(renderCtx, 1, game.currentLevelNumber);
           /*if (!game.curtin.isClosed) {
