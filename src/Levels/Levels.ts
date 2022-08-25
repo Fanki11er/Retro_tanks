@@ -1,35 +1,5 @@
-import { BrickWall } from '../Classes/BrickWall/BrickWall';
-import { ConcreteWall } from '../Classes/ConcreteWall/ConcreteWall';
-import { concreteWallRecipe } from '../Classes/ConcreteWallTextures/ConcreteWallTextures';
-import { Eagle } from '../Classes/Eagle/Eagle';
-import { Level } from '../Classes/Level/Level';
-import { brickWallRecipe } from '../Textures/BrickWall/BrickWallTexture';
-import { BoardElementType, LevelRecipe, MaterialType } from '../Types/Types';
+import { LevelRecipe } from '../Types/Types';
 import { Utils } from '../Utils/Utils';
-
-/*const level1 = new Level();
-//level1.staticObjects.push(new BrickWall(44, 28, 24, brickWallRecipe, 'Full', 3));
-//level1.staticObjects.push(new BrickWall(44, 52, 24, brickWallRecipe, 'Full', 3));
-level1.staticObjects.push(new BrickWall(92, 28, 24, brickWallRecipe, 'Full', 3));
-level1.staticObjects.push(new BrickWall(92, 52, 24, brickWallRecipe, 'Full', 3));
-level1.staticObjects.push(new BrickWall(140, 28, 24, brickWallRecipe, 'Full', 3));
-level1.staticObjects.push(new BrickWall(140, 52, 24, brickWallRecipe, 'Full', 3));
-level1.staticObjects.push(new BrickWall(188, 28, 24, brickWallRecipe, 'Full', 3));
-level1.staticObjects.push(new BrickWall(188, 52, 24, brickWallRecipe, 'Full', 3));
-level1.staticObjects.push(new BrickWall(236, 28, 24, brickWallRecipe, 'Full', 3));
-level1.staticObjects.push(new BrickWall(236, 52, 24, brickWallRecipe, 'Full', 3));
-level1.staticObjects.push(new BrickWall(284, 28, 24, brickWallRecipe, 'Full', 3));
-level1.staticObjects.push(new BrickWall(284, 52, 24, brickWallRecipe, 'Full', 3));
-level1.staticObjects.push(new ConcreteWall(300, 120, 24, concreteWallRecipe, 'Full', 12));
-//Eagle bunker
-level1.staticObjects.push(new BrickWall(152, 292, 24, brickWallRecipe, 'Vertically', 3));
-level1.staticObjects.push(new BrickWall(188, 292, 24, brickWallRecipe, 'Vertically', 3));
-level1.staticObjects.push(new BrickWall(152, 280, 24, brickWallRecipe, 'Horizontally', 3));
-level1.staticObjects.push(new BrickWall(176, 280, 24, brickWallRecipe, 'Horizontally', 3));
-//Eagle
-level1.staticObjects.push(new Eagle(164, 292, 24));
-
-export { level1 };*/
 
 export const levels: LevelRecipe[] = [
   {
@@ -58,18 +28,57 @@ export const levels: LevelRecipe[] = [
       Utils.makeStaticObjectRecipe('Brick', 92, 220, 'Full'),
       Utils.makeStaticObjectRecipe('Brick', 92, 244, 'Full'),
       Utils.makeStaticObjectRecipe('Brick', 92, 268, 'Full'),
-
       Utils.makeStaticObjectRecipe('Brick', 140, 28, 'Full'),
       Utils.makeStaticObjectRecipe('Brick', 140, 52, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 140, 76, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 140, 52, 'Horizontally'),
+      Utils.makeStaticObjectRecipe('Brick', 140, 136, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 140, 184, 'Horizontally'),
+      Utils.makeStaticObjectRecipe('Brick', 140, 196, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 140, 220, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 140, 244, 'Horizontally'),
+      Utils.makeStaticObjectRecipe('Concrete', 164, 76, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 164, 196, 'Full'),
       Utils.makeStaticObjectRecipe('Brick', 188, 28, 'Full'),
       Utils.makeStaticObjectRecipe('Brick', 188, 52, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 188, 76, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 188, 52, 'Horizontally'),
+      Utils.makeStaticObjectRecipe('Brick', 188, 136, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 188, 184, 'Horizontally'),
+      Utils.makeStaticObjectRecipe('Brick', 188, 196, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 188, 220, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 188, 244, 'Horizontally'),
       Utils.makeStaticObjectRecipe('Brick', 236, 28, 'Full'),
       Utils.makeStaticObjectRecipe('Brick', 236, 52, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 236, 28, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 236, 52, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 236, 76, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 236, 100, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 236, 160, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 236, 124, 'Horizontally'),
+      Utils.makeStaticObjectRecipe('Brick', 236, 208, 'Horizontally'),
+      Utils.makeStaticObjectRecipe('Brick', 236, 220, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 236, 244, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 236, 268, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 256, 160, 'Full'),
       Utils.makeStaticObjectRecipe('Brick', 284, 28, 'Full'),
       Utils.makeStaticObjectRecipe('Brick', 284, 52, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 284, 76, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 284, 100, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 284, 124, 'Horizontally'),
+      Utils.makeStaticObjectRecipe('Brick', 284, 208, 'Horizontally'),
+      Utils.makeStaticObjectRecipe('Brick', 284, 220, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 284, 244, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 284, 268, 'Full'),
+      Utils.makeStaticObjectRecipe('Brick', 308, 160, 'Horizontally'),
+      Utils.makeStaticObjectRecipe('Concrete', 308, 172, 'Horizontally'),
+      // Eagle Borders
+      Utils.makeStaticObjectRecipe('Brick', 152, 292, 'Vertically'),
+      Utils.makeStaticObjectRecipe('Brick', 188, 292, 'Vertically'),
+      Utils.makeStaticObjectRecipe('Brick', 152, 280, 'Horizontally'),
+      Utils.makeStaticObjectRecipe('Brick', 176, 280, 'Horizontally'),
     ],
     eagle: { xPos: 164, yPos: 292, size: 24 },
-    eagleBorders: [],
   },
 ];
 

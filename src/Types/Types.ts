@@ -54,7 +54,6 @@ export type WallRecipe = {
 export type LevelRecipe = {
   staticObjectsRecipe: StaticObjectsRecipe[];
   eagle: EagleRecipe;
-  eagleBorders: StaticObjectsRecipe[];
 };
 
 export type StaticObjectsRecipe = {
