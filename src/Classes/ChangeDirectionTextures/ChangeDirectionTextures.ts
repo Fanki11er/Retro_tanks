@@ -5,11 +5,8 @@ export class ChangeDirectionTextures {
   backwardDirectionTextures: HTMLImageElement[] = [];
   leftDirectionTextures: HTMLImageElement[] = [];
   rightDirectionTextures: HTMLImageElement[] = [];
-  textureSize: number;
 
-  constructor(textureSize: number) {
-    this.textureSize = textureSize;
-  }
+  constructor(public textureSize: number) {}
 
   addTextures(textureSrc: string, direction: Direction) {
     const image = new Image();

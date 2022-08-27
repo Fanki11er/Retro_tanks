@@ -14,12 +14,12 @@ const GameProvider = (props: PropsWithChildren<any>) => {
 
   const handleChangeDirection = useCallback(
     (direction: Direction) => {
-      game.player1Tanks && game.player1Tanks.controls.setDirection(direction);
+      game.player1Tank && game.player1Tank.controls.setDirection(direction);
     },
     [game],
   );
   const handleShot = useCallback(() => {
-    game.player1Tanks && game.player1Tanks.fire();
+    game.player1Tank && game.player1Tank.fire();
   }, [game]);
 
   const context = {

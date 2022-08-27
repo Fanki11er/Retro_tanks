@@ -1,5 +1,6 @@
 import { brickWallRecipe } from '../../Textures/BrickWall/BrickWallTexture';
-import { player1smallTankTextures } from '../../Textures/TanksTextures/TanksTextures';
+import { enemyTankTextures } from '../../Textures/EnemyTankTextures/EnemyTankTextures';
+import { player1TankTextures } from '../../Textures/TanksTextures/TanksTextures';
 import { LevelRecipe, StaticDrawable } from '../../Types/Types';
 import { BrickWall } from '../BrickWall/BrickWall';
 import { Bullet } from '../Bullet/Bullet';
@@ -7,17 +8,18 @@ import { ConcreteWall } from '../ConcreteWall/ConcreteWall';
 import { concreteWallRecipe } from '../ConcreteWallTextures/ConcreteWallTextures';
 import { Curtin } from '../Curtin/Curtin';
 import { Eagle } from '../Eagle/Eagle';
+import { EnemyTank } from '../EnemyTank/EnemyTank';
 import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
 import { GameInfoCanvas } from '../GameInfoCanvas/GameInfoCanvas';
 import { GameOverAnimation } from '../GameOverAnimation/GameOverAnimation';
+import { PlayerTank } from '../PlayerTank/PlayerTank';
 import { StaticElementsCanvas } from '../StaticElementsCanvas/StaticElementsCanvas';
-import { Tank } from '../Tank/Tank';
 
 export class Game {
-  gameStatus = 'Paused';
+  gameStatus;
   bullets: Bullet[] = [];
   staticObjects: StaticDrawable[] = [];
-  player1Tanks: Tank | null = null;
+  player1Tank: PlayerTank | null = null;
   staticObjectsCanvas: StaticElementsCanvas | null = null;
   curtin = new Curtin(372, 320);
   gameOverAnimation = new GameOverAnimation(150, 320);
@@ -25,11 +27,13 @@ export class Game {
   gameInfo = new GameInfoCanvas(372, 320);
   levelsRecipe: LevelRecipe[];
   explosions: ExplosionAnimationFrames[] = [];
+  enemyTanks: EnemyTank[] = [];
   //!! Get height and width from the constructor
 
   constructor(players: 1 | 2, levels: LevelRecipe[]) {
     this.levelsRecipe = levels;
-    this.startGame();
+    this.gameStatus = 'Ready';
+    //this.startGame();
   }
 
   startGame() {
@@ -39,7 +43,9 @@ export class Game {
 
     setTimeout(() => {
       this.curtin.isBlocked = false;
-      this.player1Tanks = new Tank(116, 292, 20, 20, player1smallTankTextures, this.staticObjects, this.bullets, this.explosions);
+      this.player1Tank = new PlayerTank(116, 292, 20, 20, player1TankTextures, this.staticObjects, this.bullets, this.explosions);
+      //this.handleEnemyTankSpawn();
+      this.addNewEnemyTank();
     }, 1000);
     this.gameStatus = 'Started';
   }
@@ -60,6 +66,12 @@ export class Game {
     }
   }
 
+  renderEnemyTanks(renderCtx: CanvasRenderingContext2D) {
+    this.enemyTanks.forEach((enemyTank) => {
+      enemyTank.draw(renderCtx);
+    });
+  }
+
   createStaticObjects() {
     const { eagle } = this.levelsRecipe[this.currentLevelNumber];
     this.staticObjects.push(new Eagle(eagle.xPos, eagle.yPos, eagle.size, this.explosions));
@@ -72,6 +84,38 @@ export class Game {
         this.staticObjects.push(
           new ConcreteWall(xPos, yPos, concreteWallRecipe.elementSize, concreteWallRecipe, layoutType, concreteWallRecipe.textureSize),
         );
+      }
+    }
+  }
+
+  handleEnemyTankSpawn() {
+    setInterval(() => {
+      this.addNewEnemyTank();
+    }, 5000);
+  }
+
+  addNewEnemyTank() {
+    const enemyTanksList = [...this.levelsRecipe[this.currentLevelNumber].enemyTanksList];
+    const index = Math.floor(Math.random() * enemyTanksList.length);
+    const { x: xPos, y: yPos } = this.getSpawnCoordinates(Math.floor(Math.random() * 3));
+    this.enemyTanks.push(
+      new EnemyTank(xPos, yPos, 22, 22, enemyTankTextures, this.staticObjects, this.bullets, this.explosions, enemyTanksList[index]),
+    );
+  }
+
+  private getSpawnCoordinates(index: number) {
+    switch (index) {
+      case 0: {
+        return { x: 20, y: 4 };
+      }
+      case 1: {
+        return { x: 164, y: 4 };
+      }
+      case 2: {
+        return { x: 308, y: 4 };
+      }
+      default: {
+        return { x: 20, y: 4 };
       }
     }
   }

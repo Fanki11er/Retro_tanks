@@ -79,6 +79,7 @@ export const levels: LevelRecipe[] = [
       Utils.makeStaticObjectRecipe('Brick', 176, 280, 'Horizontally'),
     ],
     eagle: { xPos: 164, yPos: 292, size: 24 },
+    enemyTanksList: ['Small'],
   },
 ];
 

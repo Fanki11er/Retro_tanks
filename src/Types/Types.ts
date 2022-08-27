@@ -1,10 +1,12 @@
+import { ChangeDirectionTextures } from '../Classes/ChangeDirectionTextures/ChangeDirectionTextures';
+
 export type Direction = 'Forwards' | 'Left' | 'Right' | 'Backwards' | 'None';
 
 export type BoardElementType = 'Full' | 'Horizontally' | 'Vertically';
 
 export type MaterialType = 'Brick' | 'Concrete';
 
-export type EnemyTankTypes = 'Small';
+export type TankTypes = 'Small';
 
 export class Coordinates {
   x;
@@ -54,6 +56,7 @@ export type WallRecipe = {
 export type LevelRecipe = {
   staticObjectsRecipe: StaticObjectsRecipe[];
   eagle: EagleRecipe;
+  enemyTanksList: TankTypes[];
 };
 
 export type StaticObjectsRecipe = {
@@ -67,5 +70,9 @@ export type EagleRecipe = {
   xPos: number;
   yPos: number;
   size: number;
+};
+
+export type TankTypesTextures = {
+  Small: ChangeDirectionTextures;
 };
 

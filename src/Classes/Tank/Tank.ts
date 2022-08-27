@@ -1,9 +1,8 @@
 import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { Coordinates, StaticDrawable } from '../../Types/Types';
+import { Coordinates, StaticDrawable, TankTypes, TankTypesTextures } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
 import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
 import { Bullet } from '../Bullet/Bullet';
-import { ChangeDirectionTextures } from '../ChangeDirectionTextures/ChangeDirectionTextures';
 import { Controls } from '../Controls/Controls';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
@@ -11,39 +10,37 @@ import indestructibleTextures from '../IndestructibleTextures/IndestructibleText
 import spawnPointTextures from '../SpawnPointTextures/SpawnPointTextures';
 import { TankMoveAnimation } from '../TankMoveAnimation/TankMoveAnimation';
 
-export class Tank {
+export abstract class Tank {
   controls;
-  private speed = 0.25;
-  private image;
-  private isBlockedBy;
-  private isLoading;
-  private isSpawning;
-  private isIndestructible = true;
-  private spawnAnimationFrames;
-  private indestructibleAnimationFrames;
-  private moveAnimation;
+  protected speed = 0.25;
+  protected image;
+  protected isBlockedBy;
+  protected isLoading;
+  protected isSpawning;
+  protected isIndestructible = true;
+  protected spawnAnimationFrames;
+  protected indestructibleAnimationFrames;
+  protected moveAnimation;
+  protected tankType: TankTypes = 'Small';
 
   constructor(
     public xPos: number,
     public yPos: number,
-    private width: number,
-    private height: number,
-    textures: ChangeDirectionTextures,
-    private staticObjects: StaticDrawable[],
-    private bullets: Bullet[],
-    private explosions: ExplosionAnimationFrames[],
+    protected width: number,
+    protected height: number,
+    textures: TankTypesTextures,
+    protected staticObjects: StaticDrawable[],
+    protected bullets: Bullet[],
+    protected explosions: ExplosionAnimationFrames[],
   ) {
     this.controls = new Controls();
-    this.image = textures.forwardDirectionTextures[0];
+    this.image = textures.Small.forwardDirectionTextures[0];
     this.isBlockedBy = false;
     this.isLoading = false;
     this.isSpawning = true;
     this.spawnAnimationFrames = new AnimationFrames(spawnPointTextures.animationTexture, spawnPointTextures.textureSize);
     this.indestructibleAnimationFrames = new AnimationFrames(indestructibleTextures.animationTexture, indestructibleTextures.textureSize);
-    this.moveAnimation = new TankMoveAnimation(textures);
-
-    this.madeIndestructible(4000);
-    this.spawn(2500);
+    this.moveAnimation = new TankMoveAnimation(textures[this.tankType]);
   }
 
   public draw(context: CanvasRenderingContext2D) {
@@ -155,7 +152,7 @@ export class Tank {
     return new Coordinates(-20, -20);
   }
 
-  private madeIndestructible(time: number) {
+  /*private madeIndestructible(time: number) {
     this.isIndestructible = true;
     setTimeout(() => {
       this.isIndestructible = false;
@@ -167,6 +164,7 @@ export class Tank {
     setTimeout(() => {
       this.isSpawning = false;
     }, time);
-  }
+  }*/
+  protected abstract spawn(time: number): void;
 }
 

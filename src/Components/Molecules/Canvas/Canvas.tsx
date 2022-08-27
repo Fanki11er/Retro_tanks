@@ -12,6 +12,9 @@ const Canvas = () => {
       const renderCtx = canvasRef.current.getContext('2d');
       const animate = () => {
         renderCtx?.clearRect(0, 0, 372, 320);
+        if (game.gameStatus === 'Ready') {
+          game.startGame();
+        }
 
         if (game.gameStatus === 'Started' || game.gameStatus === 'ShowingResults') {
           renderCtx && game.curtin.drawCurtin(renderCtx, 1, game.currentLevelNumber);
@@ -25,7 +28,8 @@ const Canvas = () => {
         }
 
         renderCtx && game.gameInfo.draw(renderCtx);
-        game.player1Tanks && renderCtx && game.player1Tanks.draw(renderCtx);
+        game.player1Tank && renderCtx && game.player1Tank.draw(renderCtx);
+        renderCtx && game.renderEnemyTanks(renderCtx);
         renderCtx && game.staticObjectsCanvas && game.staticObjectsCanvas.draw(renderCtx);
         /*renderCtx &&
           game.bullets.forEach((bullet) => {
