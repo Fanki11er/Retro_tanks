@@ -2,18 +2,12 @@ export class Curtin {
   counter = 0;
   animationEnded = false;
   offset = 0;
-  width;
-  height;
   isClosed = true;
   isBlocked = true;
-  constructor(width: number, height: number) {
-    this.width = width;
-    this.height = height;
-  }
+  constructor(public width: number, public height: number) {}
 
   drawCurtin(canvasCtx: CanvasRenderingContext2D, delay: number, stage: number) {
     if (canvasCtx) {
-      //canvasCtx.globalCompositeOperation = 'source-over';
       canvasCtx.clearRect(0, 0, this.width, this.height);
       canvasCtx.fillStyle = 'rgba(127, 127, 127, 1)';
       canvasCtx.fillRect(0, 0, this.width, this.height / 2 - this.offset);

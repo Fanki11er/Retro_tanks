@@ -1,20 +1,13 @@
 import { Animation } from '../Animation/Animation';
 
 export class ExplosionAnimationFrames extends Animation {
-  xPos;
-  yPos;
-  delay;
-
-  constructor(animationFrames: HTMLImageElement[], textureSize: number, delay: number, xPos: number, yPos: number) {
+  constructor(animationFrames: HTMLImageElement[], textureSize: number, public delay: number, public xPos: number, public yPos: number) {
     super(animationFrames, textureSize);
-    this.xPos = xPos;
-    this.yPos = yPos;
-    this.delay = delay;
   }
 
   animateFrames(ctx: CanvasRenderingContext2D) {
-    let image = this.animationsFrames[this.index];
-    if (this.index < this.animationsFrames.length) {
+    let image = this.animationFrames[this.index];
+    if (this.index < this.animationFrames.length) {
       ctx!.globalCompositeOperation = 'source-over';
       ctx.drawImage(image, this.xPos, this.yPos, this.textureSize, this.textureSize);
     } else {

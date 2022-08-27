@@ -6,26 +6,20 @@ import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionA
 
 export class Eagle implements StaticDrawable {
   id;
-  xPos;
-  yPos;
   width;
   height;
   isDestroyed;
   textures = eagleTextures;
   collisionZone;
   changed;
-  private explosions;
 
-  constructor(xPos: number, yPos: number, size: number, explosions: ExplosionAnimationFrames[]) {
+  constructor(public xPos: number, public yPos: number, size: number, private explosions: ExplosionAnimationFrames[]) {
     this.id = 'Eagle';
-    this.xPos = xPos;
-    this.yPos = yPos;
     this.width = size;
     this.height = size;
     this.changed = false;
     this.isDestroyed = false;
     this.collisionZone = new ElementCollisionZone({ x: xPos, y: yPos }, this.width, this.height);
-    this.explosions = explosions;
   }
 
   public draw(ctx: CanvasRenderingContext2D) {

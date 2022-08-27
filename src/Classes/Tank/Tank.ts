@@ -12,49 +12,35 @@ import spawnPointTextures from '../SpawnPointTextures/SpawnPointTextures';
 import { TankMoveAnimation } from '../TankMoveAnimation/TankMoveAnimation';
 
 export class Tank {
-  xPos;
-  yPos;
-  private width;
-  private height;
   controls;
   private speed = 0.25;
   private image;
   private isBlockedBy;
-  private staticObjects;
-  private bullets;
   private isLoading;
   private isSpawning;
   private isIndestructible = true;
   private spawnAnimationFrames;
   private indestructibleAnimationFrames;
   private moveAnimation;
-  private explosions: ExplosionAnimationFrames[];
 
   constructor(
-    xPos: number,
-    yPos: number,
-    width: number,
-    height: number,
+    public xPos: number,
+    public yPos: number,
+    private width: number,
+    private height: number,
     textures: ChangeDirectionTextures,
-    staticObjects: StaticDrawable[],
-    bullets: Bullet[],
-    explosions: ExplosionAnimationFrames[],
+    private staticObjects: StaticDrawable[],
+    private bullets: Bullet[],
+    private explosions: ExplosionAnimationFrames[],
   ) {
-    this.xPos = xPos;
-    this.yPos = yPos;
-    this.width = width;
-    this.height = height;
     this.controls = new Controls();
     this.image = textures.forwardDirectionTextures[0];
     this.isBlockedBy = false;
-    this.staticObjects = staticObjects;
-    this.bullets = bullets;
     this.isLoading = false;
     this.isSpawning = true;
     this.spawnAnimationFrames = new AnimationFrames(spawnPointTextures.animationTexture, spawnPointTextures.textureSize);
     this.indestructibleAnimationFrames = new AnimationFrames(indestructibleTextures.animationTexture, indestructibleTextures.textureSize);
     this.moveAnimation = new TankMoveAnimation(textures);
-    this.explosions = explosions;
 
     this.madeIndestructible(4000);
     this.spawn(2500);

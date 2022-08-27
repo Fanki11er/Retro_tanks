@@ -14,31 +14,28 @@ import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZo
 
 export abstract class Wall implements StaticDrawable {
   public id;
-  protected xPos;
-  protected yPos;
   protected width;
   protected height;
-  protected wallRecipe;
-  protected type;
   protected abstract materialType: MaterialType;
   protected coordinates: WallCoordinates[];
   protected collisionZone;
   public changed = false;
-  protected textureSize;
   protected numberOfElements;
   public isDestroyed = false;
 
-  constructor(xPos: number, yPos: number, size: number, wallRecipe: WallRecipe, type: BoardElementType, textureSize: number) {
+  constructor(
+    protected xPos: number,
+    protected yPos: number,
+    size: number,
+    protected wallRecipe: WallRecipe,
+    protected type: BoardElementType,
+    protected textureSize: number,
+  ) {
     this.id = uuidv4();
-    this.xPos = xPos;
-    this.yPos = yPos;
-    this.type = type;
     this.width = this.type === 'Horizontally' || this.type === 'Full' ? size : size / 2;
     this.height = this.type === 'Vertically' || this.type === 'Full' ? size : size / 2;
-    this.wallRecipe = wallRecipe;
     this.coordinates = [];
     this.collisionZone = new ElementCollisionZone({ x: xPos, y: yPos }, this.width, this.height);
-    this.textureSize = textureSize;
     this.numberOfElements = ((this.width / textureSize) * this.height) / textureSize;
     this.createArray(size / textureSize, size / textureSize, textureSize);
   }

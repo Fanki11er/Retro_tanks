@@ -2,16 +2,12 @@ import { StaticDrawable } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
 
 export class StaticElementsCanvas {
-  width;
-  height;
   canvas;
   canvasCtx;
   staticObjects: StaticDrawable[];
   isEagleDestroyed = false;
 
-  constructor(width: number, height: number, levelStaticElements: StaticDrawable[]) {
-    this.width = width;
-    this.height = height;
+  constructor(public width: number, public height: number, levelStaticElements: StaticDrawable[]) {
     this.canvas = document.createElement('canvas');
     this.canvas.width = width;
     this.canvas.height = height;

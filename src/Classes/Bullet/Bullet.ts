@@ -5,52 +5,30 @@ import { AmmunitionType, CollisionZone, Coordinates, Direction, StaticDrawable }
 import { Utils } from '../../Utils/Utils';
 import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
-import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
 import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
 
 export class Bullet {
-  private xPos;
-  private yPos;
-  private width;
-  private height;
-  private textures: BulletTextures;
-  //private explosionAnimationFrames;
-  private direction;
   private image: HTMLImageElement | null = null;
-  private staticObjects;
   private speed;
   private hit = false;
-  private bullets;
   public id;
-  private ammunitionType;
   private collisionWith: StaticDrawable[] = [];
-  private explosions: ExplosionAnimationFrames[];
 
   constructor(
-    xPos: number,
-    yPos: number,
-    width: number,
-    height: number,
-    direction: Direction,
-    textures: BulletTextures,
-    staticObjects: StaticDrawable[],
-    bullets: Bullet[],
-    explosions: ExplosionAnimationFrames[],
-    ammunitionType: AmmunitionType = 'Standard',
+    protected xPos: number,
+    protected yPos: number,
+    protected width: number,
+    protected height: number,
+    private direction: Direction,
+    private textures: BulletTextures,
+    private staticObjects: StaticDrawable[],
+    private bullets: Bullet[],
+    private explosions: ExplosionAnimationFrames[],
+    private ammunitionType: AmmunitionType = 'Standard',
   ) {
-    this.xPos = xPos;
-    this.yPos = yPos;
-    this.width = width;
-    this.height = height;
-    this.textures = textures;
-    this.direction = direction;
     this.setImageForDirection();
-    this.staticObjects = staticObjects;
-    this.bullets = bullets;
-    // this.explosionAnimationFrames = new AnimationFrames(smallExplosionTextures.animationTexture, smallExplosionTextures.textureSize);
-    this.explosions = explosions;
     this.speed = 0.5;
-    this.ammunitionType = ammunitionType;
+
     this.id = uuidv4();
   }
 
@@ -69,7 +47,6 @@ export class Bullet {
       if (!this.collisionWith.length) {
         return;
       }
-      //hitCoordinates = this.collisionWith[0].getPrecisionHitPlace(
       hitCoordinates = Utils.getPrecisionHitPlace(
         new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
         this.direction,
@@ -118,10 +95,8 @@ export class Bullet {
           explosionPosition.y,
         ),
       );
-      //this.explosionAnimationFrames.animateFrames(20, context, explosionPosition.x, explosionPosition.y, false, 1);
-      //if (this.explosionAnimationFrames.animationEnded) {
+
       Utils.removeDestroyedElement(this.bullets, this.id);
-      // }
     }
   }
 
