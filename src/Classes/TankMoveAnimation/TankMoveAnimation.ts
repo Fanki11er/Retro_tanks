@@ -10,33 +10,8 @@ export class TankMoveAnimation {
   }
 
   setImage(direction: Direction, isMoving: boolean, delay: number) {
-    let image;
-    switch (direction) {
-      case 'Forwards': {
-        this.reset(this.textures.forwardDirectionTextures.length);
-        image = this.textures.forwardDirectionTextures[this.index];
-        break;
-      }
-      case 'Backwards': {
-        this.reset(this.textures.backwardDirectionTextures.length);
-        image = this.textures.backwardDirectionTextures[this.index];
-        break;
-      }
-      case 'Left': {
-        this.reset(this.textures.leftDirectionTextures.length);
-        image = this.textures.leftDirectionTextures[this.index];
-        break;
-      }
-      case 'Right': {
-        this.reset(this.textures.rightDirectionTextures.length);
-        image = this.textures.rightDirectionTextures[this.index];
-        break;
-      }
-      default: {
-        image = new Image();
-        break;
-      }
-    }
+    let image = this.switchImage(direction);
+
     this.counter += 1;
     if (this.counter % delay === 0 && isMoving) {
       this.index += 1;
@@ -44,9 +19,51 @@ export class TankMoveAnimation {
     return image;
   }
 
+  setImageSpecialTank(direction: Direction, isMoving: boolean, delay: number, isSpecial: boolean) {
+    let image = this.switchImage(direction);
+
+    this.counter += 1;
+    if (isSpecial) {
+      if (this.counter % delay === 0 && isMoving) {
+        this.index += 1;
+      } else if (this.counter % delay === 0 && !isMoving) {
+        this.index += 3;
+      }
+    } else {
+      if (this.counter % delay === 0 && isMoving) {
+        this.index += 2;
+      }
+    }
+    return image;
+  }
+
   private reset(length: number) {
     if (this.index >= length) {
       this.index = 0;
+    }
+  }
+
+  private switchImage(direction: Direction) {
+    switch (direction) {
+      case 'Forwards': {
+        this.reset(this.textures.forwardDirectionTextures.length);
+        return this.textures.forwardDirectionTextures[this.index];
+      }
+      case 'Backwards': {
+        this.reset(this.textures.backwardDirectionTextures.length);
+        return this.textures.backwardDirectionTextures[this.index];
+      }
+      case 'Left': {
+        this.reset(this.textures.leftDirectionTextures.length);
+        return this.textures.leftDirectionTextures[this.index];
+      }
+      case 'Right': {
+        this.reset(this.textures.rightDirectionTextures.length);
+        return this.textures.rightDirectionTextures[this.index];
+      }
+      default: {
+        return new Image();
+      }
     }
   }
 }

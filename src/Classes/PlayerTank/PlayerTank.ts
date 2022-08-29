@@ -1,7 +1,8 @@
+import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
 import { StaticDrawable, TankTypesTextures } from '../../Types/Types';
 import { Bullet } from '../Bullet/Bullet';
-
-import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
+import { EnemyTank } from '../EnemyTank/EnemyTank';
+import { PlayerBullet } from '../PlayerBullet/PlayerBullet';
 import { Tank } from '../Tank/Tank';
 
 export class PlayerTank extends Tank {
@@ -13,9 +14,9 @@ export class PlayerTank extends Tank {
     textures: TankTypesTextures,
     protected staticObjects: StaticDrawable[],
     protected bullets: Bullet[],
-    protected explosions: ExplosionAnimationFrames[],
+    protected enemyTanks: EnemyTank[],
   ) {
-    super(xPos, yPos, width, height, textures, staticObjects, bullets, explosions);
+    super(xPos, yPos, width, height, textures, staticObjects, bullets);
     this.madeIndestructible(4000);
     this.spawn(2500);
   }
@@ -33,5 +34,24 @@ export class PlayerTank extends Tank {
       this.isSpawning = false;
     }, time);
   }
+
+  protected selectImage(animationSpeed: number) {
+    return this.moveAnimation.setImage(this.controls.direction, this.controls.move, animationSpeed);
+  }
+
+  fire() {
+    if (!this.isLoading && !this.isSpawning) {
+      const { x, y } = this.setPositionOfBullet(4);
+      this.bullets.push(
+        new PlayerBullet(x, y, 2, 2, this.controls.direction, bulletTextures, this.staticObjects, this.bullets, 'Standard', this.enemyTanks),
+      );
+      this.isLoading = true;
+      this.isLoading &&
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 500);
+    }
+  }
+  public processHit(): void {}
 }
 

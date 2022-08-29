@@ -14,8 +14,9 @@ export class EnemyTank extends Tank {
     protected bullets: Bullet[],
     protected explosions: ExplosionAnimationFrames[],
     protected tankType: TankTypes,
+    private isSpecial: boolean,
   ) {
-    super(xPos, yPos, width, height, textures, staticObjects, bullets, explosions);
+    super(xPos, yPos, width, height, textures, staticObjects, bullets);
     this.controls.direction = 'Backwards';
     this.spawn(2500);
   }
@@ -25,7 +26,34 @@ export class EnemyTank extends Tank {
     setTimeout(() => {
       this.isSpawning = false;
       this.isIndestructible = false;
+      //this.controls.move = true;
     }, time);
+  }
+  protected selectImage(animationSpeed: number) {
+    return this.moveAnimation.setImageSpecialTank(this.controls.direction, this.controls.move, animationSpeed, this.isSpecial);
+  }
+
+  fire(): void {}
+  public processHit(): void {
+    this.isDestroyed = true;
+  }
+  getIsSpecial() {
+    return this.isSpecial;
+  }
+  getValue() {
+    //!! Make standardized values
+    switch (this.tankType) {
+      case 'Small': {
+        return 100;
+      }
+      default: {
+        return 0;
+      }
+    }
+  }
+
+  getTankType() {
+    return this.tankType;
   }
 }
 

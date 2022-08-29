@@ -17,7 +17,7 @@ const Canvas = () => {
         }
 
         if (game.gameStatus === 'Started' || game.gameStatus === 'ShowingResults') {
-          renderCtx && game.curtin.drawCurtin(renderCtx, 1, game.currentLevelNumber);
+          renderCtx && game.curtin.drawCurtin(renderCtx, 1, game.currentLevelNumber + 1);
           /*if (!game.curtin.isClosed) {
             game.gameStatus = 'Started';
           }*/
@@ -26,7 +26,8 @@ const Canvas = () => {
           game.gameStatus = 'GameOver';
           renderCtx && game.gameOverAnimation.animate(renderCtx, 5);
         }
-
+        game.removeDestroyedTanks();
+        game.removeDestroyedBullets();
         renderCtx && game.gameInfo.draw(renderCtx);
         game.player1Tank && renderCtx && game.player1Tank.draw(renderCtx);
         renderCtx && game.renderEnemyTanks(renderCtx);

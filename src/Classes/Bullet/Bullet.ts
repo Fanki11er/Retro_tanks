@@ -5,26 +5,25 @@ import { AmmunitionType, CollisionZone, Coordinates, Direction, StaticDrawable }
 import { Utils } from '../../Utils/Utils';
 import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
-import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
 
-export class Bullet {
-  private image: HTMLImageElement | null = null;
-  private speed;
-  private hit = false;
+export abstract class Bullet {
+  protected image: HTMLImageElement | null = null;
+  protected speed;
+  protected hit = false;
   public id;
-  private collisionWith: StaticDrawable[] = [];
+  protected collisionWith: StaticDrawable[] = [];
+  protected isDestroyed = false;
 
   constructor(
     protected xPos: number,
     protected yPos: number,
     protected width: number,
     protected height: number,
-    private direction: Direction,
-    private textures: BulletTextures,
-    private staticObjects: StaticDrawable[],
-    private bullets: Bullet[],
-    private explosions: ExplosionAnimationFrames[],
-    private ammunitionType: AmmunitionType = 'Standard',
+    protected direction: Direction,
+    protected textures: BulletTextures,
+    protected staticObjects: StaticDrawable[],
+    protected bullets: Bullet[],
+    protected ammunitionType: AmmunitionType = 'Standard',
   ) {
     this.setImageForDirection();
     this.speed = 0.5;
@@ -32,73 +31,7 @@ export class Bullet {
     this.id = uuidv4();
   }
 
-  public draw(context: CanvasRenderingContext2D) {
-    this.collisionWith = [];
-    !this.hit && this.update();
-    if (!this.hit) {
-      this.hit = Utils.checkForCollisionWithBorders(this.direction, this.xPos, this.yPos, this.width, this.height, 372, 320);
-    }
-    if (!this.hit) {
-      this.collisionWith = Utils.checkForCollisionWithObjects(this.direction, this.xPos, this.yPos, this.width, this.height, this.staticObjects);
-    }
-
-    if (this.collisionWith.length && !this.hit) {
-      let hitCoordinates;
-      if (!this.collisionWith.length) {
-        return;
-      }
-      hitCoordinates = Utils.getPrecisionHitPlace(
-        new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
-        this.direction,
-        this.collisionWith[0].getInnerCoordinates(),
-        this.collisionWith[0].getTextureSize(),
-      );
-
-      if (hitCoordinates) {
-        this.hit = true;
-        let elementsInExplosionRange: StaticDrawable[] = [];
-        let bulletHitZone: CollisionZone;
-        if (this.direction === 'Forwards') {
-          bulletHitZone = new BulletHitZone(hitCoordinates, 0, 2, 22, 10).getCollisionZone();
-          elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
-        } else if (this.direction === 'Backwards') {
-          bulletHitZone = new BulletHitZone(hitCoordinates, 0, -2, 22, 10).getCollisionZone();
-          elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
-        } else if (this.direction === 'Left') {
-          bulletHitZone = new BulletHitZone(hitCoordinates, 2, 0, 10, 22).getCollisionZone();
-          elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
-        } else if (this.direction === 'Right') {
-          bulletHitZone = new BulletHitZone(hitCoordinates, -2, 0, 10, 22).getCollisionZone();
-          elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
-        } else {
-          bulletHitZone = new BulletHitZone(hitCoordinates, 0, 0, 6, 22).getCollisionZone();
-        }
-
-        for (let i = 0; i < elementsInExplosionRange.length; i++) {
-          const collisionElementIndex = Utils.findHitElementIndex(elementsInExplosionRange[i].id, this.staticObjects);
-          if (collisionElementIndex >= 0) {
-            this.staticObjects[collisionElementIndex].processHit(this.ammunitionType, bulletHitZone, this.yPos);
-          }
-        }
-      }
-    }
-    !this.hit && this.image && context.drawImage(this.image, this.xPos, this.yPos);
-
-    if (this.hit) {
-      const explosionPosition = this.getExplosionPosition();
-      this.explosions.push(
-        new ExplosionAnimationFrames(
-          smallExplosionTextures.animationTexture,
-          smallExplosionTextures.textureSize,
-          20,
-          explosionPosition.x,
-          explosionPosition.y,
-        ),
-      );
-
-      Utils.removeDestroyedElement(this.bullets, this.id);
-    }
-  }
+  abstract draw(context: CanvasRenderingContext2D): void;
 
   private setImageForDirection() {
     switch (this.direction) {
@@ -141,7 +74,7 @@ export class Bullet {
     }
   }
 
-  private getExplosionPosition(): Coordinates {
+  getExplosionPosition(): Coordinates {
     switch (this.direction) {
       case 'Forwards': {
         return { x: this.xPos - smallExplosionTextures.textureSize / 2 + this.width / 2, y: this.yPos - 10 };
@@ -171,7 +104,7 @@ export class Bullet {
     }
   }
 
-  checkForExplosionRange(bulletHitZone: CollisionZone) {
+  private checkForExplosionRange(bulletHitZone: CollisionZone) {
     const collisions = [];
 
     for (let i = 0; i < this.staticObjects.length; i++) {
@@ -186,6 +119,74 @@ export class Bullet {
       }
     }
     return collisions;
+  }
+
+  protected handleStaticObjectHit() {
+    if (this.collisionWith.length && !this.hit) {
+      let hitCoordinates;
+      if (!this.collisionWith.length) {
+        return;
+      }
+      hitCoordinates = Utils.getPrecisionHitPlace(
+        new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
+        this.direction,
+        this.collisionWith[0].getInnerCoordinates(),
+        this.collisionWith[0].getTextureSize(),
+      );
+
+      if (hitCoordinates) {
+        this.hit = true;
+        let elementsInExplosionRange: StaticDrawable[] = [];
+        let bulletHitZone: CollisionZone;
+        if (this.direction === 'Forwards') {
+          bulletHitZone = new BulletHitZone(hitCoordinates, 0, 2, 22, 10).getCollisionZone();
+          elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
+        } else if (this.direction === 'Backwards') {
+          bulletHitZone = new BulletHitZone(hitCoordinates, 0, -2, 22, 10).getCollisionZone();
+          elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
+        } else if (this.direction === 'Left') {
+          bulletHitZone = new BulletHitZone(hitCoordinates, 2, 0, 10, 22).getCollisionZone();
+          elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
+        } else if (this.direction === 'Right') {
+          bulletHitZone = new BulletHitZone(hitCoordinates, -2, 0, 10, 22).getCollisionZone();
+          elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
+        } else {
+          bulletHitZone = new BulletHitZone(hitCoordinates, 0, 0, 6, 22).getCollisionZone();
+        }
+
+        for (let i = 0; i < elementsInExplosionRange.length; i++) {
+          const collisionElementIndex = Utils.findHitElementIndex(elementsInExplosionRange[i].id, this.staticObjects);
+          if (collisionElementIndex >= 0) {
+            this.staticObjects[collisionElementIndex].processHit(this.ammunitionType, bulletHitZone, this.yPos);
+          }
+        }
+      }
+    }
+  }
+
+  protected checkForCollisionsWithStaticObjects() {
+    this.collisionWith = [];
+    !this.hit && this.update();
+    if (!this.hit) {
+      this.hit = Utils.checkForCollisionWithBorders(this.direction, this.xPos, this.yPos, this.width, this.height, 372, 320);
+    }
+    if (!this.hit) {
+      this.collisionWith = Utils.checkForCollisionWithObjects(this.direction, this.xPos, this.yPos, this.width, this.height, this.staticObjects);
+    }
+  }
+
+  protected handleExplosion() {
+    if (this.hit) {
+      this.isDestroyed = true;
+    }
+  }
+
+  protected handleDrawImage(context: CanvasRenderingContext2D) {
+    !this.hit && this.image && context.drawImage(this.image, this.xPos, this.yPos);
+  }
+
+  getIsDestroyed() {
+    return this.isDestroyed;
   }
 }
 
