@@ -8,6 +8,8 @@ export type MaterialType = 'Brick' | 'Concrete';
 
 export type TankTypes = 'Small';
 
+export type Owner = 'Plyer1' | 'Player2' | '';
+
 export class Coordinates {
   x;
   y;
@@ -22,6 +24,11 @@ export type CollisionZone = {
   B: Coordinates;
   C: Coordinates;
   D: Coordinates;
+};
+
+export type DestroyedBy = {
+  destroyedBy: Owner;
+  type: TankTypes;
 };
 
 export interface StaticDrawable {

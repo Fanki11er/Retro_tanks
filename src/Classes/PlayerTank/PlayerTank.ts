@@ -1,5 +1,5 @@
 import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { StaticDrawable, TankTypesTextures } from '../../Types/Types';
+import { Owner, StaticDrawable, TankTypesTextures } from '../../Types/Types';
 import { Bullet } from '../Bullet/Bullet';
 import { EnemyTank } from '../EnemyTank/EnemyTank';
 import { PlayerBullet } from '../PlayerBullet/PlayerBullet';
@@ -15,6 +15,7 @@ export class PlayerTank extends Tank {
     protected staticObjects: StaticDrawable[],
     protected bullets: Bullet[],
     protected enemyTanks: EnemyTank[],
+    protected owner: Owner,
   ) {
     super(xPos, yPos, width, height, textures, staticObjects, bullets);
     this.madeIndestructible(4000);
@@ -43,7 +44,19 @@ export class PlayerTank extends Tank {
     if (!this.isLoading && !this.isSpawning) {
       const { x, y } = this.setPositionOfBullet(4);
       this.bullets.push(
-        new PlayerBullet(x, y, 2, 2, this.controls.direction, bulletTextures, this.staticObjects, this.bullets, 'Standard', this.enemyTanks),
+        new PlayerBullet(
+          x,
+          y,
+          2,
+          2,
+          this.controls.direction,
+          bulletTextures,
+          this.staticObjects,
+          this.bullets,
+          'Standard',
+          this.enemyTanks,
+          this.owner,
+        ),
       );
       this.isLoading = true;
       this.isLoading &&
@@ -52,6 +65,6 @@ export class PlayerTank extends Tank {
         }, 500);
     }
   }
-  public processHit(): void {}
+  public processHit(hitBy: Owner): void {}
 }
 

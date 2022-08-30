@@ -3,7 +3,7 @@ import { brickWallRecipe } from '../../Textures/BrickWall/BrickWallTexture';
 import { enemyTankTextures } from '../../Textures/EnemyTankTextures/EnemyTankTextures';
 import { largeExplosionTextures, smallExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
 import { player1TankTextures } from '../../Textures/TanksTextures/TanksTextures';
-import { LevelRecipe, StaticDrawable, TankTypes } from '../../Types/Types';
+import { DestroyedBy, LevelRecipe, StaticDrawable, TankTypes } from '../../Types/Types';
 import { BrickWall } from '../BrickWall/BrickWall';
 import { Bullet } from '../Bullet/Bullet';
 import { ConcreteWall } from '../ConcreteWall/ConcreteWall';
@@ -37,9 +37,12 @@ export class Game {
   enemyTanks: EnemyTank[] = [];
   enemyTanksList: TankTypes[] = [];
   values: Value[] = [];
-  destroyedEnemyTanksList: TankTypes[] = []; //!! Change for array of objects with who destroys information
+  destroyedEnemyTanksList: DestroyedBy[] = [];
 
   //!! Get height and width from the constructor
+  //!! Check if all enemy tanks destroyed and finish the round
+  //!! Check if all players tanks are destroyed and finish the game
+  //!! Add findings actions
 
   constructor(private players: 1 | 2, levels: LevelRecipe[]) {
     this.levelsRecipe = levels;
@@ -119,7 +122,6 @@ export class Game {
   }
 
   private addNewEnemyTank() {
-    //const enemyTanksList = [...this.levelsRecipe[this.currentLevelNumber].enemyTanksList];
     const index = Math.floor(Math.random() * this.enemyTanksList.length);
     const { x: xPos, y: yPos } = this.getSpawnCoordinates(Math.floor(Math.random() * 3));
     this.enemyTanks.push(
@@ -171,7 +173,7 @@ export class Game {
 
   private handlePlayer1TankSpawn() {
     if (!this.player1Tank && this.player1LivesLeft > 0) {
-      this.player1Tank = new PlayerTank(116, 292, 20, 20, player1TankTextures, this.staticObjects, this.bullets, this.enemyTanks);
+      this.player1Tank = new PlayerTank(116, 292, 20, 20, player1TankTextures, this.staticObjects, this.bullets, this.enemyTanks, 'Plyer1');
       this.player1LivesLeft -= 1;
       this.handleGameInfoUpdate();
     }
@@ -186,8 +188,7 @@ export class Game {
         }
         this.explosions.push(new ExplosionAnimationFrames(largeExplosionTextures.animationTexture, 30, 20, xPos - 4, yPos - 4));
         this.values.push(new Value(this.enemyTanks[i].getValue(), xPos, yPos + 12, 1, 2.5));
-        //!! Figure whose bullet destroyed tank when two players play
-        //!! Add type to destroyed (object with type and who destroyed)
+        this.destroyedEnemyTanksList.push(this.enemyTanks[i].getIsDestroyed()!);
         this.enemyTanks.splice(i, 1);
         i--;
       }

@@ -1,4 +1,4 @@
-import { StaticDrawable, TankTypes, TankTypesTextures } from '../../Types/Types';
+import { Owner, StaticDrawable, TankTypes, TankTypesTextures } from '../../Types/Types';
 import { Bullet } from '../Bullet/Bullet';
 import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
 import { Tank } from '../Tank/Tank';
@@ -34,8 +34,8 @@ export class EnemyTank extends Tank {
   }
 
   fire(): void {}
-  public processHit(): void {
-    this.isDestroyed = true;
+  public processHit(hitBy: Owner): void {
+    this.isDestroyed = { type: this.tankType, destroyedBy: hitBy };
   }
   getIsSpecial() {
     return this.isSpecial;

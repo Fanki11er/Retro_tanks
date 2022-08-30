@@ -1,4 +1,4 @@
-import { Coordinates, StaticDrawable, TankTypes, TankTypesTextures } from '../../Types/Types';
+import { Coordinates, DestroyedBy, Owner, StaticDrawable, TankTypes, TankTypesTextures } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
 import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
 import { Bullet } from '../Bullet/Bullet';
@@ -22,7 +22,7 @@ export abstract class Tank {
   protected indestructibleAnimationFrames;
   protected moveAnimation;
   protected tankType: TankTypes = 'Small';
-  protected isDestroyed = false;
+  protected isDestroyed: DestroyedBy | null = null;
 
   constructor(
     public xPos: number,
@@ -142,7 +142,7 @@ export abstract class Tank {
     return new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height);
   }
   protected abstract spawn(time: number): void;
-  public abstract processHit(): void;
+  public abstract processHit(hitBy: Owner): void;
 
   getIsDestroyed() {
     return this.isDestroyed;

@@ -1,5 +1,5 @@
 import { BulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { AmmunitionType, Direction, StaticDrawable } from '../../Types/Types';
+import { AmmunitionType, Direction, Owner, StaticDrawable } from '../../Types/Types';
 import { Bullet } from '../Bullet/Bullet';
 import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
@@ -17,8 +17,9 @@ export class PlayerBullet extends Bullet {
     protected bullets: Bullet[],
     protected ammunitionType: AmmunitionType = 'Standard',
     private enemyTanks: EnemyTank[], //!!Enemy bullets
+    protected owner: Owner,
   ) {
-    super(xPos, yPos, width, height, direction, textures, staticObjects, bullets);
+    super(xPos, yPos, width, height, direction, textures, staticObjects, bullets, ammunitionType);
   }
 
   public draw(context: CanvasRenderingContext2D) {
@@ -41,7 +42,7 @@ export class PlayerBullet extends Bullet {
         bulletHitZone.C.y > enemyTankCollisionZone.A.y
       ) {
         this.hit = true;
-        enemyTanks[i].processHit();
+        enemyTanks[i].processHit(this.owner);
       }
     }
   }
