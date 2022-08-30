@@ -1,6 +1,9 @@
 import { Animation } from '../Animation/Animation';
 
 export class AnimationFrames extends Animation {
+  constructor(public animationFrames: HTMLImageElement[], public textureSize: number) {
+    super();
+  }
   animateFrames(delay: number, ctx: CanvasRenderingContext2D, xPos: number, yPos: number, termOfStop: boolean, repeats: number) {
     let image = this.animationFrames[this.index];
     if (termOfStop || this.repeats > 0) {

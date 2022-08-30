@@ -1,8 +1,14 @@
 import { Animation } from '../Animation/Animation';
 
 export class ExplosionAnimationFrames extends Animation {
-  constructor(animationFrames: HTMLImageElement[], textureSize: number, public delay: number, public xPos: number, public yPos: number) {
-    super(animationFrames, textureSize);
+  constructor(
+    private animationFrames: HTMLImageElement[],
+    private textureSize: number,
+    public delay: number,
+    public xPos: number,
+    public yPos: number,
+  ) {
+    super();
   }
 
   animateFrames(ctx: CanvasRenderingContext2D) {

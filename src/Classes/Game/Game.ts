@@ -16,6 +16,7 @@ import { GameInfoCanvas } from '../GameInfoCanvas/GameInfoCanvas';
 import { GameOverAnimation } from '../GameOverAnimation/GameOverAnimation';
 import { PlayerTank } from '../PlayerTank/PlayerTank';
 import { StaticElementsCanvas } from '../StaticElementsCanvas/StaticElementsCanvas';
+import { Value } from '../Value/Value';
 
 export class Game {
   gameStatus;
@@ -35,29 +36,26 @@ export class Game {
   explosions: ExplosionAnimationFrames[] = [];
   enemyTanks: EnemyTank[] = [];
   enemyTanksList: TankTypes[] = [];
-  destroyedEnemyTanksList: TankTypes[] = [];
+  values: Value[] = [];
+  destroyedEnemyTanksList: TankTypes[] = []; //!! Change for array of objects with who destroys information
+
   //!! Get height and width from the constructor
 
   constructor(private players: 1 | 2, levels: LevelRecipe[]) {
     this.levelsRecipe = levels;
     this.gameStatus = 'Ready';
-    //this.startGame();
   }
 
   startGame() {
     this.createStaticObjects();
     this.enemyTanksList = [...levels[this.currentLevelNumber].enemyTanksList];
-    //this.gameInfo.update(this.enemyTanksList.length, this.player1LivesLeft, this.player2LivesLeft, this.players, this.currentLevelNumber);
     this.handleGameInfoUpdate();
     this.staticObjectsCanvas = new StaticElementsCanvas(372, 320, this.staticObjects);
 
     setTimeout(() => {
       this.curtin.isBlocked = false;
       this.handlePlayer1TankSpawn();
-      //this.player1Tank = new PlayerTank(116, 292, 20, 20, player1TankTextures, this.staticObjects, this.bullets, this.explosions);
       this.addNewEnemyTank();
-      //this.handleGameInfoUpdate()
-      // this.gameInfo.update(this.enemyTanksList.length, 3, 3, 1, 1);
       this.handleEnemyTankSpawn();
     }, 1000);
     this.gameStatus = 'Started';
@@ -83,6 +81,17 @@ export class Game {
     this.enemyTanks.forEach((enemyTank) => {
       enemyTank.draw(renderCtx);
     });
+  }
+
+  renderValues(renderCtx: CanvasRenderingContext2D) {
+    for (let i = 0; i < this.values.length; i++) {
+      if (!this.values[i].animationEnded) {
+        this.values[i].showValue(renderCtx);
+      } else {
+        this.values.splice(i, 1);
+        i--;
+      }
+    }
   }
 
   createStaticObjects() {
@@ -175,10 +184,10 @@ export class Game {
         if (this.enemyTanks[i].getIsSpecial()) {
           //! Add new finding
         }
-        //!! Figure whose bullet destroyed tank when two players play
-        //!! Add floating message with score
         this.explosions.push(new ExplosionAnimationFrames(largeExplosionTextures.animationTexture, 30, 20, xPos - 4, yPos - 4));
-        //!! Add type to destroyed
+        this.values.push(new Value(this.enemyTanks[i].getValue(), xPos, yPos + 12, 1, 2.5));
+        //!! Figure whose bullet destroyed tank when two players play
+        //!! Add type to destroyed (object with type and who destroyed)
         this.enemyTanks.splice(i, 1);
         i--;
       }

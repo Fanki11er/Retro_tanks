@@ -38,6 +38,7 @@ const Canvas = () => {
           });*/
         renderCtx && game.renderBullets(renderCtx);
         renderCtx && game.renderExplosions(renderCtx);
+        renderCtx && game.renderValues(renderCtx);
 
         requestAnimationFrame(animate);
       };
