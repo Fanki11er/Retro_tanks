@@ -21,6 +21,12 @@ export class EnemyTank extends Tank {
     this.spawn(2500);
   }
 
+  public update() {
+    this.handleCollisionsWithBorders();
+    this.handleCollisionsWithStaticObjects();
+    this.handleImageChange();
+  }
+
   protected spawn(time: number) {
     this.isSpawning = true;
     setTimeout(() => {

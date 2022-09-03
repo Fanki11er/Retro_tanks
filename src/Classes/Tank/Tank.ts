@@ -12,7 +12,8 @@ import { TankMoveAnimation } from '../TankMoveAnimation/TankMoveAnimation';
 
 export abstract class Tank {
   controls;
-  protected speed = 0.25;
+  protected speed = 0.35; //!! Send speed to function that check for collisions
+  protected moveAnimationSpeed = 15;
   protected image;
   protected isBlockedBy;
   protected isLoading;
@@ -56,11 +57,50 @@ export abstract class Tank {
     }
   }
 
-  public update() {
-    const moveAnimationSpeed = 15;
+  protected abstract selectImage(animationSpeed: number): HTMLImageElement;
+
+  setImage(correctImage: HTMLImageElement) {
+    if (this.image !== correctImage) {
+      this.image = correctImage;
+    }
+  }
+
+  abstract fire(): void;
+
+  protected setPositionOfBullet(bulletWidth: number) {
+    if (this.controls.direction === 'Forwards') {
+      return new Coordinates(this.xPos + this.width / 2 - 1, this.yPos);
+    }
+    if (this.controls.direction === 'Backwards') {
+      return new Coordinates(this.xPos + this.width / 2 - 1, this.yPos + this.height - bulletWidth);
+    }
+    if (this.controls.direction === 'Left') {
+      return new Coordinates(this.xPos, this.yPos + this.height / 2 - 1);
+    }
+    if (this.controls.direction === 'Right') {
+      return new Coordinates(this.xPos + this.width - bulletWidth, this.yPos + this.height / 2 - 1);
+    }
+    return new Coordinates(-20, -20);
+  }
+
+  getCollisionZone() {
+    return new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height);
+  }
+
+  getIsDestroyed() {
+    return this.isDestroyed;
+  }
+
+  getCoordinates() {
+    return new Coordinates(this.xPos, this.yPos);
+  }
+
+  protected handleCollisionsWithBorders() {
     this.isBlockedBy = false;
     this.isBlockedBy = Utils.checkForCollisionWithBorders(this.controls.direction, this.xPos, this.yPos, this.width, this.height, 372, 320);
+  }
 
+  protected handleCollisionsWithStaticObjects() {
     if (!this.isBlockedBy) {
       const collisionWith = Utils.checkForCollisionWithObjects(
         this.controls.direction,
@@ -81,7 +121,10 @@ export abstract class Tank {
         }
       }
     }
-    const image = this.selectImage(moveAnimationSpeed);
+  }
+
+  protected handleImageChange() {
+    const image = this.selectImage(this.moveAnimationSpeed);
     if (this.controls.direction === 'Forwards') {
       this.setImage(image);
       if (!this.isBlockedBy && this.controls.move) {
@@ -112,44 +155,65 @@ export abstract class Tank {
     }
   }
 
-  protected abstract selectImage(animationSpeed: number): HTMLImageElement;
+  public abstract update(): void;
+  public abstract processHit(hitBy: Owner): void;
+  protected abstract spawn(time: number): void;
+}
 
-  setImage(correctImage: HTMLImageElement) {
-    if (this.image !== correctImage) {
-      this.image = correctImage;
+/*
+public update() {
+  this.isBlockedBy = false;
+  this.isBlockedBy = Utils.checkForCollisionWithBorders(this.controls.direction, this.xPos, this.yPos, this.width, this.height, 372, 320);
+  
+  if (!this.isBlockedBy) {
+      const collisionWith = Utils.checkForCollisionWithObjects(
+        this.controls.direction,
+        this.xPos,
+        this.yPos,
+        this.width,
+        this.height,
+        this.staticObjects,
+      );
+      if (collisionWith.length) {
+        for (let i = 0; i < collisionWith.length; i++) {
+          if (!this.isBlockedBy) {
+            this.isBlockedBy = !!collisionWith[i].getPrecisionCollisionPlace(
+              new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
+              this.controls.direction,
+            );
+          }
+        }
+      }
     }
-  }
-
-  abstract fire(): void;
-
-  protected setPositionOfBullet(bulletWidth: number) {
+    const image = this.selectImage(this.moveAnimationSpeed);
     if (this.controls.direction === 'Forwards') {
-      return new Coordinates(this.xPos + this.width / 2 - 1, this.yPos);
+      this.setImage(image);
+      if (!this.isBlockedBy && this.controls.move) {
+        this.yPos -= this.speed;
+      }
+      return;
     }
     if (this.controls.direction === 'Backwards') {
-      return new Coordinates(this.xPos + this.width / 2 - 1, this.yPos + this.height - bulletWidth);
+      this.setImage(image);
+      if (!this.isBlockedBy && this.controls.move) {
+        this.yPos += this.speed;
+      }
+      return;
     }
     if (this.controls.direction === 'Left') {
-      return new Coordinates(this.xPos, this.yPos + this.height / 2 - 1);
+      this.setImage(image);
+      if (!this.isBlockedBy && this.controls.move) {
+        this.xPos -= this.speed;
+      }
+      return;
     }
     if (this.controls.direction === 'Right') {
-      return new Coordinates(this.xPos + this.width - bulletWidth, this.yPos + this.height / 2 - 1);
+      this.setImage(image);
+      if (!this.isBlockedBy && this.controls.move) {
+        this.xPos += this.speed;
+      }
+      return;
     }
-    return new Coordinates(-20, -20);
   }
-
-  getCollisionZone() {
-    return new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height);
-  }
-  protected abstract spawn(time: number): void;
-  public abstract processHit(hitBy: Owner): void;
-
-  getIsDestroyed() {
-    return this.isDestroyed;
-  }
-
-  getCoordinates() {
-    return new Coordinates(this.xPos, this.yPos);
-  }
-}
+*/
 

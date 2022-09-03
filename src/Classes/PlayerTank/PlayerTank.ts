@@ -22,6 +22,13 @@ export class PlayerTank extends Tank {
     this.spawn(2500);
   }
 
+  update() {
+    this.handleCollisionsWithBorders();
+    this.handleCollisionsWithFindings();
+    this.handleCollisionsWithStaticObjects();
+    this.handleImageChange();
+  }
+
   protected madeIndestructible(time: number) {
     this.isIndestructible = true;
     setTimeout(() => {
@@ -65,6 +72,20 @@ export class PlayerTank extends Tank {
         }, 500);
     }
   }
+  handleCollisionsWithFindings() {
+    for (let i = 0; i < this.findings.length; i++) {
+      const collisionZone = this.findings[i].getCollisionZone();
+      if (
+        this.xPos <= collisionZone.B.x &&
+        this.xPos + this.width >= collisionZone.A.x &&
+        this.yPos <= collisionZone.C.y &&
+        this.yPos + this.height >= collisionZone.A.y
+      ) {
+        this.findings[i].setIsTaken(this.owner);
+      }
+    }
+  }
+
   public processHit(hitBy: Owner): void {}
 }
 
