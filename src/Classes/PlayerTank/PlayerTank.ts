@@ -2,6 +2,7 @@ import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
 import { Owner, StaticDrawable, TankTypesTextures } from '../../Types/Types';
 import { Bullet } from '../Bullet/Bullet';
 import { EnemyTank } from '../EnemyTank/EnemyTank';
+import { Finding } from '../Finding/Finding';
 import { PlayerBullet } from '../PlayerBullet/PlayerBullet';
 import { Tank } from '../Tank/Tank';
 
@@ -15,6 +16,7 @@ export class PlayerTank extends Tank {
     protected staticObjects: StaticDrawable[],
     protected bullets: Bullet[],
     protected enemyTanks: EnemyTank[],
+    protected findings: Finding[],
     protected owner: Owner,
   ) {
     super(xPos, yPos, width, height, textures, staticObjects, bullets);

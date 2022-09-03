@@ -39,6 +39,7 @@ const Canvas = () => {
         renderCtx && game.renderBullets(renderCtx);
         renderCtx && game.renderExplosions(renderCtx);
         renderCtx && game.renderValues(renderCtx);
+        renderCtx && game.renderFindings(renderCtx);
 
         requestAnimationFrame(animate);
       };

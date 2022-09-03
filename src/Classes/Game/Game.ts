@@ -2,8 +2,9 @@ import { levels } from '../../Levels/Levels';
 import { brickWallRecipe } from '../../Textures/BrickWall/BrickWallTexture';
 import { enemyTankTextures } from '../../Textures/EnemyTankTextures/EnemyTankTextures';
 import { largeExplosionTextures, smallExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
+import { findingsTextures } from '../../Textures/FindingsTextures/FindingsTextures';
 import { player1TankTextures } from '../../Textures/TanksTextures/TanksTextures';
-import { DestroyedBy, LevelRecipe, StaticDrawable, TankTypes } from '../../Types/Types';
+import { DestroyedBy, FindingsTypes, LevelRecipe, Owner, StaticDrawable, TankTypes } from '../../Types/Types';
 import { BrickWall } from '../BrickWall/BrickWall';
 import { Bullet } from '../Bullet/Bullet';
 import { ConcreteWall } from '../ConcreteWall/ConcreteWall';
@@ -12,6 +13,7 @@ import { Curtin } from '../Curtin/Curtin';
 import { Eagle } from '../Eagle/Eagle';
 import { EnemyTank } from '../EnemyTank/EnemyTank';
 import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
+import { Finding } from '../Finding/Finding';
 import { GameInfoCanvas } from '../GameInfoCanvas/GameInfoCanvas';
 import { GameOverAnimation } from '../GameOverAnimation/GameOverAnimation';
 import { PlayerTank } from '../PlayerTank/PlayerTank';
@@ -38,6 +40,8 @@ export class Game {
   enemyTanksList: TankTypes[] = [];
   values: Value[] = [];
   destroyedEnemyTanksList: DestroyedBy[] = [];
+  findings: Finding[] = [];
+  findingsList: FindingsTypes[] = ['Tank'];
 
   //!! Get height and width from the constructor
   //!! Check if all enemy tanks destroyed and finish the round
@@ -93,6 +97,23 @@ export class Game {
       } else {
         this.values.splice(i, 1);
         i--;
+      }
+    }
+  }
+
+  renderFindings(renderCtx: CanvasRenderingContext2D) {
+    for (let i = 0; i < this.findings.length; i++) {
+      if (this.findings[i].getIsTaken()) {
+        const { x: xPos, y: yPos } = this.findings[i].getCoordinates();
+        this.values.push(new Value(this.findings[i].getValue(), xPos, yPos + 12, 0.2, 2.5));
+        this.handleProcessRewardFromFinding(this.findings[i].getIsTaken(), this.findings[i].getType());
+        this.findings.splice(i, 1);
+        i++;
+      } else if (this.findings[i].getTimeIsOut()) {
+        this.findings.splice(i, 1);
+        i++;
+      } else {
+        this.findings[i].draw(renderCtx);
       }
     }
   }
@@ -173,7 +194,18 @@ export class Game {
 
   private handlePlayer1TankSpawn() {
     if (!this.player1Tank && this.player1LivesLeft > 0) {
-      this.player1Tank = new PlayerTank(116, 292, 20, 20, player1TankTextures, this.staticObjects, this.bullets, this.enemyTanks, 'Plyer1');
+      this.player1Tank = new PlayerTank(
+        116,
+        292,
+        20,
+        20,
+        player1TankTextures,
+        this.staticObjects,
+        this.bullets,
+        this.enemyTanks,
+        this.findings,
+        'Plyer1',
+      );
       this.player1LivesLeft -= 1;
       this.handleGameInfoUpdate();
     }
@@ -184,7 +216,7 @@ export class Game {
       if (this.enemyTanks[i].getIsDestroyed()) {
         const { x: xPos, y: yPos } = this.enemyTanks[i].getCoordinates();
         if (this.enemyTanks[i].getIsSpecial()) {
-          //! Add new finding
+          this.generateFinding();
         }
         this.explosions.push(new ExplosionAnimationFrames(largeExplosionTextures.animationTexture, 30, 20, xPos - 4, yPos - 4));
         this.values.push(new Value(this.enemyTanks[i].getValue(), xPos, yPos + 12, 1, 2.5));
@@ -204,6 +236,25 @@ export class Game {
         );
         this.bullets.splice(i, 1);
         i--;
+      }
+    }
+  }
+
+  private generateFinding() {
+    const index = Math.floor(Math.random() * this.findingsList.length);
+    const xPos = Math.floor(Math.random() * 300 + 4);
+    const yPos = Math.floor(Math.random() * 240 + 20);
+    switch (this.findingsList[index]) {
+      case 'Tank': {
+        this.findings.push(new Finding(this.findingsList[index], xPos, yPos, findingsTextures.tankFindingTexture, 24));
+      }
+    }
+  }
+
+  private handleProcessRewardFromFinding(owner: Owner, findingType: FindingsTypes) {
+    switch (findingType) {
+      case 'Tank': {
+        // Handle Add userLive
       }
     }
   }

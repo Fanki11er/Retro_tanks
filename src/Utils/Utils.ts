@@ -14,7 +14,7 @@ export class Utils {
     if (direction === 'Forwards') {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
-        if (xPos + 0.2 < collisionZone.B.x && xPos + width - 0.2 > collisionZone.A.x && yPos >= collisionZone.A.y && yPos <= collisionZone.D.y) {
+        if (xPos + 0.3 < collisionZone.B.x && xPos + width - 0.3 > collisionZone.A.x && yPos >= collisionZone.A.y && yPos <= collisionZone.D.y) {
           collisions.push(staticObjects[i]);
         }
       }
@@ -25,8 +25,8 @@ export class Utils {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
         if (
-          xPos + 0.2 < collisionZone.B.x &&
-          xPos + width - 0.2 > collisionZone.A.x &&
+          xPos + 0.3 < collisionZone.B.x &&
+          xPos + width - 0.3 > collisionZone.A.x &&
           yPos + height >= collisionZone.A.y &&
           yPos + height <= collisionZone.D.y
         ) {
@@ -39,7 +39,7 @@ export class Utils {
     if (direction === 'Left') {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
-        if (yPos + 0.2 < collisionZone.D.y && yPos + height - 0.2 > collisionZone.A.y && xPos <= collisionZone.D.x && xPos >= collisionZone.A.x) {
+        if (yPos + 0.3 < collisionZone.D.y && yPos + height - 0.3 > collisionZone.A.y && xPos <= collisionZone.D.x && xPos >= collisionZone.A.x) {
           collisions.push(staticObjects[i]);
         }
       }
@@ -50,8 +50,8 @@ export class Utils {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
         if (
-          yPos + 0.2 < collisionZone.D.y &&
-          yPos + height - 0.2 > collisionZone.A.y &&
+          yPos + 0.3 < collisionZone.D.y &&
+          yPos + height - 0.3 > collisionZone.A.y &&
           xPos + width >= collisionZone.A.x &&
           xPos + width <= collisionZone.B.x
         ) {
