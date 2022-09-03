@@ -6,7 +6,7 @@ export class Finding {
   protected timeIsOut = false;
   protected showImage = true;
   protected timeOut;
-  protected isTakenBy: Owner = '';
+  protected isTakenBy: Owner | '' = '';
   protected value = 500;
   protected showTime = 8;
   protected collisionZone;

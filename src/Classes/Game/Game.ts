@@ -16,6 +16,7 @@ import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionA
 import { Finding } from '../Finding/Finding';
 import { GameInfoCanvas } from '../GameInfoCanvas/GameInfoCanvas';
 import { GameOverAnimation } from '../GameOverAnimation/GameOverAnimation';
+import { Players } from '../Players/Players';
 import { PlayerTank } from '../PlayerTank/PlayerTank';
 import { StaticElementsCanvas } from '../StaticElementsCanvas/StaticElementsCanvas';
 import { Value } from '../Value/Value';
@@ -24,11 +25,12 @@ export class Game {
   gameStatus;
   bullets: Bullet[] = [];
   staticObjects: StaticDrawable[] = [];
-  player1Tank: PlayerTank | null = null;
-  player1LivesLeft = 3;
-  player1Score = 0;
-  player2LivesLeft = 3;
-  player2Score = 0;
+  players: Players;
+  //player1Tank: PlayerTank | null = null;
+  //player1LivesLeft = 3;
+  //player1Score = 0;
+  //player2LivesLeft = 3;
+  //player2Score = 0;
   staticObjectsCanvas: StaticElementsCanvas | null = null;
   curtin = new Curtin(372, 320);
   gameOverAnimation = new GameOverAnimation(150, 320);
@@ -48,8 +50,9 @@ export class Game {
   //!! Check if all players tanks are destroyed and finish the game
   //!! Add findings actions
 
-  constructor(private players: 1 | 2, levels: LevelRecipe[]) {
+  constructor(players: 1 | 2, levels: LevelRecipe[]) {
     this.levelsRecipe = levels;
+    this.players = new Players(players);
     this.gameStatus = 'Ready';
   }
 
@@ -61,7 +64,8 @@ export class Game {
 
     setTimeout(() => {
       this.curtin.isBlocked = false;
-      this.handlePlayer1TankSpawn();
+      this.handlePlayerTankSpawn('player1');
+      // ! What if we have two players
       this.addNewEnemyTank();
       this.handleEnemyTankSpawn();
     }, 1000);
@@ -189,24 +193,25 @@ export class Game {
   }
 
   private handleGameInfoUpdate() {
-    this.gameInfo.update(this.enemyTanksList.length, this.player1LivesLeft, this.player2LivesLeft, this.players, this.currentLevelNumber + 1);
+    this.gameInfo.update(this.enemyTanksList.length, this.players, this.currentLevelNumber + 1);
   }
 
-  private handlePlayer1TankSpawn() {
-    if (!this.player1Tank && this.player1LivesLeft > 0) {
-      this.player1Tank = new PlayerTank(
-        116,
-        292,
-        20,
-        20,
-        player1TankTextures,
-        this.staticObjects,
-        this.bullets,
-        this.enemyTanks,
-        this.findings,
-        'Plyer1',
-      );
-      this.player1LivesLeft -= 1;
+  private handlePlayerTankSpawn(owner: Owner) {
+    if (this.players[`${owner}`]) {
+      if (this.players[`${owner}`]!.getPlayerLivesLeft() > 0 && !this.players[`${owner}`]!.playerTank)
+        this.players[`${owner}`]!.playerTank = new PlayerTank(
+          116,
+          292,
+          20,
+          20,
+          player1TankTextures,
+          this.staticObjects,
+          this.bullets,
+          this.enemyTanks,
+          this.findings,
+          owner,
+        );
+      this.players[`${owner}`]?.modifyPlayerLivesLeft(-1);
       this.handleGameInfoUpdate();
     }
   }
@@ -251,7 +256,7 @@ export class Game {
     }
   }
 
-  private handleProcessRewardFromFinding(owner: Owner, findingType: FindingsTypes) {
+  private handleProcessRewardFromFinding(owner: Owner | '', findingType: FindingsTypes) {
     switch (findingType) {
       case 'Tank': {
         // Handle Add userLive
@@ -259,4 +264,25 @@ export class Game {
     }
   }
 }
+
+/*
+private handlePlayerTankSpawn(owner: Owner) {
+    if (!this.player1Tank && this.player1LivesLeft > 0) {
+      this.player1Tank = new PlayerTank(
+        116,
+        292,
+        20,
+        20,
+        player1TankTextures,
+        this.staticObjects,
+        this.bullets,
+        this.enemyTanks,
+        this.findings,
+        'Plyer1',
+      );
+      this.player1LivesLeft -= 1;
+      this.handleGameInfoUpdate();
+    }
+  }
+*/
 

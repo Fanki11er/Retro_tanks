@@ -29,7 +29,7 @@ const Canvas = () => {
         game.removeDestroyedTanks();
         game.removeDestroyedBullets();
         renderCtx && game.gameInfo.draw(renderCtx);
-        game.player1Tank && renderCtx && game.player1Tank.draw(renderCtx);
+        game.players.player1?.playerTank && renderCtx && game.players.player1.playerTank.draw(renderCtx);
         renderCtx && game.renderEnemyTanks(renderCtx);
         renderCtx && game.staticObjectsCanvas && game.staticObjectsCanvas.draw(renderCtx);
         /*renderCtx &&

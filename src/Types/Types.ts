@@ -8,10 +8,9 @@ export type MaterialType = 'Brick' | 'Concrete';
 
 export type TankTypes = 'Small';
 
-export type Owner = 'Plyer1' | 'Player2' | '';
+export type Owner = 'player1' | 'player2';
 
 export type FindingsTypes = 'Tank';
-
 export class Coordinates {
   x;
   y;

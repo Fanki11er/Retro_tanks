@@ -1,4 +1,5 @@
 import { enemyTankIcon, playerTankIcon, roundFlagIcon } from '../Icon/Icon';
+import { Players } from '../Players/Players';
 
 export class GameInfoCanvas {
   width;
@@ -13,7 +14,7 @@ export class GameInfoCanvas {
     this.canvas.width = width;
     this.canvas.height = height;
     this.canvasCtx = this.canvas.getContext('2d');
-    this.update();
+    //this.update(0, );
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -23,18 +24,21 @@ export class GameInfoCanvas {
 
   update(
     enemyTanksLeft: number = 0,
-    player1LivesLeft: number = 0,
-    player2LivesLeft: number = 0,
-    players: number = 1,
+    //player1LivesLeft: number = 0,
+    //player2LivesLeft: number = 0,
+    //players: number = 1,
+    players: Players,
     roundNumber: number = 0,
     gameStatus: string = 'Pause',
   ) {
     this.canvasCtx?.clearRect(0, 0, this.width, this.height);
     this.drawBorders();
     this.drawEnemyTanksLeftInfo(enemyTanksLeft);
-    this.drawPlayerLivesLeft(player1LivesLeft);
-    if (players === 2) {
-      this.drawPlayerLivesLeft(player2LivesLeft, true);
+    if (players.player1) {
+      this.drawPlayerLivesLeft(players.player1.getPlayerLivesLeft());
+    }
+    if (players.player2) {
+      this.drawPlayerLivesLeft(players.player2.getPlayerLivesLeft(), true);
     }
     this.drawRoundFlag(roundNumber);
   }
