@@ -1,8 +1,7 @@
 import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { Owner, StaticDrawable, TankTypesTextures } from '../../Types/Types';
-import { Bullet } from '../Bullet/Bullet';
-import { EnemyTank } from '../EnemyTank/EnemyTank';
-import { Finding } from '../Finding/Finding';
+import { Owner, TankTypesTextures } from '../../Types/Types';
+
+import { Game } from '../Game/Game';
 import { PlayerBullet } from '../PlayerBullet/PlayerBullet';
 import { Tank } from '../Tank/Tank';
 
@@ -13,13 +12,10 @@ export class PlayerTank extends Tank {
     protected width: number,
     protected height: number,
     textures: TankTypesTextures,
-    protected staticObjects: StaticDrawable[],
-    protected bullets: Bullet[],
-    protected enemyTanks: EnemyTank[],
-    protected findings: Finding[],
     protected owner: Owner,
+    protected game: Game,
   ) {
-    super(xPos, yPos, width, height, textures, staticObjects, bullets);
+    super(xPos, yPos, width, height, textures, game);
     this.madeIndestructible(4);
     this.spawn(2.5);
   }
@@ -52,20 +48,8 @@ export class PlayerTank extends Tank {
   fire() {
     if (!this.isLoading && !this.isSpawning) {
       const { x, y } = this.setPositionOfBullet(4);
-      this.bullets.push(
-        new PlayerBullet(
-          x,
-          y,
-          2,
-          2,
-          this.controls.direction,
-          bulletTextures,
-          this.staticObjects,
-          this.bullets,
-          'Standard',
-          this.enemyTanks,
-          this.owner,
-        ),
+      this.game.bullets.push(
+        new PlayerBullet(x, y, 2, 2, this.controls.direction, bulletTextures, 'Standard', this.game.enemyTanks, this.owner, this.game),
       );
       this.isLoading = true;
       this.isLoading &&
@@ -75,15 +59,15 @@ export class PlayerTank extends Tank {
     }
   }
   handleCollisionsWithFindings() {
-    for (let i = 0; i < this.findings.length; i++) {
-      const collisionZone = this.findings[i].getCollisionZone();
+    for (let i = 0; i < this.game.findings.length; i++) {
+      const collisionZone = this.game.findings[i].getCollisionZone();
       if (
         this.xPos <= collisionZone.B.x &&
         this.xPos + this.width >= collisionZone.A.x &&
         this.yPos <= collisionZone.C.y &&
         this.yPos + this.height >= collisionZone.A.y
       ) {
-        this.findings[i].setIsTaken(this.owner);
+        this.game.findings[i].setIsTaken(this.owner);
       }
     }
   }

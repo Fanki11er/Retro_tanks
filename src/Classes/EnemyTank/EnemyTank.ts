@@ -1,6 +1,5 @@
-import { Owner, StaticDrawable, TankTypes, TankTypesTextures } from '../../Types/Types';
-import { Bullet } from '../Bullet/Bullet';
-import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
+import { Owner, TankTypes, TankTypesTextures } from '../../Types/Types';
+import { Game } from '../Game/Game';
 import { Tank } from '../Tank/Tank';
 
 export class EnemyTank extends Tank {
@@ -10,14 +9,12 @@ export class EnemyTank extends Tank {
     protected width: number,
     protected height: number,
     textures: TankTypesTextures,
-    protected staticObjects: StaticDrawable[],
-    protected bullets: Bullet[],
-    protected explosions: ExplosionAnimationFrames[],
     protected tankType: TankTypes,
     private isSpecial: boolean,
     private timeBlockade: boolean,
+    protected game: Game,
   ) {
-    super(xPos, yPos, width, height, textures, staticObjects, bullets);
+    super(xPos, yPos, width, height, textures, game);
     this.controls.direction = 'Backwards';
     this.spawn(2.5);
   }

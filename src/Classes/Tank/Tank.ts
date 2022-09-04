@@ -1,9 +1,10 @@
-import { Coordinates, DestroyedBy, Owner, StaticDrawable, TankTypes, TankTypesTextures } from '../../Types/Types';
+import { Coordinates, DestroyedBy, Owner, /*StaticDrawable,*/ TankTypes, TankTypesTextures } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
 import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
-import { Bullet } from '../Bullet/Bullet';
+//import { Bullet } from '../Bullet/Bullet';
 import { Controls } from '../Controls/Controls';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
+import { Game } from '../Game/Game';
 
 import indestructibleTextures from '../IndestructibleTextures/IndestructibleTextures';
 
@@ -31,9 +32,10 @@ export abstract class Tank {
     protected width: number,
     protected height: number,
     textures: TankTypesTextures,
-    protected staticObjects: StaticDrawable[],
-    protected bullets: Bullet[],
-  ) {
+    protected game: Game,
+  ) //protected staticObjects: StaticDrawable[],
+  //protected bullets: Bullet[],
+  {
     this.controls = new Controls();
     this.image = textures.Small.forwardDirectionTextures[0];
     this.isBlockedBy = false;
@@ -108,7 +110,7 @@ export abstract class Tank {
         this.yPos,
         this.width,
         this.height,
-        this.staticObjects,
+        this.game.staticObjects,
       );
       if (collisionWith.length) {
         for (let i = 0; i < collisionWith.length; i++) {

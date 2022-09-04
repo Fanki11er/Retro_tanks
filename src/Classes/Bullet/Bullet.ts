@@ -5,6 +5,7 @@ import { AmmunitionType, CollisionZone, Coordinates, Direction, StaticDrawable }
 import { Utils } from '../../Utils/Utils';
 import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
+import { Game } from '../Game/Game';
 
 export abstract class Bullet {
   protected image: HTMLImageElement | null = null;
@@ -21,9 +22,8 @@ export abstract class Bullet {
     protected height: number,
     protected direction: Direction,
     protected textures: BulletTextures,
-    protected staticObjects: StaticDrawable[],
-    protected bullets: Bullet[],
     protected ammunitionType: AmmunitionType = 'Standard',
+    protected game: Game,
   ) {
     this.setImageForDirection();
     this.speed = 0.5;
@@ -107,15 +107,15 @@ export abstract class Bullet {
   private checkForExplosionRange(bulletHitZone: CollisionZone) {
     const collisions = [];
 
-    for (let i = 0; i < this.staticObjects.length; i++) {
-      const collisionZone = this.staticObjects[i].getCollisionZone();
+    for (let i = 0; i < this.game.staticObjects.length; i++) {
+      const collisionZone = this.game.staticObjects[i].getCollisionZone();
       if (
         bulletHitZone.A.x < collisionZone.B.x &&
         bulletHitZone.B.x > collisionZone.A.x &&
         bulletHitZone.A.y < collisionZone.C.y &&
         bulletHitZone.C.y > collisionZone.A.y
       ) {
-        collisions.push(this.staticObjects[i]);
+        collisions.push(this.game.staticObjects[i]);
       }
     }
     return collisions;
@@ -155,9 +155,9 @@ export abstract class Bullet {
         }
 
         for (let i = 0; i < elementsInExplosionRange.length; i++) {
-          const collisionElementIndex = Utils.findHitElementIndex(elementsInExplosionRange[i].id, this.staticObjects);
+          const collisionElementIndex = Utils.findHitElementIndex(elementsInExplosionRange[i].id, this.game.staticObjects);
           if (collisionElementIndex >= 0) {
-            this.staticObjects[collisionElementIndex].processHit(this.ammunitionType, bulletHitZone, this.yPos);
+            this.game.staticObjects[collisionElementIndex].processHit(this.ammunitionType, bulletHitZone, this.yPos);
           }
         }
       }
@@ -171,7 +171,7 @@ export abstract class Bullet {
       this.hit = Utils.checkForCollisionWithBorders(this.direction, this.xPos, this.yPos, this.width, this.height, 372, 320);
     }
     if (!this.hit) {
-      this.collisionWith = Utils.checkForCollisionWithObjects(this.direction, this.xPos, this.yPos, this.width, this.height, this.staticObjects);
+      this.collisionWith = Utils.checkForCollisionWithObjects(this.direction, this.xPos, this.yPos, this.width, this.height, this.game.staticObjects);
     }
   }
 

@@ -136,12 +136,10 @@ export class Game {
         22,
         22,
         enemyTankTextures,
-        this.staticObjects,
-        this.bullets,
-        this.explosions,
         this.enemyTanksList[index],
         this.ShouldBeSpecial(this.enemyTanksList),
         this.timeBlockade,
+        this,
       ),
     );
     this.enemyTanksList.splice(index, 1);
@@ -180,18 +178,7 @@ export class Game {
   private handlePlayerTankSpawn(owner: Owner) {
     if (owner && this.players[`${owner}`]) {
       if (this.players[`${owner}`]!.getPlayerLivesLeft() > 0 && !this.players[`${owner}`]!.playerTank)
-        this.players[`${owner}`]!.playerTank = new PlayerTank(
-          116,
-          292,
-          20,
-          20,
-          player1TankTextures,
-          this.staticObjects,
-          this.bullets,
-          this.enemyTanks,
-          this.findings,
-          owner,
-        );
+        this.players[`${owner}`]!.playerTank = new PlayerTank(116, 292, 20, 20, player1TankTextures, owner, this);
       this.players[`${owner}`]?.modifyPlayerLivesLeft(-1);
       this.handleGameInfoUpdate();
     }

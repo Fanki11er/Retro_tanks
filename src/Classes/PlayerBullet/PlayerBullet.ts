@@ -1,9 +1,10 @@
 import { BulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { AmmunitionType, Direction, Owner, StaticDrawable } from '../../Types/Types';
+import { AmmunitionType, Direction, Owner } from '../../Types/Types';
 import { Bullet } from '../Bullet/Bullet';
 import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 import { EnemyTank } from '../EnemyTank/EnemyTank';
+import { Game } from '../Game/Game';
 
 export class PlayerBullet extends Bullet {
   constructor(
@@ -13,13 +14,12 @@ export class PlayerBullet extends Bullet {
     protected height: number,
     protected direction: Direction,
     protected textures: BulletTextures,
-    protected staticObjects: StaticDrawable[],
-    protected bullets: Bullet[],
     protected ammunitionType: AmmunitionType = 'Standard',
     private enemyTanks: EnemyTank[], //!!Enemy bullets
     protected owner: Owner,
+    protected game: Game,
   ) {
-    super(xPos, yPos, width, height, direction, textures, staticObjects, bullets, ammunitionType);
+    super(xPos, yPos, width, height, direction, textures, ammunitionType, game);
   }
 
   public draw(context: CanvasRenderingContext2D) {
