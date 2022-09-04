@@ -193,12 +193,19 @@ export class Utils {
     return null;
   }
 
-  static makeStaticObjectRecipe(material: MaterialType, xPos: number, yPos: number, layoutType: BoardElementType): StaticObjectsRecipe {
+  static makeStaticObjectRecipe(
+    material: MaterialType,
+    xPos: number,
+    yPos: number,
+    layoutType: BoardElementType,
+    eagleBorder: boolean = false,
+  ): StaticObjectsRecipe {
     return {
       material,
       xPos,
       yPos,
       layoutType,
+      eagleBorder,
     };
   }
 }

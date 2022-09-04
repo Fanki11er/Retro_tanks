@@ -1,16 +1,11 @@
 import { levels } from '../../Levels/Levels';
-import { brickWallRecipe } from '../../Textures/BrickWall/BrickWallTexture';
 import { enemyTankTextures } from '../../Textures/EnemyTankTextures/EnemyTankTextures';
 import { largeExplosionTextures, smallExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
 import { findingsTextures } from '../../Textures/FindingsTextures/FindingsTextures';
 import { player1TankTextures } from '../../Textures/TanksTextures/TanksTextures';
 import { DestroyedBy, FindingsTypes, LevelRecipe, Owner, StaticDrawable, TankTypes } from '../../Types/Types';
-import { BrickWall } from '../BrickWall/BrickWall';
 import { Bullet } from '../Bullet/Bullet';
-import { ConcreteWall } from '../ConcreteWall/ConcreteWall';
-import { concreteWallRecipe } from '../ConcreteWallTextures/ConcreteWallTextures';
 import { Curtin } from '../Curtin/Curtin';
-import { Eagle } from '../Eagle/Eagle';
 import { EnemyTank } from '../EnemyTank/EnemyTank';
 import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
 import { Finding } from '../Finding/Finding';
@@ -26,11 +21,6 @@ export class Game {
   bullets: Bullet[] = [];
   staticObjects: StaticDrawable[] = [];
   players: Players;
-  //player1Tank: PlayerTank | null = null;
-  //player1LivesLeft = 3;
-  //player1Score = 0;
-  //player2LivesLeft = 3;
-  //player2Score = 0;
   staticObjectsCanvas: StaticElementsCanvas | null = null;
   curtin = new Curtin(372, 320);
   gameOverAnimation = new GameOverAnimation(150, 320);
@@ -43,7 +33,9 @@ export class Game {
   values: Value[] = [];
   destroyedEnemyTanksList: DestroyedBy[] = [];
   findings: Finding[] = [];
-  findingsList: FindingsTypes[] = ['Tank'];
+  findingsList: FindingsTypes[] = ['Tank', 'Grenade', 'Helmet', 'Stopwatch', 'Shovel', 'Star'];
+  timeBlockade = false;
+  //!!!!!!!! Try to make renderer object which will be render things instead canvas
 
   //!! Get height and width from the constructor
   //!! Check if all enemy tanks destroyed and finish the round
@@ -57,10 +49,10 @@ export class Game {
   }
 
   startGame() {
-    this.createStaticObjects();
+    this.staticObjectsCanvas = new StaticElementsCanvas(372, 320, this);
+    this.staticObjectsCanvas.createStaticObjects();
     this.enemyTanksList = [...levels[this.currentLevelNumber].enemyTanksList];
     this.handleGameInfoUpdate();
-    this.staticObjectsCanvas = new StaticElementsCanvas(372, 320, this.staticObjects);
 
     setTimeout(() => {
       this.curtin.isBlocked = false;
@@ -109,8 +101,12 @@ export class Game {
     for (let i = 0; i < this.findings.length; i++) {
       if (this.findings[i].getIsTaken()) {
         const { x: xPos, y: yPos } = this.findings[i].getCoordinates();
-        this.values.push(new Value(this.findings[i].getValue(), xPos, yPos + 12, 0.2, 2.5));
-        this.handleProcessRewardFromFinding(this.findings[i].getIsTaken(), this.findings[i].getType());
+        const value = this.findings[i].getValue();
+        const isTakenBy = this.findings[i].getIsTaken();
+
+        this.values.push(new Value(value, xPos, yPos + 12, 0.2, 2.5));
+        this.handleAddPlayerScore(isTakenBy, value);
+        this.handleProcessRewardFromFinding(isTakenBy, this.findings[i].getType());
         this.findings.splice(i, 1);
         i++;
       } else if (this.findings[i].getTimeIsOut()) {
@@ -118,22 +114,6 @@ export class Game {
         i++;
       } else {
         this.findings[i].draw(renderCtx);
-      }
-    }
-  }
-
-  createStaticObjects() {
-    const { eagle } = this.levelsRecipe[this.currentLevelNumber];
-    this.staticObjects.push(new Eagle(eagle.xPos, eagle.yPos, eagle.size, this.explosions));
-    for (let i = 0; i < this.levelsRecipe[this.currentLevelNumber].staticObjectsRecipe.length; i++) {
-      const { material, xPos, yPos, layoutType } = this.levelsRecipe[this.currentLevelNumber].staticObjectsRecipe[i];
-      if (material === 'Brick') {
-        this.staticObjects.push(new BrickWall(xPos, yPos, brickWallRecipe.elementSize, brickWallRecipe, layoutType, brickWallRecipe.textureSize));
-      }
-      if (material === 'Concrete') {
-        this.staticObjects.push(
-          new ConcreteWall(xPos, yPos, concreteWallRecipe.elementSize, concreteWallRecipe, layoutType, concreteWallRecipe.textureSize),
-        );
       }
     }
   }
@@ -161,6 +141,7 @@ export class Game {
         this.explosions,
         this.enemyTanksList[index],
         this.ShouldBeSpecial(this.enemyTanksList),
+        this.timeBlockade,
       ),
     );
     this.enemyTanksList.splice(index, 1);
@@ -197,7 +178,7 @@ export class Game {
   }
 
   private handlePlayerTankSpawn(owner: Owner) {
-    if (this.players[`${owner}`]) {
+    if (owner && this.players[`${owner}`]) {
       if (this.players[`${owner}`]!.getPlayerLivesLeft() > 0 && !this.players[`${owner}`]!.playerTank)
         this.players[`${owner}`]!.playerTank = new PlayerTank(
           116,
@@ -224,8 +205,10 @@ export class Game {
           this.generateFinding();
         }
         this.explosions.push(new ExplosionAnimationFrames(largeExplosionTextures.animationTexture, 30, 20, xPos - 4, yPos - 4));
-        this.values.push(new Value(this.enemyTanks[i].getValue(), xPos, yPos + 12, 1, 2.5));
-        this.destroyedEnemyTanksList.push(this.enemyTanks[i].getIsDestroyed()!);
+        if (this.enemyTanks[i].getIsDestroyed()?.destroyedBy) {
+          this.values.push(new Value(this.enemyTanks[i].getValue(), xPos, yPos + 12, 1, 2.5));
+          this.destroyedEnemyTanksList.push(this.enemyTanks[i].getIsDestroyed()!);
+        }
         this.enemyTanks.splice(i, 1);
         i--;
       }
@@ -245,44 +228,110 @@ export class Game {
     }
   }
 
+  private handleAddPlayerScore(owner: Owner, value: number) {
+    if (owner) {
+      this.players[`${owner}`]?.addPlayerScore(value);
+    }
+  }
+
+  //Handle findings
+
   private generateFinding() {
-    const index = Math.floor(Math.random() * this.findingsList.length);
+    //const index = Math.floor(Math.random() * this.findingsList.length);
+    const index = 5;
     const xPos = Math.floor(Math.random() * 300 + 4);
     const yPos = Math.floor(Math.random() * 240 + 20);
     switch (this.findingsList[index]) {
       case 'Tank': {
         this.findings.push(new Finding(this.findingsList[index], xPos, yPos, findingsTextures.tankFindingTexture, 24));
+        break;
+      }
+      case 'Grenade': {
+        this.findings.push(new Finding(this.findingsList[index], xPos, yPos, findingsTextures.grenadeFindingTexture, 24));
+        break;
+      }
+      case 'Helmet': {
+        this.findings.push(new Finding(this.findingsList[index], xPos, yPos, findingsTextures.helmetFindingTexture, 24));
+        break;
+      }
+      case 'Stopwatch': {
+        this.findings.push(new Finding(this.findingsList[index], xPos, yPos, findingsTextures.stopwatchFindingTexture, 24));
+        break;
+      }
+      case 'Shovel': {
+        this.findings.push(new Finding(this.findingsList[index], xPos, yPos, findingsTextures.shovelFindingTexture, 24));
+        break;
+      }
+      case 'Star': {
+        this.findings.push(new Finding(this.findingsList[index], xPos, yPos, findingsTextures.starFindingTexture, 24));
+        break;
       }
     }
   }
 
-  private handleProcessRewardFromFinding(owner: Owner | '', findingType: FindingsTypes) {
+  private handleProcessRewardFromFinding(owner: Owner, findingType: FindingsTypes) {
     switch (findingType) {
       case 'Tank': {
-        // Handle Add userLive
+        this.handleAddPlayerLive(owner);
+        break;
+      }
+      case 'Grenade': {
+        this.handleDestroyAllEnemyTanks();
+        break;
+      }
+      case 'Helmet': {
+        this.handleMakePlayerIndestructible(owner);
+        break;
+      }
+      case 'Stopwatch': {
+        this.handleBlockAllEnemyTanks(6);
+        break;
+      }
+      case 'Shovel': {
+        this.handleArmorEagle(6);
+        break;
+      }
+      case 'Star': {
+        this.handlePlayerTankUpdate(owner);
+        break;
       }
     }
   }
-}
 
-/*
-private handlePlayerTankSpawn(owner: Owner) {
-    if (!this.player1Tank && this.player1LivesLeft > 0) {
-      this.player1Tank = new PlayerTank(
-        116,
-        292,
-        20,
-        20,
-        player1TankTextures,
-        this.staticObjects,
-        this.bullets,
-        this.enemyTanks,
-        this.findings,
-        'Plyer1',
-      );
-      this.player1LivesLeft -= 1;
+  private handleDestroyAllEnemyTanks() {
+    this.enemyTanks.forEach((enemyTank) => {
+      enemyTank.processHit('');
+    });
+  }
+
+  private handleAddPlayerLive(owner: Owner) {
+    if (owner) {
+      this.players[`${owner}`]?.modifyPlayerLivesLeft(1);
       this.handleGameInfoUpdate();
     }
   }
-*/
+
+  private handleMakePlayerIndestructible(owner: Owner) {
+    if (owner) {
+      this.players[`${owner}`]?.playerTank?.madeIndestructible(10);
+    }
+  }
+  private handleBlockAllEnemyTanks(time: number) {
+    this.timeBlockade = true;
+    setTimeout(() => {
+      this.timeBlockade = false;
+    }, time * 1000);
+    this.enemyTanks.forEach((enemyTank) => {
+      enemyTank.setIsTimeBlocked(time);
+    });
+  }
+
+  private handleArmorEagle(time: number) {
+    this.staticObjectsCanvas?.handleEagleBordersArmourChange(time);
+  }
+
+  private handlePlayerTankUpdate(owner: Owner) {
+    console.log('Update');
+  }
+}
 

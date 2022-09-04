@@ -15,16 +15,19 @@ export class EnemyTank extends Tank {
     protected explosions: ExplosionAnimationFrames[],
     protected tankType: TankTypes,
     private isSpecial: boolean,
+    private timeBlockade: boolean,
   ) {
     super(xPos, yPos, width, height, textures, staticObjects, bullets);
     this.controls.direction = 'Backwards';
-    this.spawn(2500);
+    this.spawn(2.5);
   }
 
   public update() {
-    this.handleCollisionsWithBorders();
-    this.handleCollisionsWithStaticObjects();
-    this.handleImageChange();
+    if (!this.timeBlockade) {
+      this.handleCollisionsWithBorders();
+      this.handleCollisionsWithStaticObjects();
+      this.handleImageChange();
+    }
   }
 
   protected spawn(time: number) {
@@ -32,14 +35,15 @@ export class EnemyTank extends Tank {
     setTimeout(() => {
       this.isSpawning = false;
       this.isIndestructible = false;
-      //this.controls.move = true;
-    }, time);
+      this.controls.move = true;
+    }, time * 1000);
   }
   protected selectImage(animationSpeed: number) {
     return this.moveAnimation.setImageSpecialTank(this.controls.direction, this.controls.move, animationSpeed, this.isSpecial);
   }
 
   fire(): void {}
+
   public processHit(hitBy: Owner): void {
     this.isDestroyed = { type: this.tankType, destroyedBy: hitBy };
   }
@@ -60,6 +64,13 @@ export class EnemyTank extends Tank {
 
   getTankType() {
     return this.tankType;
+  }
+
+  setIsTimeBlocked(time: number) {
+    this.timeBlockade = true;
+    setTimeout(() => {
+      this.timeBlockade = false;
+    }, time * 1000);
   }
 }
 

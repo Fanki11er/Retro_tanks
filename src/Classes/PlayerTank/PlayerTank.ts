@@ -20,8 +20,8 @@ export class PlayerTank extends Tank {
     protected owner: Owner,
   ) {
     super(xPos, yPos, width, height, textures, staticObjects, bullets);
-    this.madeIndestructible(4000);
-    this.spawn(2500);
+    this.madeIndestructible(4);
+    this.spawn(2.5);
   }
 
   update() {
@@ -31,18 +31,18 @@ export class PlayerTank extends Tank {
     this.handleImageChange();
   }
 
-  protected madeIndestructible(time: number) {
+  madeIndestructible(time: number) {
     this.isIndestructible = true;
     setTimeout(() => {
       this.isIndestructible = false;
-    }, time);
+    }, time * 1000);
   }
 
   protected spawn(time: number) {
     this.isSpawning = true;
     setTimeout(() => {
       this.isSpawning = false;
-    }, time);
+    }, time * 1000);
   }
 
   protected selectImage(animationSpeed: number) {

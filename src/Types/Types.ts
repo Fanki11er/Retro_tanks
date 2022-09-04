@@ -8,9 +8,9 @@ export type MaterialType = 'Brick' | 'Concrete';
 
 export type TankTypes = 'Small';
 
-export type Owner = 'player1' | 'player2';
+export type Owner = 'player1' | 'player2' | '';
 
-export type FindingsTypes = 'Tank';
+export type FindingsTypes = 'Tank' | 'Grenade' | 'Helmet' | 'Stopwatch' | 'Shovel' | 'Star';
 export class Coordinates {
   x;
   y;
@@ -41,19 +41,12 @@ export interface StaticDrawable {
   changed: boolean;
   isDestroyed: boolean;
   processHit: (ammunitionType: AmmunitionType, collisionZone: CollisionZone, yPos: number) => string;
-  //getPrecisionHitPlace: (collisionZone: CollisionZone, direction: Direction) => WallCoordinates;
   getPrecisionCollisionPlace: (collisionZone: CollisionZone, direction: Direction) => WallCoordinates;
+  getIsEagleBorder: () => boolean;
 }
 
 export type AmmunitionType = 'Standard' | 'Heavy';
 export type WallCoordinates = Coordinates | null;
-
-/*export type WallRecipe = {
-  1: HTMLImageElement[];
-  2: HTMLImageElement[];
-  3: HTMLImageElement[];
-  4: HTMLImageElement[];
-};*/
 
 export type WallRecipe = {
   textureSize: number;
@@ -72,6 +65,7 @@ export type StaticObjectsRecipe = {
   xPos: number;
   yPos: number;
   layoutType: BoardElementType;
+  eagleBorder: boolean;
 };
 
 export type EagleRecipe = {

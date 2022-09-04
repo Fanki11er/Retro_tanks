@@ -52,5 +52,8 @@ export class Eagle implements StaticDrawable {
     this.changed = true;
     return '';
   }
+  getIsEagleBorder() {
+    return false;
+  }
 }
 
