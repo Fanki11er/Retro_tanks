@@ -22,12 +22,13 @@ const Canvas = () => {
             game.gameStatus = 'Started';
           }*/
         }
-        if (game.staticObjectsCanvas?.isEagleDestroyed) {
+        if (game.checkForGameOver()) {
           game.gameStatus = 'GameOver';
           renderCtx && game.gameOverAnimation.animate(renderCtx, 5);
         }
         game.removeDestroyedTanks();
         game.removeDestroyedBullets();
+        game.handleUserTankHit();
         renderCtx && game.gameInfo.draw(renderCtx);
         game.players.player1?.playerTank && renderCtx && game.players.player1.playerTank.draw(renderCtx);
         renderCtx && game.renderEnemyTanks(renderCtx);

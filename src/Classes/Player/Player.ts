@@ -18,4 +18,12 @@ export class Player {
   addPlayerScore(amount: number) {
     this.playerScore += amount;
   }
+
+  isPlayerDestroyed() {
+    if (this.playerLivesLeft === 0 && this.playerTank === null) {
+      return true;
+    }
+    return false;
+  }
 }
+

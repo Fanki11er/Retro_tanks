@@ -1,4 +1,6 @@
+import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
 import { Owner, TankTypes, TankTypesTextures } from '../../Types/Types';
+import { EnemyBullet } from '../EnemyBullet/EnemyBullet';
 import { Game } from '../Game/Game';
 import { Tank } from '../Tank/Tank';
 
@@ -34,14 +36,25 @@ export class EnemyTank extends Tank {
     setTimeout(() => {
       this.isSpawning = false;
       this.isIndestructible = false;
-      this.controls.move = true;
+      this.controls.move = true; //!Temporary
+      this.fire(); //! Temporary
     }, time * 1000);
   }
   protected selectImage(animationSpeed: number) {
     return this.moveAnimation.setImageSpecialTank(this.controls.direction, this.controls.move, animationSpeed, this.isSpecial);
   }
 
-  fire(): void {}
+  fire() {
+    if (!this.isLoading && !this.isSpawning) {
+      const { x, y } = this.setPositionOfBullet(4);
+      this.game.bullets.push(new EnemyBullet(x, y, 2, 2, this.controls.direction, bulletTextures, 'Standard', '', this.game));
+      this.isLoading = true;
+      this.isLoading &&
+        setTimeout(() => {
+          this.isLoading = false;
+        }, this.reloadTime * 1000);
+    }
+  }
 
   public processHit(hitBy: Owner): void {
     this.isDestroyed = { type: this.tankType, destroyedBy: hitBy };

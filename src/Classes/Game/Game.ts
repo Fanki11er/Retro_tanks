@@ -202,6 +202,21 @@ export class Game {
     }
   }
 
+  handleUserTankHit() {
+    const tanks = this.players.getActivePlayersTanks();
+    for (let i = 0; i < tanks.length; i++) {
+      if (tanks[i].getIsDestroyed()) {
+        const owner = tanks[i].getOwner();
+        if (owner) {
+          this.players[owner]!.playerTank = null;
+          setTimeout(() => {
+            this.handlePlayerTankSpawn(owner);
+          }, 1500);
+        }
+      }
+    }
+  }
+
   removeDestroyedBullets() {
     for (let i = 0; i < this.bullets.length; i++) {
       if (this.bullets[i].getIsDestroyed()) {
@@ -320,6 +335,19 @@ export class Game {
     if (owner) {
       this.players[owner]?.playerTank?.updateTank();
     }
+  }
+
+  checkForGameOver() {
+    if (this.staticObjectsCanvas?.isEagleDestroyed) {
+      return true;
+    }
+    if (this.players.player1 && this.players.player1.isPlayerDestroyed() && !this.players.player2) {
+      return true;
+    }
+    if (this.players.player1 && this.players.player1.isPlayerDestroyed() && this.players.player2 && this.players.player2.isPlayerDestroyed()) {
+      return true;
+    }
+    return false;
   }
 }
 

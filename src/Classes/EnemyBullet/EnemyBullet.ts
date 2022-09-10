@@ -3,10 +3,10 @@ import { AmmunitionType, Direction, Owner } from '../../Types/Types';
 import { Bullet } from '../Bullet/Bullet';
 import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
-import { EnemyTank } from '../EnemyTank/EnemyTank';
 import { Game } from '../Game/Game';
+import { Tank } from '../Tank/Tank';
 
-export class PlayerBullet extends Bullet {
+export class EnemyBullet extends Bullet {
   constructor(
     protected xPos: number,
     protected yPos: number,
@@ -15,8 +15,8 @@ export class PlayerBullet extends Bullet {
     protected direction: Direction,
     protected textures: BulletTextures,
     protected ammunitionType: AmmunitionType = 'Standard',
-    //!!Enemy bullets
-    protected owner: Owner,
+    //!!PlayerBullets
+    protected owner: Owner = '',
     protected game: Game,
   ) {
     super(xPos, yPos, width, height, direction, textures, ammunitionType, game);
@@ -25,16 +25,15 @@ export class PlayerBullet extends Bullet {
   public draw(context: CanvasRenderingContext2D) {
     this.checkForCollisionsWithStaticObjects();
 
-    this.handleEnemyTanksHits();
+    this.handleTanksHits();
     this.handleStaticObjectHit();
-
     this.handleExplosion();
     this.handleDrawImage(context);
   }
 
-  private checkForEnemyTanksHit(bulletHitZone: BulletHitZone, enemyTanks: EnemyTank[]) {
-    for (let i = 0; i < enemyTanks.length; i++) {
-      const enemyTankCollisionZone = enemyTanks[i].getCollisionZone();
+  private checkForTanksHit(bulletHitZone: BulletHitZone, tanks: Tank[]) {
+    for (let i = 0; i < tanks.length; i++) {
+      const enemyTankCollisionZone = tanks[i].getCollisionZone();
       if (
         bulletHitZone.A.x < enemyTankCollisionZone.B.x &&
         bulletHitZone.B.x > enemyTankCollisionZone.A.x &&
@@ -42,13 +41,15 @@ export class PlayerBullet extends Bullet {
         bulletHitZone.C.y > enemyTankCollisionZone.A.y
       ) {
         this.hit = true;
-        enemyTanks[i].processHit(this.owner);
+        tanks[i].processHit('');
       }
     }
   }
 
-  private handleEnemyTanksHits() {
-    this.checkForEnemyTanksHit(new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height), this.game.enemyTanks);
+  private handleTanksHits() {
+    this.checkForTanksHit(
+      new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
+      this.game.players.getActivePlayersTanks(),
+    );
   }
 }
-

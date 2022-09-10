@@ -1,5 +1,5 @@
 import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { Owner, TankTypesTextures } from '../../Types/Types';
+import { DestroyedBy, Owner, TankTypesTextures } from '../../Types/Types';
 
 import { Game } from '../Game/Game';
 import { PlayerBullet } from '../PlayerBullet/PlayerBullet';
@@ -50,9 +50,7 @@ export class PlayerTank extends Tank {
   fire() {
     if (!this.isLoading && !this.isSpawning) {
       const { x, y } = this.setPositionOfBullet(4);
-      this.game.bullets.push(
-        new PlayerBullet(x, y, 2, 2, this.controls.direction, bulletTextures, 'Standard', this.game.enemyTanks, this.owner, this.game),
-      );
+      this.game.bullets.push(new PlayerBullet(x, y, 2, 2, this.controls.direction, bulletTextures, 'Standard', this.owner, this.game));
       this.isLoading = true;
       this.isLoading &&
         setTimeout(() => {
@@ -74,7 +72,9 @@ export class PlayerTank extends Tank {
     }
   }
 
-  public processHit(hitBy: Owner): void {}
+  public processHit(hitBy: Owner): void {
+    this.isDestroyed = { destroyedBy: hitBy, type: 'Small' } as DestroyedBy;
+  }
 
   updateTank() {
     if (this.updateTankType()) {
@@ -94,6 +94,10 @@ export class PlayerTank extends Tank {
       }
     }
     return false;
+  }
+
+  getOwner() {
+    return this.owner;
   }
 }
 
