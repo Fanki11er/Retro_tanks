@@ -23,6 +23,8 @@ export class EnemyTank extends Tank {
     if (!this.timeBlockade) {
       this.handleCollisionsWithBorders();
       this.handleCollisionsWithStaticObjects();
+      this.handleCollisionsWithOtherTanks(this.game.enemyTanks);
+      this.handleCollisionsWithOtherTanks(this.game.players.getActivePlayersTanks());
       this.handleImageChange();
     }
   }

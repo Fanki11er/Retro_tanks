@@ -23,6 +23,8 @@ export class PlayerTank extends Tank {
   update() {
     this.handleCollisionsWithBorders();
     this.handleCollisionsWithFindings();
+    this.handleCollisionsWithOtherTanks(this.game.enemyTanks);
+    this.handleCollisionsWithOtherTanks(this.game.players.getActivePlayersTanks());
     this.handleCollisionsWithStaticObjects();
     this.handleImageChange();
   }

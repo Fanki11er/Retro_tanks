@@ -1,19 +1,18 @@
-import { Coordinates, DestroyedBy, Owner, /*StaticDrawable,*/ TankTypes, TankTypesTextures } from '../../Types/Types';
+import { Coordinates, DestroyedBy, Owner, TankTypes, TankTypesTextures } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
 import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
-//import { Bullet } from '../Bullet/Bullet';
 import { Controls } from '../Controls/Controls';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 import { Game } from '../Game/Game';
-
 import indestructibleTextures from '../IndestructibleTextures/IndestructibleTextures';
-
 import spawnPointTextures from '../SpawnPointTextures/SpawnPointTextures';
 import { TankMoveAnimation } from '../TankMoveAnimation/TankMoveAnimation';
+import { v4 as uuidv4 } from 'uuid';
 
 export abstract class Tank {
+  protected id;
   controls;
-  protected speed = 0.4; //!! Send speed to function that check for collisions
+  protected speed = 0.4;
   protected reloadTime = 0.5;
   protected moveAnimationSpeed = 15;
   protected image;
@@ -33,8 +32,9 @@ export abstract class Tank {
     protected width: number,
     protected height: number,
     textures: TankTypesTextures,
-    protected game: Game, //protected staticObjects: StaticDrawable[], //protected bullets: Bullet[],
+    protected game: Game,
   ) {
+    this.id = uuidv4();
     this.controls = new Controls();
     this.image = textures.Small.forwardDirectionTextures[0];
     this.isBlockedBy = false;
@@ -124,6 +124,12 @@ export abstract class Tank {
     }
   }
 
+  protected handleCollisionsWithOtherTanks(tanks: Tank[]) {
+    if (!this.isBlockedBy && this.detectCollisionsWithOtherTanks(tanks)) {
+      this.isBlockedBy = true;
+    }
+  }
+
   protected handleImageChange() {
     const image = this.selectImage(this.moveAnimationSpeed);
     if (this.controls.direction === 'Forwards') {
@@ -156,65 +162,59 @@ export abstract class Tank {
     }
   }
 
+  protected detectCollisionsWithOtherTanks(tanks: Tank[]) {
+    for (let i = 0; i < tanks.length; i++) {
+      if (tanks[i].id === this.id) {
+        continue;
+      }
+      const collisionZone = new ElementCollisionZone({ x: tanks[i].xPos, y: tanks[i].yPos }, tanks[i].width, tanks[i].height);
+      if (this.controls.direction === 'Forwards') {
+        if (
+          this.xPos + 0.5 < collisionZone.B.x &&
+          this.xPos + this.width - 0.5 > collisionZone.A.x &&
+          this.yPos >= collisionZone.A.y &&
+          this.yPos <= collisionZone.D.y
+        ) {
+          return true;
+        }
+      }
+      if (this.controls.direction === 'Backwards') {
+        if (
+          this.xPos + 0.5 < collisionZone.B.x &&
+          this.xPos + this.width - 0.5 > collisionZone.A.x &&
+          this.yPos + this.height >= collisionZone.A.y &&
+          this.yPos + this.height <= collisionZone.D.y
+        ) {
+          return true;
+        }
+      }
+
+      if (this.controls.direction === 'Left') {
+        if (
+          this.yPos + 0.5 < collisionZone.D.y &&
+          this.yPos + this.height - 0.5 > collisionZone.A.y &&
+          this.xPos <= collisionZone.D.x &&
+          this.xPos >= collisionZone.A.x
+        ) {
+          return true;
+        }
+      }
+      if (this.controls.direction === 'Right') {
+        if (
+          this.yPos + 0.5 < collisionZone.D.y &&
+          this.yPos + this.height - 0.5 > collisionZone.A.y &&
+          this.xPos + this.width >= collisionZone.A.x &&
+          this.xPos + this.width <= collisionZone.B.x
+        ) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   public abstract update(): void;
   public abstract processHit(hitBy: Owner): void;
   protected abstract spawn(time: number): void;
 }
-
-/*
-public update() {
-  this.isBlockedBy = false;
-  this.isBlockedBy = Utils.checkForCollisionWithBorders(this.controls.direction, this.xPos, this.yPos, this.width, this.height, 372, 320);
-  
-  if (!this.isBlockedBy) {
-      const collisionWith = Utils.checkForCollisionWithObjects(
-        this.controls.direction,
-        this.xPos,
-        this.yPos,
-        this.width,
-        this.height,
-        this.staticObjects,
-      );
-      if (collisionWith.length) {
-        for (let i = 0; i < collisionWith.length; i++) {
-          if (!this.isBlockedBy) {
-            this.isBlockedBy = !!collisionWith[i].getPrecisionCollisionPlace(
-              new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
-              this.controls.direction,
-            );
-          }
-        }
-      }
-    }
-    const image = this.selectImage(this.moveAnimationSpeed);
-    if (this.controls.direction === 'Forwards') {
-      this.setImage(image);
-      if (!this.isBlockedBy && this.controls.move) {
-        this.yPos -= this.speed;
-      }
-      return;
-    }
-    if (this.controls.direction === 'Backwards') {
-      this.setImage(image);
-      if (!this.isBlockedBy && this.controls.move) {
-        this.yPos += this.speed;
-      }
-      return;
-    }
-    if (this.controls.direction === 'Left') {
-      this.setImage(image);
-      if (!this.isBlockedBy && this.controls.move) {
-        this.xPos -= this.speed;
-      }
-      return;
-    }
-    if (this.controls.direction === 'Right') {
-      this.setImage(image);
-      if (!this.isBlockedBy && this.controls.move) {
-        this.xPos += this.speed;
-      }
-      return;
-    }
-  }
-*/
 
