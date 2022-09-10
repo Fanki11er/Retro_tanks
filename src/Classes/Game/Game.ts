@@ -224,8 +224,7 @@ export class Game {
   //Handle findings
 
   private generateFinding() {
-    //const index = Math.floor(Math.random() * this.findingsList.length);
-    const index = 5;
+    const index = Math.floor(Math.random() * this.findingsList.length);
     const xPos = Math.floor(Math.random() * 300 + 4);
     const yPos = Math.floor(Math.random() * 240 + 20);
     switch (this.findingsList[index]) {

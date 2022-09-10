@@ -26,7 +26,7 @@ export abstract class Bullet {
     protected game: Game,
   ) {
     this.setImageForDirection();
-    this.speed = 0.5;
+    this.speed = 0.7;
 
     this.id = uuidv4();
   }

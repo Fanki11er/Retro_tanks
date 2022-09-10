@@ -55,7 +55,7 @@ export class PlayerTank extends Tank {
       this.isLoading &&
         setTimeout(() => {
           this.isLoading = false;
-        }, this.reloadSpeed * 1000);
+        }, this.reloadTime * 1000);
     }
   }
   handleCollisionsWithFindings() {
@@ -84,8 +84,8 @@ export class PlayerTank extends Tank {
     switch (this.tankType) {
       case 'Small': {
         this.tankType = 'Medium';
-        //! Change time of reload
-        //! Maybe change speed
+        this.reloadTime = 0.4;
+        this.speed = 0.4;
         //! on last level change ammunition type
 
         return true;

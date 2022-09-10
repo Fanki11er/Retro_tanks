@@ -13,8 +13,8 @@ import { TankMoveAnimation } from '../TankMoveAnimation/TankMoveAnimation';
 
 export abstract class Tank {
   controls;
-  protected speed = 0.35; //!! Send speed to function that check for collisions
-  protected reloadSpeed = 0.5;
+  protected speed = 0.4; //!! Send speed to function that check for collisions
+  protected reloadTime = 0.5;
   protected moveAnimationSpeed = 15;
   protected image;
   protected isBlockedBy;
