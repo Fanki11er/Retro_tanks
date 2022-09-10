@@ -185,8 +185,8 @@ export abstract class Wall implements StaticDrawable {
       for (let i = 0; i < this.coordinates.length; i++) {
         if (
           this.coordinates[i] &&
-          this.coordinates[i]!.x + 0.35 < collisionZone.B.x &&
-          this.coordinates[i]!.x + this.textureSize - 0.35 > collisionZone.A.x &&
+          this.coordinates[i]!.x + 0.5 < collisionZone.B.x &&
+          this.coordinates[i]!.x + this.textureSize - 0.5 > collisionZone.A.x &&
           this.coordinates[i]!.y <= collisionZone.C.y &&
           this.coordinates[i]!.y + this.textureSize >= collisionZone.A.y
         ) {
@@ -198,8 +198,8 @@ export abstract class Wall implements StaticDrawable {
       for (let i = 0; i < this.coordinates.length; i++) {
         if (
           this.coordinates[i] &&
-          this.coordinates[i]!.x + 0.35 < collisionZone.B.x &&
-          this.coordinates[i]!.x + this.textureSize - 0.35 > collisionZone.A.x &&
+          this.coordinates[i]!.x + 0.5 < collisionZone.B.x &&
+          this.coordinates[i]!.x + this.textureSize - 0.5 > collisionZone.A.x &&
           this.coordinates[i]!.y <= collisionZone.C.y &&
           this.coordinates[i]!.y + this.textureSize >= collisionZone.A.y
         ) {
@@ -213,8 +213,8 @@ export abstract class Wall implements StaticDrawable {
           this.coordinates[i] &&
           this.coordinates[i]!.x <= collisionZone.B.x &&
           this.coordinates[i]!.x + this.textureSize >= collisionZone.A.x &&
-          this.coordinates[i]!.y + 0.35 < collisionZone.C.y &&
-          this.coordinates[i]!.y + this.textureSize - 0.35 > collisionZone.A.y
+          this.coordinates[i]!.y + 0.5 < collisionZone.C.y &&
+          this.coordinates[i]!.y + this.textureSize - 0.5 > collisionZone.A.y
         ) {
           return { x: collisionZone.A.x, y: collisionZone.A.y };
         }
@@ -226,8 +226,8 @@ export abstract class Wall implements StaticDrawable {
           this.coordinates[i] &&
           this.coordinates[i]!.x <= collisionZone.B.x &&
           this.coordinates[i]!.x + this.textureSize >= collisionZone.A.x &&
-          this.coordinates[i]!.y + 0.35 < collisionZone.C.y &&
-          this.coordinates[i]!.y + this.textureSize - 0.35 > collisionZone.A.y
+          this.coordinates[i]!.y + 0.5 < collisionZone.C.y &&
+          this.coordinates[i]!.y + this.textureSize - 0.5 > collisionZone.A.y
         ) {
           return { x: collisionZone.B.x, y: collisionZone.B.y };
         }
