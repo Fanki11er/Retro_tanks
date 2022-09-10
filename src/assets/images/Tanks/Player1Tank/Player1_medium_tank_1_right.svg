@@ -1,0 +1,32 @@
+<svg width="17" height="13" viewBox="0 0 17 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="12" y="1" width="2" height="12" transform="rotate(90 12 1)" fill="#E79C21"/>
+<rect x="11" y="3" width="2" height="9" transform="rotate(90 11 3)" fill="#E7E794"/>
+<rect x="12" y="11" width="2" height="11" transform="rotate(90 12 11)" fill="#E79C21"/>
+<rect x="11" y="8" width="3" height="9" transform="rotate(90 11 8)" fill="#6B6B00"/>
+<rect x="10" y="5" width="3" height="8" transform="rotate(90 10 5)" fill="#E79C21"/>
+<line x1="1" y1="0.5" x2="12" y2="0.5" stroke="#E7E794"/>
+<line x1="10.5" x2="10.5" y2="2" stroke="#6B6B00"/>
+<line x1="10.5" y1="11" x2="10.5" y2="13" stroke="#6B6B00"/>
+<line x1="8.5" y1="11" x2="8.5" y2="13" stroke="#6B6B00"/>
+<line x1="6.5" y1="11" x2="6.5" y2="13" stroke="#6B6B00"/>
+<line x1="4.5" y1="11" x2="4.5" y2="13" stroke="#6B6B00"/>
+<line x1="2.5" y1="11" x2="2.5" y2="13" stroke="#6B6B00"/>
+<line x1="8.5" x2="8.5" y2="2" stroke="#6B6B00"/>
+<line x1="6.5" x2="6.5" y2="2" stroke="#6B6B00"/>
+<line x1="4.5" x2="4.5" y2="2" stroke="#6B6B00"/>
+<line x1="2.5" x2="2.5" y2="2" stroke="#6B6B00"/>
+<line x1="0.5" x2="0.5" y2="3" stroke="#6B6B00"/>
+<line x1="1.5" y1="2" x2="1.5" y2="3" stroke="#E7E794"/>
+<line x1="11.5" y1="10" x2="11.5" y2="11" stroke="#E7E794"/>
+<line x1="7.5" y1="6" x2="7.5" y2="7" stroke="#E7E794"/>
+<line x1="3.5" y1="6" x2="3.5" y2="7" stroke="#6B6B00"/>
+<line x1="0.5" y1="10" x2="0.5" y2="13" stroke="#6B6B00"/>
+<line x1="10.5" y1="2" x2="10.5" y2="3" stroke="#E7E794"/>
+<rect x="12" y="5" width="3" height="2" transform="rotate(90 12 5)" fill="#6B6B00"/>
+<line x1="9" y1="6.5" x2="17" y2="6.5" stroke="#E7E794"/>
+<line x1="4" y1="5.5" x2="8" y2="5.5" stroke="#E7E794"/>
+<line x1="3" y1="8.5" x2="8" y2="8.5" stroke="#E79C21"/>
+<line x1="3" y1="7.5" x2="7" y2="7.5" stroke="#6B6B00"/>
+<line x1="1.5" y1="3" x2="1.5" y2="11" stroke="#6B6B00"/>
+<line x1="3" y1="4.5" x2="8" y2="4.5" stroke="#E79C21"/>
+</svg>
