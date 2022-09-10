@@ -14,6 +14,7 @@ import { TankMoveAnimation } from '../TankMoveAnimation/TankMoveAnimation';
 export abstract class Tank {
   controls;
   protected speed = 0.35; //!! Send speed to function that check for collisions
+  protected reloadSpeed = 0.5;
   protected moveAnimationSpeed = 15;
   protected image;
   protected isBlockedBy;
@@ -32,10 +33,8 @@ export abstract class Tank {
     protected width: number,
     protected height: number,
     textures: TankTypesTextures,
-    protected game: Game,
-  ) //protected staticObjects: StaticDrawable[],
-  //protected bullets: Bullet[],
-  {
+    protected game: Game, //protected staticObjects: StaticDrawable[], //protected bullets: Bullet[],
+  ) {
     this.controls = new Controls();
     this.image = textures.Small.forwardDirectionTextures[0];
     this.isBlockedBy = false;

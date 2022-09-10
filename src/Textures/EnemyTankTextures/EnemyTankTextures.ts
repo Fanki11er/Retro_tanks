@@ -40,6 +40,7 @@ enemySmallTankTextures.addTextures(enemySmallTank1SpecialRight, 'Right');
 
 const enemyTankTextures: TankTypesTextures = {
   Small: enemySmallTankTextures,
+  Medium: enemySmallTankTextures,
 };
 
 export { enemyTankTextures };

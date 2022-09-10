@@ -48,7 +48,7 @@ export class EnemyTank extends Tank {
     return this.isSpecial;
   }
   getValue() {
-    //!! Make standardized values
+    //!! Make standardized values (enum will be great)
     switch (this.tankType) {
       case 'Small': {
         return 100;

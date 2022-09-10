@@ -318,7 +318,9 @@ export class Game {
   }
 
   private handlePlayerTankUpdate(owner: Owner) {
-    console.log('Update');
+    if (owner) {
+      this.players[owner]?.playerTank?.updateTank();
+    }
   }
 }
 

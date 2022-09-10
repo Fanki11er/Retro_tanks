@@ -66,5 +66,9 @@ export class TankMoveAnimation {
       }
     }
   }
+
+  public changeTextures(textures: ChangeDirectionTextures) {
+    this.textures = textures;
+  }
 }
 

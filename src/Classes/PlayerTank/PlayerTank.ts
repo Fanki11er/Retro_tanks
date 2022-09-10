@@ -11,7 +11,7 @@ export class PlayerTank extends Tank {
     public yPos: number,
     protected width: number,
     protected height: number,
-    textures: TankTypesTextures,
+    public textures: TankTypesTextures,
     protected owner: Owner,
     protected game: Game,
   ) {
@@ -55,7 +55,7 @@ export class PlayerTank extends Tank {
       this.isLoading &&
         setTimeout(() => {
           this.isLoading = false;
-        }, 500);
+        }, this.reloadSpeed * 1000);
     }
   }
   handleCollisionsWithFindings() {
@@ -73,5 +73,25 @@ export class PlayerTank extends Tank {
   }
 
   public processHit(hitBy: Owner): void {}
+
+  updateTank() {
+    if (this.updateTankType()) {
+      this.moveAnimation.changeTextures(this.textures[this.tankType]);
+    }
+  }
+
+  updateTankType() {
+    switch (this.tankType) {
+      case 'Small': {
+        this.tankType = 'Medium';
+        //! Change time of reload
+        //! Maybe change speed
+        //! on last level change ammunition type
+
+        return true;
+      }
+    }
+    return false;
+  }
 }
 

@@ -6,7 +6,7 @@ export type BoardElementType = 'Full' | 'Horizontally' | 'Vertically';
 
 export type MaterialType = 'Brick' | 'Concrete';
 
-export type TankTypes = 'Small';
+export type TankTypes = 'Small' | 'Medium';
 
 export type Owner = 'player1' | 'player2' | '';
 
@@ -76,5 +76,6 @@ export type EagleRecipe = {
 
 export type TankTypesTextures = {
   Small: ChangeDirectionTextures;
+  Medium: ChangeDirectionTextures;
 };
 
