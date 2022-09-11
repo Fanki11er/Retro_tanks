@@ -1,5 +1,5 @@
 import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { DestroyedBy, Owner, TankTypesTextures } from '../../Types/Types';
+import { Owner, TankTypesTextures } from '../../Types/Types';
 
 import { Game } from '../Game/Game';
 import { PlayerBullet } from '../PlayerBullet/PlayerBullet';
@@ -73,7 +73,8 @@ export class PlayerTank extends Tank {
   }
 
   public processHit(hitBy: Owner): void {
-    this.isDestroyed = { destroyedBy: hitBy, type: 'Small' } as DestroyedBy;
+    this.handleExplosion();
+    this.handleDestruction();
   }
 
   updateTank() {
@@ -94,6 +95,15 @@ export class PlayerTank extends Tank {
       }
     }
     return false;
+  }
+
+  private handleDestruction() {
+    if (this.owner) {
+      this.game.players[this.owner]!.playerTank = null;
+      setTimeout(() => {
+        this.game.handlePlayerTankSpawn(this.owner);
+      }, 1500);
+    }
   }
 
   getOwner() {

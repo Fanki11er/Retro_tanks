@@ -1,6 +1,6 @@
 import { levels } from '../../Levels/Levels';
 import { enemyTankTextures } from '../../Textures/EnemyTankTextures/EnemyTankTextures';
-import { largeExplosionTextures, smallExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
+import { smallExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
 import { findingsTextures } from '../../Textures/FindingsTextures/FindingsTextures';
 import { player1TankTextures } from '../../Textures/TanksTextures/TanksTextures';
 import { DestroyedBy, FindingsTypes, LevelRecipe, Owner, StaticDrawable, TankTypes } from '../../Types/Types';
@@ -39,8 +39,6 @@ export class Game {
 
   //!! Get height and width from the constructor
   //!! Check if all enemy tanks destroyed and finish the round
-  //!! Check if all players tanks are destroyed and finish the game
-  //!! Add findings actions
 
   constructor(players: 1 | 2, levels: LevelRecipe[]) {
     this.levelsRecipe = levels;
@@ -175,45 +173,12 @@ export class Game {
     this.gameInfo.update(this.enemyTanksList.length, this.players, this.currentLevelNumber + 1);
   }
 
-  private handlePlayerTankSpawn(owner: Owner) {
+  handlePlayerTankSpawn(owner: Owner) {
     if (owner && this.players[`${owner}`]) {
       if (this.players[`${owner}`]!.getPlayerLivesLeft() > 0 && !this.players[`${owner}`]!.playerTank)
         this.players[`${owner}`]!.playerTank = new PlayerTank(116, 292, 20, 20, player1TankTextures, owner, this);
       this.players[`${owner}`]?.modifyPlayerLivesLeft(-1);
       this.handleGameInfoUpdate();
-    }
-  }
-
-  removeDestroyedTanks() {
-    for (let i = 0; i < this.enemyTanks.length; i++) {
-      if (this.enemyTanks[i].getIsDestroyed()) {
-        const { x: xPos, y: yPos } = this.enemyTanks[i].getCoordinates();
-        if (this.enemyTanks[i].getIsSpecial()) {
-          this.generateFinding();
-        }
-        this.explosions.push(new ExplosionAnimationFrames(largeExplosionTextures.animationTexture, 30, 20, xPos - 4, yPos - 4));
-        if (this.enemyTanks[i].getIsDestroyed()?.destroyedBy) {
-          this.values.push(new Value(this.enemyTanks[i].getValue(), xPos, yPos + 12, 1, 2.5));
-          this.destroyedEnemyTanksList.push(this.enemyTanks[i].getIsDestroyed()!);
-        }
-        this.enemyTanks.splice(i, 1);
-        i--;
-      }
-    }
-  }
-
-  handleUserTankHit() {
-    const tanks = this.players.getActivePlayersTanks();
-    for (let i = 0; i < tanks.length; i++) {
-      if (tanks[i].getIsDestroyed()) {
-        const owner = tanks[i].getOwner();
-        if (owner) {
-          this.players[owner]!.playerTank = null;
-          setTimeout(() => {
-            this.handlePlayerTankSpawn(owner);
-          }, 1500);
-        }
-      }
     }
   }
 
@@ -261,7 +226,7 @@ export class Game {
 
   //Handle findings
 
-  private generateFinding() {
+  generateFinding() {
     const index = Math.floor(Math.random() * this.findingsList.length);
     const xPos = Math.floor(Math.random() * 300 + 4);
     const yPos = Math.floor(Math.random() * 240 + 20);

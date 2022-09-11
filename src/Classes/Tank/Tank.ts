@@ -8,6 +8,8 @@ import indestructibleTextures from '../IndestructibleTextures/IndestructibleText
 import spawnPointTextures from '../SpawnPointTextures/SpawnPointTextures';
 import { TankMoveAnimation } from '../TankMoveAnimation/TankMoveAnimation';
 import { v4 as uuidv4 } from 'uuid';
+import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
+import { largeExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
 
 export abstract class Tank {
   protected id;
@@ -58,15 +60,11 @@ export abstract class Tank {
     }
   }
 
-  protected abstract selectImage(animationSpeed: number): HTMLImageElement;
-
   setImage(correctImage: HTMLImageElement) {
     if (this.image !== correctImage) {
       this.image = correctImage;
     }
   }
-
-  abstract fire(): void;
 
   protected setPositionOfBullet(bulletWidth: number) {
     if (this.controls.direction === 'Forwards') {
@@ -82,18 +80,6 @@ export abstract class Tank {
       return new Coordinates(this.xPos + this.width - bulletWidth, this.yPos + this.height / 2 - 1);
     }
     return new Coordinates(-20, -20);
-  }
-
-  getCollisionZone() {
-    return new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height);
-  }
-
-  getIsDestroyed() {
-    return this.isDestroyed;
-  }
-
-  getCoordinates() {
-    return new Coordinates(this.xPos, this.yPos);
   }
 
   protected handleCollisionsWithBorders() {
@@ -213,8 +199,26 @@ export abstract class Tank {
     return false;
   }
 
+  protected handleExplosion() {
+    this.game.explosions.push(new ExplosionAnimationFrames(largeExplosionTextures.animationTexture, 30, 20, this.xPos - 4, this.yPos - 4));
+  }
+
+  getCollisionZone() {
+    return new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height);
+  }
+
+  getIsDestroyed() {
+    return this.isDestroyed;
+  }
+
+  getCoordinates() {
+    return new Coordinates(this.xPos, this.yPos);
+  }
+
+  public abstract fire(): void;
   public abstract update(): void;
   public abstract processHit(hitBy: Owner): void;
   protected abstract spawn(time: number): void;
+  protected abstract selectImage(animationSpeed: number): HTMLImageElement;
 }
 

@@ -3,6 +3,7 @@ import { Owner, TankTypes, TankTypesTextures } from '../../Types/Types';
 import { EnemyBullet } from '../EnemyBullet/EnemyBullet';
 import { Game } from '../Game/Game';
 import { Tank } from '../Tank/Tank';
+import { Value } from '../Value/Value';
 
 export class EnemyTank extends Tank {
   constructor(
@@ -58,10 +59,29 @@ export class EnemyTank extends Tank {
 
   public processHit(hitBy: Owner): void {
     this.isDestroyed = { type: this.tankType, destroyedBy: hitBy };
+    this.handleDestruction();
   }
-  getIsSpecial() {
-    return this.isSpecial;
+
+  setIsTimeBlocked(time: number) {
+    this.timeBlockade = true;
+    setTimeout(() => {
+      this.timeBlockade = false;
+    }, time * 1000);
   }
+
+  private handleDestruction() {
+    if (this.isSpecial) {
+      this.game.generateFinding();
+    }
+    this.handleExplosion();
+    if (this.isDestroyed?.destroyedBy) {
+      this.game.values.push(new Value(this.getValue(), this.xPos, this.yPos + 12, 1, 2.5));
+      this.game.destroyedEnemyTanksList.push(this.isDestroyed);
+    }
+    const index = this.game.enemyTanks.indexOf(this);
+    this.game.enemyTanks.splice(index, 1);
+  }
+
   getValue() {
     //!! Make standardized values (enum will be great)
     switch (this.tankType) {
@@ -78,11 +98,8 @@ export class EnemyTank extends Tank {
     return this.tankType;
   }
 
-  setIsTimeBlocked(time: number) {
-    this.timeBlockade = true;
-    setTimeout(() => {
-      this.timeBlockade = false;
-    }, time * 1000);
+  getIsSpecial() {
+    return this.isSpecial;
   }
 }
 
