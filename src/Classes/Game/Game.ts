@@ -217,6 +217,29 @@ export class Game {
     }
   }
 
+  private checkForOtherBulletsHit() {
+    for (let i = 0; i < this.bullets.length - 1; i++) {
+      const firstBulletCollisionZone = this.bullets[i].getCollisionZone();
+      for (let j = i + 1; j < this.bullets.length; j++) {
+        const secondBulletCollisionZone = this.bullets[j].getCollisionZone();
+
+        if (
+          firstBulletCollisionZone.A.x < secondBulletCollisionZone.B.x &&
+          firstBulletCollisionZone.B.x > secondBulletCollisionZone.A.x &&
+          firstBulletCollisionZone.A.y < secondBulletCollisionZone.C.y &&
+          firstBulletCollisionZone.C.y > secondBulletCollisionZone.A.y
+        ) {
+          this.bullets[i].processHit();
+          this.bullets[j].processHit();
+        }
+      }
+    }
+  }
+  handleBulletsHit() {
+    this.checkForOtherBulletsHit();
+    this.removeDestroyedBullets();
+  }
+
   removeDestroyedBullets() {
     for (let i = 0; i < this.bullets.length; i++) {
       if (this.bullets[i].getIsDestroyed()) {

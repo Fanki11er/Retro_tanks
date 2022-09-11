@@ -27,7 +27,8 @@ const Canvas = () => {
           renderCtx && game.gameOverAnimation.animate(renderCtx, 5);
         }
         game.removeDestroyedTanks();
-        game.removeDestroyedBullets();
+        //game.removeDestroyedBullets();
+        game.handleBulletsHit();
         game.handleUserTankHit();
         renderCtx && game.gameInfo.draw(renderCtx);
         game.players.player1?.playerTank && renderCtx && game.players.player1.playerTank.draw(renderCtx);

@@ -205,5 +205,13 @@ export abstract class Bullet {
   getIsDestroyed() {
     return this.isDestroyed;
   }
+
+  getCollisionZone() {
+    return new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height);
+  }
+
+  processHit() {
+    this.hit = true;
+  }
 }
 
