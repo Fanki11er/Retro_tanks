@@ -1,9 +1,7 @@
 import { BulletTextures } from '../../Textures/BulletTextures/BulletTextures';
 import { AmmunitionType, Direction, Owner } from '../../Types/Types';
 import { Bullet } from '../Bullet/Bullet';
-import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
-import { EnemyTank } from '../EnemyTank/EnemyTank';
 import { Game } from '../Game/Game';
 
 export class PlayerBullet extends Bullet {
@@ -15,11 +13,10 @@ export class PlayerBullet extends Bullet {
     protected direction: Direction,
     protected textures: BulletTextures,
     protected ammunitionType: AmmunitionType = 'Standard',
-    //!!Enemy bullets
     protected owner: Owner,
     protected game: Game,
   ) {
-    super(xPos, yPos, width, height, direction, textures, ammunitionType, game);
+    super(xPos, yPos, width, height, direction, textures, ammunitionType, owner, game);
   }
 
   public draw(context: CanvasRenderingContext2D) {
@@ -32,23 +29,8 @@ export class PlayerBullet extends Bullet {
     this.handleDrawImage(context);
   }
 
-  private checkForEnemyTanksHit(bulletHitZone: BulletHitZone, enemyTanks: EnemyTank[]) {
-    for (let i = 0; i < enemyTanks.length; i++) {
-      const enemyTankCollisionZone = enemyTanks[i].getCollisionZone();
-      if (
-        bulletHitZone.A.x < enemyTankCollisionZone.B.x &&
-        bulletHitZone.B.x > enemyTankCollisionZone.A.x &&
-        bulletHitZone.A.y < enemyTankCollisionZone.C.y &&
-        bulletHitZone.C.y > enemyTankCollisionZone.A.y
-      ) {
-        this.hit = true;
-        enemyTanks[i].processHit(this.owner);
-      }
-    }
-  }
-
   private handleEnemyTanksHits() {
-    this.checkForEnemyTanksHit(new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height), this.game.enemyTanks);
+    this.checkForTanksHit(new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height), this.game.enemyTanks);
   }
 }
 

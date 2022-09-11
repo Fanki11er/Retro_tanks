@@ -1,11 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 import { BulletTextures } from '../../Textures/BulletTextures/BulletTextures';
 import { smallExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
-import { AmmunitionType, CollisionZone, Coordinates, Direction, StaticDrawable } from '../../Types/Types';
+import { AmmunitionType, CollisionZone, Coordinates, Direction, Owner, StaticDrawable } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
 import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 import { Game } from '../Game/Game';
+import { Tank } from '../Tank/Tank';
 
 export abstract class Bullet {
   protected image: HTMLImageElement | null = null;
@@ -23,6 +24,7 @@ export abstract class Bullet {
     protected direction: Direction,
     protected textures: BulletTextures,
     protected ammunitionType: AmmunitionType = 'Standard',
+    protected owner: Owner,
     protected game: Game,
   ) {
     this.setImageForDirection();
@@ -183,6 +185,21 @@ export abstract class Bullet {
 
   protected handleDrawImage(context: CanvasRenderingContext2D) {
     !this.hit && this.image && context.drawImage(this.image, this.xPos, this.yPos);
+  }
+
+  protected checkForTanksHit(bulletHitZone: BulletHitZone, tanks: Tank[]) {
+    for (let i = 0; i < tanks.length; i++) {
+      const enemyTankCollisionZone = tanks[i].getCollisionZone();
+      if (
+        bulletHitZone.A.x < enemyTankCollisionZone.B.x &&
+        bulletHitZone.B.x > enemyTankCollisionZone.A.x &&
+        bulletHitZone.A.y < enemyTankCollisionZone.C.y &&
+        bulletHitZone.C.y > enemyTankCollisionZone.A.y
+      ) {
+        this.hit = true;
+        tanks[i].processHit(this.owner);
+      }
+    }
   }
 
   getIsDestroyed() {
