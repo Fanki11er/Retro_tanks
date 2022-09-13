@@ -1,5 +1,5 @@
 import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { Owner, TankTypesTextures } from '../../Types/Types';
+import { Owner, TankTypes, TankTypesTextures } from '../../Types/Types';
 
 import { Game } from '../Game/Game';
 import { PlayerBullet } from '../PlayerBullet/PlayerBullet';
@@ -12,10 +12,11 @@ export class PlayerTank extends Tank {
     protected width: number,
     protected height: number,
     public textures: TankTypesTextures,
+    protected tankType: TankTypes,
     protected owner: Owner,
     protected game: Game,
   ) {
-    super(xPos, yPos, width, height, textures, game);
+    super(xPos, yPos, width, height, textures, (tankType = 'Small'), game);
     this.madeIndestructible(4);
     this.spawn(2.5);
   }

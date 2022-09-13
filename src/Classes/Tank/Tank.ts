@@ -25,7 +25,7 @@ export abstract class Tank {
   protected spawnAnimationFrames;
   protected indestructibleAnimationFrames;
   protected moveAnimation;
-  protected tankType: TankTypes = 'Small';
+  protected tankType: TankTypes;
   protected isDestroyed: DestroyedBy | null = null;
 
   constructor(
@@ -34,6 +34,7 @@ export abstract class Tank {
     protected width: number,
     protected height: number,
     textures: TankTypesTextures,
+    tankType: TankTypes,
     protected game: Game,
   ) {
     this.id = uuidv4();
@@ -42,6 +43,7 @@ export abstract class Tank {
     this.isBlockedBy = false;
     this.isLoading = false;
     this.isSpawning = true;
+    this.tankType = tankType;
     this.spawnAnimationFrames = new AnimationFrames(spawnPointTextures.animationTexture, spawnPointTextures.textureSize);
     this.indestructibleAnimationFrames = new AnimationFrames(indestructibleTextures.animationTexture, indestructibleTextures.textureSize);
     this.moveAnimation = new TankMoveAnimation(textures[this.tankType]);

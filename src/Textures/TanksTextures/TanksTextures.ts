@@ -41,6 +41,7 @@ player1MediumTankTextures.addTextures(player1MediumTank2Right, 'Right');
 const player1TankTextures: TankTypesTextures = {
   Small: player1smallTankTextures,
   Medium: player1MediumTankTextures,
+  Fast: player1smallTankTextures,
 };
 
 export { player1TankTextures };

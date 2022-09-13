@@ -17,7 +17,7 @@ export class EnemyTank extends Tank {
     private timeBlockade: boolean,
     protected game: Game,
   ) {
-    super(xPos, yPos, width, height, textures, game);
+    super(xPos, yPos, width, height, textures, tankType, game);
     this.controls.direction = 'Backwards';
     this.spawn(2.5);
   }

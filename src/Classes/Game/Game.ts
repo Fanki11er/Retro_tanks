@@ -176,7 +176,7 @@ export class Game {
   handlePlayerTankSpawn(owner: Owner) {
     if (owner && this.players[`${owner}`]) {
       if (this.players[`${owner}`]!.getPlayerLivesLeft() > 0 && !this.players[`${owner}`]!.playerTank)
-        this.players[`${owner}`]!.playerTank = new PlayerTank(116, 292, 20, 20, player1TankTextures, owner, this);
+        this.players[`${owner}`]!.playerTank = new PlayerTank(116, 292, 20, 20, player1TankTextures, 'Small', owner, this);
       this.players[`${owner}`]?.modifyPlayerLivesLeft(-1);
       this.handleGameInfoUpdate();
     }
