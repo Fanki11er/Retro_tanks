@@ -196,8 +196,10 @@ export abstract class Bullet {
         bulletHitZone.A.y < enemyTankCollisionZone.C.y &&
         bulletHitZone.C.y > enemyTankCollisionZone.A.y
       ) {
-        this.hit = true;
-        tanks[i].processHit(this.owner);
+        if (!tanks[i].getIsSpawning()) {
+          this.hit = true;
+          tanks[i].processHit(this.owner);
+        }
       }
     }
   }

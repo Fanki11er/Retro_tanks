@@ -216,6 +216,9 @@ export abstract class Tank {
   getCoordinates() {
     return new Coordinates(this.xPos, this.yPos);
   }
+  getIsSpawning() {
+    return this.isSpawning;
+  }
 
   public abstract fire(): void;
   public abstract update(): void;

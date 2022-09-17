@@ -19,6 +19,7 @@ export class EnemyTank extends Tank {
   ) {
     super(xPos, yPos, width, height, textures, tankType, game);
     this.controls.direction = 'Backwards';
+    this.setTankSpeed();
     this.spawn(2.5);
   }
 
@@ -34,6 +35,7 @@ export class EnemyTank extends Tank {
 
   protected spawn(time: number) {
     this.isSpawning = true;
+    this.isIndestructible = true;
     setTimeout(() => {
       this.isSpawning = false;
       this.isIndestructible = false;
@@ -58,8 +60,10 @@ export class EnemyTank extends Tank {
   }
 
   public processHit(hitBy: Owner): void {
-    this.isDestroyed = { type: this.tankType, destroyedBy: hitBy };
-    this.handleDestruction();
+    if (!this.isIndestructible) {
+      this.isDestroyed = { type: this.tankType, destroyedBy: hitBy };
+      this.handleDestruction();
+    }
   }
 
   setIsTimeBlocked(time: number) {
@@ -88,8 +92,18 @@ export class EnemyTank extends Tank {
       case 'Small': {
         return 100;
       }
+      case 'Fast': {
+        return 200;
+      }
       default: {
         return 0;
+      }
+    }
+  }
+  setTankSpeed() {
+    switch (this.tankType) {
+      case 'Fast': {
+        this.speed = 0.5;
       }
     }
   }
