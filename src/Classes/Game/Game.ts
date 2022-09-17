@@ -337,5 +337,31 @@ export class Game {
     }
     return false;
   }
+
+  renderGame(renderCtx: CanvasRenderingContext2D) {
+    renderCtx?.clearRect(0, 0, 372, 320);
+    if (this.gameStatus === 'Ready') {
+      this.startGame();
+    }
+
+    if (this.gameStatus === 'Started' || this.gameStatus === 'ShowingResults') {
+      renderCtx && this.curtin.drawCurtin(renderCtx, 1, this.currentLevelNumber + 1);
+    }
+    if (this.checkForGameOver()) {
+      this.gameStatus = 'GameOver';
+      renderCtx && this.gameOverAnimation.animate(renderCtx, 5);
+    }
+    this.handleBulletsHit();
+
+    renderCtx && this.gameInfo.draw(renderCtx);
+    this.players.player1?.playerTank && renderCtx && this.players.player1.playerTank.draw(renderCtx);
+    renderCtx && this.renderEnemyTanks(renderCtx);
+    renderCtx && this.staticObjectsCanvas && this.staticObjectsCanvas.draw(renderCtx);
+
+    renderCtx && this.renderBullets(renderCtx);
+    renderCtx && this.renderExplosions(renderCtx);
+    renderCtx && this.renderValues(renderCtx);
+    renderCtx && this.renderFindings(renderCtx);
+  }
 }
 
