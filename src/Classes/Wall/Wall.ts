@@ -247,6 +247,9 @@ export abstract class Wall implements StaticDrawable {
   getType() {
     return this.type;
   }
+  getMaterialType() {
+    return this.materialType;
+  }
 
   protected abstract getRowFromRecipe(row: number, column: number): HTMLImageElement;
 }

@@ -28,6 +28,7 @@ export class PlayerTank extends Tank {
     this.handleCollisionsWithOtherTanks(this.game.players.getActivePlayersTanks());
     this.handleCollisionsWithStaticObjects();
     this.handleImageChange();
+    //this.tankSensor.update();
   }
 
   madeIndestructible(time: number) {

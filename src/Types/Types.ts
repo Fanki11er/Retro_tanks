@@ -1,16 +1,19 @@
 import { ChangeDirectionTextures } from '../Classes/ChangeDirectionTextures/ChangeDirectionTextures';
 
 export type Direction = 'Forwards' | 'Left' | 'Right' | 'Backwards' | 'None';
+export type SensorDirection = 'forward' | 'left' | 'right' | 'backward';
 
 export type BoardElementType = 'Full' | 'Horizontally' | 'Vertically';
 
-export type MaterialType = 'Brick' | 'Concrete';
+export type MaterialType = 'Brick' | 'Concrete' | 'Eagle';
 
 export type TankTypes = 'Small' | 'Fast' | 'Medium';
 
 export type Owner = 'player1' | 'player2' | '';
 
 export type FindingsTypes = 'Tank' | 'Grenade' | 'Helmet' | 'Stopwatch' | 'Shovel' | 'Star';
+
+export type SensorReding = 'forwardReading' | 'leftReading' | 'rightReading' | 'backwardReading' | 'heightReading';
 export class Coordinates {
   x;
   y;
@@ -32,6 +35,11 @@ export type DestroyedBy = {
   type: TankTypes;
 };
 
+export type Size = {
+  width: number;
+  height: number;
+};
+
 export interface StaticDrawable {
   draw: (ctx: CanvasRenderingContext2D) => void;
   getCollisionZone: () => CollisionZone;
@@ -43,6 +51,8 @@ export interface StaticDrawable {
   processHit: (ammunitionType: AmmunitionType, collisionZone: CollisionZone, yPos: number) => string;
   getPrecisionCollisionPlace: (collisionZone: CollisionZone, direction: Direction) => WallCoordinates;
   getIsEagleBorder: () => boolean;
+  getMaterialType: () => MaterialType;
+  getCoordinates: () => Coordinates;
 }
 
 export type AmmunitionType = 'Standard' | 'Heavy';

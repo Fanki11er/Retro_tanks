@@ -1,4 +1,4 @@
-import { Coordinates, DestroyedBy, Owner, TankTypes, TankTypesTextures } from '../../Types/Types';
+import { Coordinates, DestroyedBy, Owner, Size, TankTypes, TankTypesTextures } from '../../Types/Types';
 import { Utils } from '../../Utils/Utils';
 import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
 import { Controls } from '../Controls/Controls';
@@ -10,6 +10,7 @@ import { TankMoveAnimation } from '../TankMoveAnimation/TankMoveAnimation';
 import { v4 as uuidv4 } from 'uuid';
 import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
 import { largeExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
+//import { TankSensor } from '../TankSensor/TankSensor';
 
 export abstract class Tank {
   protected id;
@@ -27,6 +28,7 @@ export abstract class Tank {
   protected moveAnimation;
   protected tankType: TankTypes;
   protected isDestroyed: DestroyedBy | null = null;
+  //protected tankSensor: TankSensor;
 
   constructor(
     public xPos: number,
@@ -47,6 +49,7 @@ export abstract class Tank {
     this.spawnAnimationFrames = new AnimationFrames(spawnPointTextures.animationTexture, spawnPointTextures.textureSize);
     this.indestructibleAnimationFrames = new AnimationFrames(indestructibleTextures.animationTexture, indestructibleTextures.textureSize);
     this.moveAnimation = new TankMoveAnimation(textures[this.tankType]);
+    //this.tankSensor = new TankSensor(this, this.game);
   }
 
   public draw(context: CanvasRenderingContext2D) {
@@ -56,9 +59,11 @@ export abstract class Tank {
       this.update();
       context.drawImage(this.image, this.xPos, this.yPos, 20, 20);
       this.indestructibleAnimationFrames.animateFrames(15, context, this.xPos - 2, this.yPos - 2, this.isIndestructible, 0);
+      //this.tankSensor.draw(context);
     } else {
       this.update();
       context.drawImage(this.image, this.xPos, this.yPos, 20, 20);
+      //this.tankSensor.draw(context);
     }
   }
 
@@ -218,6 +223,21 @@ export abstract class Tank {
   }
   getIsSpawning() {
     return this.isSpawning;
+  }
+
+  getSize() {
+    return {
+      width: this.width,
+      height: this.height,
+    } as Size;
+  }
+
+  setIsBlockedBy(isBlockedBy: boolean) {
+    this.isBlockedBy = isBlockedBy;
+  }
+
+  getId() {
+    return this.id;
   }
 
   public abstract fire(): void;

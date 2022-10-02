@@ -62,6 +62,32 @@ export class Game {
     this.gameStatus = 'Started';
   }
 
+  renderGame(renderCtx: CanvasRenderingContext2D) {
+    renderCtx?.clearRect(0, 0, 372, 320);
+    if (this.gameStatus === 'Ready') {
+      this.startGame();
+    }
+
+    if (this.gameStatus === 'Started' || this.gameStatus === 'ShowingResults') {
+      renderCtx && this.curtin.drawCurtin(renderCtx, 1, this.currentLevelNumber + 1);
+    }
+    if (this.checkForGameOver()) {
+      this.gameStatus = 'GameOver';
+      renderCtx && this.gameOverAnimation.animate(renderCtx, 5);
+    }
+    this.handleBulletsHit();
+
+    renderCtx && this.gameInfo.draw(renderCtx);
+    this.players.player1?.playerTank && renderCtx && this.players.player1.playerTank.draw(renderCtx);
+    renderCtx && this.renderEnemyTanks(renderCtx);
+    renderCtx && this.staticObjectsCanvas && this.staticObjectsCanvas.draw(renderCtx);
+
+    renderCtx && this.renderBullets(renderCtx);
+    renderCtx && this.renderExplosions(renderCtx);
+    renderCtx && this.renderValues(renderCtx);
+    renderCtx && this.renderFindings(renderCtx);
+  }
+
   renderBullets(renderCtx: CanvasRenderingContext2D) {
     renderCtx &&
       this.bullets.forEach((bullet) => {
@@ -81,6 +107,7 @@ export class Game {
   renderEnemyTanks(renderCtx: CanvasRenderingContext2D) {
     this.enemyTanks.forEach((enemyTank) => {
       enemyTank.draw(renderCtx);
+      enemyTank.brain.drawSensors(renderCtx);
     });
   }
 
@@ -147,16 +174,16 @@ export class Game {
   private getSpawnCoordinates(index: number) {
     switch (index) {
       case 0: {
-        return { x: 20, y: 4 };
+        return { x: 21, y: 5 };
       }
       case 1: {
-        return { x: 164, y: 4 };
+        return { x: 164, y: 5 };
       }
       case 2: {
-        return { x: 308, y: 4 };
+        return { x: 308, y: 5 };
       }
       default: {
-        return { x: 20, y: 4 };
+        return { x: 21, y: 5 };
       }
     }
   }
@@ -336,32 +363,6 @@ export class Game {
       return true;
     }
     return false;
-  }
-
-  renderGame(renderCtx: CanvasRenderingContext2D) {
-    renderCtx?.clearRect(0, 0, 372, 320);
-    if (this.gameStatus === 'Ready') {
-      this.startGame();
-    }
-
-    if (this.gameStatus === 'Started' || this.gameStatus === 'ShowingResults') {
-      renderCtx && this.curtin.drawCurtin(renderCtx, 1, this.currentLevelNumber + 1);
-    }
-    if (this.checkForGameOver()) {
-      this.gameStatus = 'GameOver';
-      renderCtx && this.gameOverAnimation.animate(renderCtx, 5);
-    }
-    this.handleBulletsHit();
-
-    renderCtx && this.gameInfo.draw(renderCtx);
-    this.players.player1?.playerTank && renderCtx && this.players.player1.playerTank.draw(renderCtx);
-    renderCtx && this.renderEnemyTanks(renderCtx);
-    renderCtx && this.staticObjectsCanvas && this.staticObjectsCanvas.draw(renderCtx);
-
-    renderCtx && this.renderBullets(renderCtx);
-    renderCtx && this.renderExplosions(renderCtx);
-    renderCtx && this.renderValues(renderCtx);
-    renderCtx && this.renderFindings(renderCtx);
   }
 }
 

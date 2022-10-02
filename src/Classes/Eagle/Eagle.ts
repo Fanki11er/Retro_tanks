@@ -1,5 +1,5 @@
 import { largeExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
-import { StaticDrawable } from '../../Types/Types';
+import { Coordinates, MaterialType, StaticDrawable } from '../../Types/Types';
 import { eagleTextures } from '../EagleTextures/EagleTextures';
 import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
 import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
@@ -54,6 +54,13 @@ export class Eagle implements StaticDrawable {
   }
   getIsEagleBorder() {
     return false;
+  }
+
+  getMaterialType() {
+    return 'Eagle' as MaterialType;
+  }
+  getCoordinates() {
+    return new Coordinates(this.xPos, this.yPos);
   }
 }
 

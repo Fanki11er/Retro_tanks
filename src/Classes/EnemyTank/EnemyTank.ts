@@ -2,10 +2,14 @@ import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
 import { Owner, TankTypes, TankTypesTextures } from '../../Types/Types';
 import { EnemyBullet } from '../EnemyBullet/EnemyBullet';
 import { Game } from '../Game/Game';
+import { NeuralNetwork } from '../NeuralNetwork/NeuralNetwork/NeuralNetwork';
+import { Brain } from '../Brain/Brain';
 import { Tank } from '../Tank/Tank';
 import { Value } from '../Value/Value';
 
 export class EnemyTank extends Tank {
+  brain: Brain;
+  //private brain: NeuralNetwork;
   constructor(
     public xPos: number,
     public yPos: number,
@@ -19,15 +23,25 @@ export class EnemyTank extends Tank {
   ) {
     super(xPos, yPos, width, height, textures, tankType, game);
     this.controls.direction = 'Backwards';
+    //this.brain = new NeuralNetwork([5, 8, 8, 4]);
+    this.brain = new Brain(this, game);
     this.setTankSpeed();
     this.spawn(2.5);
   }
 
   public update() {
     if (!this.timeBlockade) {
-      this.handleCollisionsWithBorders();
-      this.handleCollisionsWithStaticObjects();
-      this.handleCollisionsWithOtherTanks(this.game.enemyTanks);
+      //this.sensor.resetValues(); //!
+      //this.handleCollisionsWithBorders();
+      //this.intelligentHandleCollisionsWithBorders(); //!
+      this.brain.update();
+      //this.handleCollisionsWithStaticObjects();
+      //this.intelligentHandleCollisionWithStaticObjects();
+
+      //const outputs = NeuralNetwork.feedForward(this.sensor.getValues(), this.brain); //!
+      //console.log(outputs); //!
+      //this.setDirection(outputs); //!
+      //this.handleCollisionsWithOtherTanks(this.game.enemyTanks);
       this.handleCollisionsWithOtherTanks(this.game.players.getActivePlayersTanks());
       this.handleImageChange();
     }
@@ -114,6 +128,10 @@ export class EnemyTank extends Tank {
 
   getIsSpecial() {
     return this.isSpecial;
+  }
+
+  getIsBlocked() {
+    return this.isBlockedBy;
   }
 }
 
