@@ -1,3 +1,4 @@
+import { ThemeConsumer } from 'styled-components';
 import { levels } from '../../Levels/Levels';
 import { enemyTankTextures } from '../../Textures/EnemyTankTextures/EnemyTankTextures';
 import { smallExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
@@ -35,6 +36,9 @@ export class Game {
   findings: Finding[] = [];
   findingsList: FindingsTypes[] = ['Tank', 'Grenade', 'Helmet', 'Stopwatch', 'Shovel', 'Star'];
   timeBlockade = false;
+
+  learnIteration = 0;
+  bestResult = 0;
   //!!!!!!!! Try to make renderer object which will be render things instead canvas
 
   //!! Get height and width from the constructor
@@ -59,6 +63,9 @@ export class Game {
       this.addNewEnemyTank();
       this.handleEnemyTankSpawn();
     }, 1000);
+    //!!! Uncomment this line for enemy tanks learning
+    this.learnEnemyTanks();
+    //!!
     this.gameStatus = 'Started';
   }
 
@@ -78,10 +85,10 @@ export class Game {
     this.handleBulletsHit();
 
     renderCtx && this.gameInfo.draw(renderCtx);
-    this.players.player1?.playerTank && renderCtx && this.players.player1.playerTank.draw(renderCtx);
-    renderCtx && this.renderEnemyTanks(renderCtx);
     renderCtx && this.staticObjectsCanvas && this.staticObjectsCanvas.draw(renderCtx);
 
+    this.players.player1?.playerTank && renderCtx && this.players.player1.playerTank.draw(renderCtx);
+    renderCtx && this.renderEnemyTanks(renderCtx);
     renderCtx && this.renderBullets(renderCtx);
     renderCtx && this.renderExplosions(renderCtx);
     renderCtx && this.renderValues(renderCtx);
@@ -145,7 +152,8 @@ export class Game {
 
   private handleEnemyTankSpawn() {
     setInterval(() => {
-      if (this.enemyTanksList.length && this.enemyTanks.length < 4) {
+      if (this.enemyTanksList.length && this.enemyTanks.length < 3) {
+        //!!!! 4
         this.addNewEnemyTank();
       }
     }, 5000);
@@ -167,7 +175,8 @@ export class Game {
         this,
       ),
     );
-    this.enemyTanksList.splice(index, 1);
+    //!! Comment next line when enemy tanks are learning
+    //this.enemyTanksList.splice(index, 1);
     this.handleGameInfoUpdate();
   }
 
@@ -363,6 +372,51 @@ export class Game {
       return true;
     }
     return false;
+  }
+
+  learnEnemyTanks() {
+    setInterval(() => {
+      this.saveBestBrain();
+      this.enemyTanks = [];
+      //this.staticObjectsCanvas?.resetStaticObjects();
+    }, 20000);
+  }
+
+  saveBestBrain() {
+    let score = 0;
+    score =
+      this.enemyTanks
+        .find((tank) => tank.brain.getBrainScore() === Math.max(...this.enemyTanks.map((tank) => tank.brain.getBrainScore())))
+        ?.brain.saveBrain() || 0;
+
+    if (score > this.bestResult) {
+      this.bestResult += score;
+      this.learnIteration = 0;
+    } else {
+      this.learnIteration++;
+    }
+
+    if (this.learnIteration >= 15 && this.bestResult < 3) {
+      this.bestResult = 0;
+      this.learnIteration = 0;
+      localStorage.removeItem('BestBrain');
+    }
+
+    console.log('Score: ', this.bestResult);
+    console.log('Iteration: ', this.learnIteration);
+  }
+
+  resetGame() {
+    this.bullets = [];
+    this.staticObjects = [];
+    this.staticObjectsCanvas = null;
+    this.explosions = [];
+    this.enemyTanks = [];
+    this.enemyTanksList = [];
+    this.values = [];
+    this.destroyedEnemyTanksList = [];
+    this.findings = [];
+    this.findingsList = [];
   }
 }
 

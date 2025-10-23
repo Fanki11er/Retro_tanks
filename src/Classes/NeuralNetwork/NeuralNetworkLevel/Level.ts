@@ -3,8 +3,8 @@ type weight = number[];
 export class NeuralNetworkLevel {
   inputsArray: number[];
   outputsArray: number[];
-  private biases: number[];
-  private weights: weight[] = [];
+  biases: number[];
+  weights: weight[] = [];
   constructor(inputCount: number, outputCount: number) {
     this.inputsArray = new Array(inputCount);
     this.outputsArray = new Array(outputCount);

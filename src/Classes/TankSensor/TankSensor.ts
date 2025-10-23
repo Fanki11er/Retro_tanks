@@ -10,7 +10,7 @@ abstract class TankSensor {
   height!: number;
   isCollision: boolean = false;
 
-  constructor(protected tank: EnemyTank, protected game: Game, protected range: number) {
+  constructor(public tank: EnemyTank, public game: Game, protected range: number) {
     this.updateCoordinates();
   }
 
@@ -18,44 +18,45 @@ abstract class TankSensor {
     this.updateCoordinates();
     this.tank.setIsBlockedBy(false);
     this.isCollision = false;
-
-    this.intelligentCheckForCollisionWithBorders(372, 320);
-    this.intelligentHandleCollisionWithStaticObjects();
-    this.intelligentHandleCollisionsWithOtherTanks(this.game.enemyTanks);
-    this.intelligentHandleCollisionsWithOtherTanks(this.game.players.getActivePlayersTanks());
+    this.handleCollisions();
+    //this.intelligentCheckForCollisionWithBorders(372, 320);
+    //this.intelligentHandleCollisionWithStaticObjects();
+    //this.intelligentHandleCollisionsWithOtherTanks(this.game.enemyTanks);
+    //this.intelligentHandleCollisionsWithOtherTanks(this.game.players.getActivePlayersTanks());
 
     this.tank.setIsBlockedBy(this.tank.brain.checkForBlockade(this.tank.controls.direction));
   }
 
   protected abstract updateCoordinates(): void;
   protected abstract convertDirectionToSensorDirection(direction: Direction): SensorReding;
+  protected abstract handleCollisions(): void;
 
   protected intelligentCheckForCollisionWithBorders(boardWidth: number, boardHeight: number) {
     const { x, y } = this.A;
     const brain = this.tank.brain;
 
     if (y <= 4) {
-      brain.updateValue('forwardReading', 0);
+      brain.updateValue('forwardReading', 1);
       this.isCollision = true;
     }
 
     if (y + this.height >= boardHeight - 4) {
-      brain.updateValue('backwardReading', 0);
+      brain.updateValue('backwardReading', 1);
       this.isCollision = true;
     }
 
     if (x <= 20) {
-      brain.updateValue('leftReading', 0);
+      brain.updateValue('leftReading', 1);
       this.isCollision = true;
     }
 
     if (x + this.width >= boardWidth - 40) {
-      brain.updateValue('rightReading', 0);
+      brain.updateValue('rightReading', 1);
       this.isCollision = true;
     }
   }
 
-  protected intelligentHandleCollisionWithStaticObjects() {
+  protected intelligentHandleCollisionWithStaticObjects(callback: (sensor: TankSensor) => StaticDrawable[]) {
     let collision = false;
     if (!this.tank.getIsBlocked()) {
       //const { x, y } = this.A;
@@ -68,7 +69,8 @@ abstract class TankSensor {
         this.game.staticObjects,
       );*/
 
-      const collisionWith = this.intelligentCheckForCollisionWithObjects();
+      //const collisionWith = this.intelligentCheckForCollisionWithObjects();
+      const collisionWith = callback(this);
       if (collisionWith.length) {
         for (let i = 0; i < collisionWith.length; i++) {
           if (/*!this.tank.getIsBlocked() &&*/ !collision) {
@@ -90,29 +92,13 @@ abstract class TankSensor {
     }
   }
 
-  protected intelligentCheckForCollisionWithObjects() {
-    const collisions: StaticDrawable[] = [];
-    for (let i = 0; i < this.game.staticObjects.length; i++) {
-      const collisionZone = this.game.staticObjects[i].getCollisionZone();
-      if (
-        this.A.x < collisionZone.B.x &&
-        this.A.x + this.width > collisionZone.A.x &&
-        this.A.y < collisionZone.C.y &&
-        this.A.y + this.height > collisionZone.A.y
-      ) {
-        collisions.push(this.game.staticObjects[i]);
-      }
-    }
-    return collisions;
-  }
-
   protected figureMaterialType(object: StaticDrawable, direction: SensorDirection) {
     if (object.getMaterialType() === 'Brick') {
       return 0.5;
     } else if (object.getMaterialType() === 'Concrete') {
-      return 0;
+      return 1;
     }
-    return 0;
+    return 1;
   }
 
   protected convertDirection(direction: Direction) {
@@ -158,17 +144,95 @@ abstract class TankSensor {
   }
 
   protected intelligentHandleCollisionsWithOtherTanks(tanks: Tank[]) {
+    //!callback
     if (this.intelligentDetectCollisionsWithOtherTanks(tanks)) {
-      this.tank.brain.updateValue(this.convertDirectionToSensorDirection(this.tank.controls.direction), 0);
+      this.tank.brain.updateValue(this.convertDirectionToSensorDirection(this.tank.controls.direction), 1);
       this.isCollision = true;
     }
   }
 }
 
-export class FrontTankSensor extends TankSensor {
-  constructor(protected tank: EnemyTank, protected game: Game, protected range: number) {
-    super(tank, game, range);
+export abstract class SideSensor extends TankSensor {
+  protected handleCollisions() {
+    this.intelligentCheckForCollisionWithBorders(372, 320);
+    this.intelligentHandleCollisionWithStaticObjects(this.intelligentCheckForCollisionWithObjects);
+    //this.intelligentHandleCollisionsWithOtherTanks(this.game.enemyTanks);
+    //this.intelligentHandleCollisionsWithOtherTanks(this.game.players.getActivePlayersTanks());
   }
+
+  protected intelligentCheckForCollisionWithObjects(sensor: TankSensor) {
+    const collisions: StaticDrawable[] = [];
+    const { A, width, height, game } = sensor;
+    for (let i = 0; i < game.staticObjects.length; i++) {
+      const collisionZone = game.staticObjects[i].getCollisionZone();
+      if (A.x < collisionZone.B.x && A.x + width > collisionZone.A.x && A.y < collisionZone.C.y && A.y + height > collisionZone.A.y) {
+        collisions.push(game.staticObjects[i]);
+      }
+    }
+    return collisions;
+  }
+}
+
+export abstract class MainSensor extends TankSensor {
+  protected handleCollisions() {
+    this.intelligentCheckForCollisionWithBorders(372, 320);
+    this.intelligentHandleCollisionWithStaticObjects(this.intelligentCheckForCollisionWithObjects);
+    //this.intelligentHandleCollisionsWithOtherTanks(this.game.enemyTanks);
+    //this.intelligentHandleCollisionsWithOtherTanks(this.game.players.getActivePlayersTanks());
+  }
+
+  protected intelligentCheckForCollisionWithObjects(sensor: TankSensor) {
+    const collisions: StaticDrawable[] = [];
+    const { tank, game } = sensor;
+    const direction = tank.controls.direction;
+    const { x: xPos, y: yPos } = tank.getCoordinates();
+    const { width, height } = tank.getSize();
+    const staticObjects = game.staticObjects;
+
+    for (let i = 0; i < staticObjects.length; i++) {
+      const collisionZone = staticObjects[i].getCollisionZone();
+      if (xPos < collisionZone.B.x && xPos + width > collisionZone.A.x && yPos >= collisionZone.A.y && yPos <= collisionZone.D.y) {
+        if (direction === 'Forwards') {
+          collisions.push(staticObjects[i]);
+        }
+      }
+    }
+
+    for (let i = 0; i < staticObjects.length; i++) {
+      const collisionZone = staticObjects[i].getCollisionZone();
+      if (xPos < collisionZone.B.x && xPos + width > collisionZone.A.x && yPos + height >= collisionZone.A.y && yPos + height <= collisionZone.D.y) {
+        if (direction === 'Backwards') {
+          collisions.push(staticObjects[i]);
+        }
+      }
+    }
+
+    for (let i = 0; i < staticObjects.length; i++) {
+      const collisionZone = staticObjects[i].getCollisionZone();
+      if (yPos < collisionZone.D.y && yPos + height > collisionZone.A.y && xPos <= collisionZone.D.x && xPos >= collisionZone.A.x) {
+        if (direction === 'Left') {
+          collisions.push(staticObjects[i]);
+        }
+      }
+    }
+
+    for (let i = 0; i < staticObjects.length; i++) {
+      const collisionZone = staticObjects[i].getCollisionZone();
+      if (yPos < collisionZone.D.y && yPos + height > collisionZone.A.y && xPos + width >= collisionZone.A.x && xPos + width <= collisionZone.B.x) {
+        if (direction === 'Right') {
+          collisions.push(staticObjects[i]);
+        }
+      }
+    }
+
+    return collisions;
+  }
+}
+
+export class FrontTankSensor extends MainSensor {
+  /*constructor(protected tank: EnemyTank, protected game: Game, protected range: number) {
+    super(tank, game, range);
+  }*/
 
   updateCoordinates() {
     const { width, height } = this.tank.getSize();
@@ -199,10 +263,10 @@ export class FrontTankSensor extends TankSensor {
     }
   }
 }
-export class LeftTankSensor extends TankSensor {
-  constructor(protected tank: EnemyTank, protected game: Game, protected range: number) {
+export class LeftTankSensor extends SideSensor {
+  /*constructor(protected tank: EnemyTank, protected game: Game, protected range: number) {
     super(tank, game, range);
-  }
+  }*/
 
   updateCoordinates() {
     const { width, height } = this.tank.getSize();
@@ -210,12 +274,12 @@ export class LeftTankSensor extends TankSensor {
     const direction = this.tank.controls.direction;
 
     if (direction === 'Forwards' || direction === 'Backwards') {
-      this.A = new Coordinates(startCoordinates.x - this.range, startCoordinates.y);
+      this.A = new Coordinates(startCoordinates.x - this.range, startCoordinates.y + 1);
       this.width = this.range;
-      this.height = height - 1;
+      this.height = height - 2;
     } else if (direction === 'Left' || direction === 'Right') {
-      this.A = new Coordinates(startCoordinates.x, startCoordinates.y + height);
-      this.width = width - 1;
+      this.A = new Coordinates(startCoordinates.x + 1, startCoordinates.y + height);
+      this.width = width - 2;
       this.height = this.range;
     }
   }
@@ -241,10 +305,10 @@ export class LeftTankSensor extends TankSensor {
   }
 }
 
-export class RightTankSensor extends TankSensor {
-  constructor(protected tank: EnemyTank, protected game: Game, protected range: number) {
+export class RightTankSensor extends SideSensor {
+  /*constructor(protected tank: EnemyTank, protected game: Game, protected range: number) {
     super(tank, game, range);
-  }
+  }*/
 
   updateCoordinates() {
     const { width, height } = this.tank.getSize();
@@ -252,12 +316,12 @@ export class RightTankSensor extends TankSensor {
     const direction = this.tank.controls.direction;
 
     if (direction === 'Forwards' || direction === 'Backwards') {
-      this.A = new Coordinates(startCoordinates.x + width, startCoordinates.y);
+      this.A = new Coordinates(startCoordinates.x + width, startCoordinates.y + 1);
       this.width = this.range;
-      this.height = height - 1;
+      this.height = height - 2;
     } else if (direction === 'Left' || direction === 'Right') {
-      this.A = new Coordinates(startCoordinates.x, startCoordinates.y - this.range);
-      this.width = width - 1;
+      this.A = new Coordinates(startCoordinates.x + 1, startCoordinates.y - this.range);
+      this.width = width - 2;
       this.height = this.range;
     }
   }
@@ -283,10 +347,10 @@ export class RightTankSensor extends TankSensor {
   }
 }
 
-export class RearTankSensor extends TankSensor {
-  constructor(protected tank: EnemyTank, protected game: Game, protected range: number) {
+export class RearTankSensor extends SideSensor {
+  /*constructor(protected tank: EnemyTank, protected game: Game, protected range: number) {
     super(tank, game, range);
-  }
+  }*/
 
   updateCoordinates() {
     const { width, height } = this.tank.getSize();
@@ -295,20 +359,20 @@ export class RearTankSensor extends TankSensor {
 
     if (direction === 'Forwards') {
       this.A = new Coordinates(startCoordinates.x + 1, startCoordinates.y + height);
-      this.width = width - 1;
+      this.width = width - 2;
       this.height = this.range;
     } else if (direction === 'Backwards') {
       this.A = new Coordinates(startCoordinates.x + 1, startCoordinates.y - this.range);
-      this.width = width - 1;
+      this.width = width - 2;
       this.height = this.range;
     } else if (direction === 'Left') {
       this.A = new Coordinates(startCoordinates.x + width, startCoordinates.y + 1);
       this.width = this.range;
-      this.height = height - 1;
+      this.height = height - 2;
     } else if (direction === 'Right') {
       this.A = new Coordinates(startCoordinates.x - this.range, startCoordinates.y + 1);
       this.width = this.range;
-      this.height = height - 1;
+      this.height = height - 2;
     }
   }
 
@@ -434,3 +498,4 @@ export class RearTankSensor extends TankSensor {
 
     return collisions;
   }*/
+

@@ -41,6 +41,11 @@ export class StaticElementsCanvas {
     this.update();
   }
 
+  resetStaticObjects() {
+    this.staticObjects = [];
+    this.createStaticObjects();
+  }
+
   draw(ctx: CanvasRenderingContext2D) {
     this.checkForChanges();
     ctx.drawImage(this.canvas, 0, 0);
