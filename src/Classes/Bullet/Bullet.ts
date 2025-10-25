@@ -1,55 +1,95 @@
-import { v4 as uuidv4 } from 'uuid';
-import { BulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { smallExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
-import { AmmunitionType, CollisionZone, Coordinates, Direction, Owner, StaticDrawable } from '../../Types/Types';
-import { Utils } from '../../Utils/Utils';
-import { BulletHitZone } from '../BulletHitZone/BulletHitZone';
-import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
-import { Game } from '../Game/Game';
-import { Tank } from '../Tank/Tank';
+import { v4 as uuidv4 } from "uuid";
+import { BulletTextures } from "../../Textures/BulletTextures/BulletTextures";
+import { smallExplosionTextures } from "../../Textures/ExplosionTextures/ExplosionTextures";
+import { Coordinates } from "../../Types/Types";
+import type {
+  AmmunitionType,
+  CollisionZone,
+  Direction,
+  Owner,
+  StaticDrawable,
+} from "../../Types/Types";
+import { Utils } from "../../Utils/Utils";
+import { BulletHitZone } from "../BulletHitZone/BulletHitZone";
+import { ElementCollisionZone } from "../ElementCollisionZone/ElementCollisionZone";
+import { Game } from "../Game/Game";
+import { Tank } from "../Tank/Tank";
 
-export abstract class Bullet {
+export class Bullet {
   protected image: HTMLImageElement | null = null;
   protected speed;
   protected hit = false;
   public id;
   protected collisionWith: StaticDrawable[] = [];
   protected isDestroyed = false;
+  protected xPos: number;
+  protected yPos: number;
+  protected width: number;
+  protected height: number;
+  protected direction: Direction;
+  protected textures: BulletTextures;
+  protected ammunitionType: AmmunitionType = "Standard";
+  protected owner: Owner;
+  protected game: Game;
+  private bulletType: "PlayerBullet" | "EnemyBullet";
 
   constructor(
-    protected xPos: number,
-    protected yPos: number,
-    protected width: number,
-    protected height: number,
-    protected direction: Direction,
-    protected textures: BulletTextures,
-    protected ammunitionType: AmmunitionType = 'Standard',
-    protected owner: Owner,
-    protected game: Game,
+    xPos: number,
+    yPos: number,
+    width: number,
+    height: number,
+    direction: Direction,
+    textures: BulletTextures,
+    owner: Owner,
+    game: Game,
+    bulletsType: "PlayerBullet" | "EnemyBullet"
   ) {
+    this.xPos = xPos;
+    this.yPos = yPos;
+    this.width = width;
+    this.height = height;
+    this.direction = direction;
+    this.textures = textures;
+    this.owner = owner;
+    this.game = game;
+    this.bulletType = bulletsType;
+
     this.setImageForDirection();
     this.speed = 0.7;
 
     this.id = uuidv4();
   }
 
-  abstract draw(context: CanvasRenderingContext2D): void;
+  public draw(context: CanvasRenderingContext2D) {
+    this.checkForCollisionsWithStaticObjects();
+
+    const targetTanks =
+      this.bulletType === "PlayerBullet"
+        ? this.game.enemyTanks
+        : this.game.players.getActivePlayersTanks();
+
+    this.handleTanksHits(targetTanks);
+    this.handleStaticObjectHit();
+
+    this.handleExplosion();
+    this.handleDrawImage(context);
+  }
 
   private setImageForDirection() {
     switch (this.direction) {
-      case 'Forwards': {
+      case "Forwards": {
         this.image = this.textures.upDirectionTexture;
         break;
       }
-      case 'Backwards': {
+      case "Backwards": {
         this.image = this.textures.downDirectionTexture;
         break;
       }
-      case 'Left': {
+      case "Left": {
         this.image = this.textures.leftDirectionTexture;
         break;
       }
-      case 'Right': {
+      case "Right": {
         this.image = this.textures.rightDirectionTexture;
       }
     }
@@ -57,19 +97,19 @@ export abstract class Bullet {
 
   private update() {
     switch (this.direction) {
-      case 'Forwards': {
+      case "Forwards": {
         this.yPos -= this.speed;
         break;
       }
-      case 'Backwards': {
+      case "Backwards": {
         this.yPos += this.speed;
         break;
       }
-      case 'Left': {
+      case "Left": {
         this.xPos -= this.speed;
         break;
       }
-      case 'Right': {
+      case "Right": {
         this.xPos += this.speed;
         break;
       }
@@ -78,26 +118,33 @@ export abstract class Bullet {
 
   getExplosionPosition(): Coordinates {
     switch (this.direction) {
-      case 'Forwards': {
-        return { x: this.xPos - smallExplosionTextures.textureSize / 2 + this.width / 2, y: this.yPos - 10 };
-      }
-      case 'Backwards': {
+      case "Forwards": {
         return {
-          x: this.xPos - smallExplosionTextures.textureSize / 2 + this.width / 2,
+          x:
+            this.xPos - smallExplosionTextures.textureSize / 2 + this.width / 2,
+          y: this.yPos - 10,
+        };
+      }
+      case "Backwards": {
+        return {
+          x:
+            this.xPos - smallExplosionTextures.textureSize / 2 + this.width / 2,
           y: this.yPos + this.height - smallExplosionTextures.textureSize + 10,
         };
       }
-      case 'Left': {
+      case "Left": {
         return {
           x: this.xPos - 10,
-          y: this.yPos - smallExplosionTextures.textureSize / 2 + this.width / 2,
+          y:
+            this.yPos - smallExplosionTextures.textureSize / 2 + this.width / 2,
         };
       }
 
-      case 'Right': {
+      case "Right": {
         return {
           x: this.xPos + this.width - smallExplosionTextures.textureSize + 10,
-          y: this.yPos - smallExplosionTextures.textureSize / 2 + this.width / 2,
+          y:
+            this.yPos - smallExplosionTextures.textureSize / 2 + this.width / 2,
         };
       }
       default: {
@@ -125,41 +172,82 @@ export abstract class Bullet {
 
   protected handleStaticObjectHit() {
     if (this.collisionWith.length && !this.hit) {
-      let hitCoordinates;
       if (!this.collisionWith.length) {
         return;
       }
-      hitCoordinates = Utils.getPrecisionHitPlace(
-        new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
+
+      const hitCoordinates = Utils.getPrecisionHitPlace(
+        new ElementCollisionZone(
+          { x: this.xPos, y: this.yPos },
+          this.width,
+          this.height
+        ),
         this.direction,
         this.collisionWith[0].getInnerCoordinates(),
-        this.collisionWith[0].getTextureSize(),
+        this.collisionWith[0].getTextureSize()
       );
 
       if (hitCoordinates) {
         this.hit = true;
         let elementsInExplosionRange: StaticDrawable[] = [];
         let bulletHitZone: CollisionZone;
-        if (this.direction === 'Forwards') {
-          bulletHitZone = new BulletHitZone(hitCoordinates, 0, 2, 22, 10).getCollisionZone();
+        if (this.direction === "Forwards") {
+          bulletHitZone = new BulletHitZone(
+            hitCoordinates,
+            0,
+            2,
+            22,
+            10
+          ).getCollisionZone();
           elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
-        } else if (this.direction === 'Backwards') {
-          bulletHitZone = new BulletHitZone(hitCoordinates, 0, -2, 22, 10).getCollisionZone();
+        } else if (this.direction === "Backwards") {
+          bulletHitZone = new BulletHitZone(
+            hitCoordinates,
+            0,
+            -2,
+            22,
+            10
+          ).getCollisionZone();
           elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
-        } else if (this.direction === 'Left') {
-          bulletHitZone = new BulletHitZone(hitCoordinates, 2, 0, 10, 22).getCollisionZone();
+        } else if (this.direction === "Left") {
+          bulletHitZone = new BulletHitZone(
+            hitCoordinates,
+            2,
+            0,
+            10,
+            22
+          ).getCollisionZone();
           elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
-        } else if (this.direction === 'Right') {
-          bulletHitZone = new BulletHitZone(hitCoordinates, -2, 0, 10, 22).getCollisionZone();
+        } else if (this.direction === "Right") {
+          bulletHitZone = new BulletHitZone(
+            hitCoordinates,
+            -2,
+            0,
+            10,
+            22
+          ).getCollisionZone();
           elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
         } else {
-          bulletHitZone = new BulletHitZone(hitCoordinates, 0, 0, 6, 22).getCollisionZone();
+          bulletHitZone = new BulletHitZone(
+            hitCoordinates,
+            0,
+            0,
+            6,
+            22
+          ).getCollisionZone();
         }
 
         for (let i = 0; i < elementsInExplosionRange.length; i++) {
-          const collisionElementIndex = Utils.findHitElementIndex(elementsInExplosionRange[i].id, this.game.staticObjects);
+          const collisionElementIndex = Utils.findHitElementIndex(
+            elementsInExplosionRange[i].id,
+            this.game.staticObjects
+          );
           if (collisionElementIndex >= 0) {
-            this.game.staticObjects[collisionElementIndex].processHit(this.ammunitionType, bulletHitZone, this.yPos);
+            this.game.staticObjects[collisionElementIndex].processHit(
+              this.ammunitionType,
+              bulletHitZone,
+              this.yPos
+            );
           }
         }
       }
@@ -168,12 +256,28 @@ export abstract class Bullet {
 
   protected checkForCollisionsWithStaticObjects() {
     this.collisionWith = [];
-    !this.hit && this.update();
+    // !this.hit && this.update();
     if (!this.hit) {
-      this.hit = Utils.checkForCollisionWithBorders(this.direction, this.xPos, this.yPos, this.width, this.height, 372, 320);
+      this.update();
+      this.hit = Utils.checkForCollisionWithBorders(
+        this.direction,
+        this.xPos,
+        this.yPos,
+        this.width,
+        this.height,
+        372,
+        320
+      );
     }
     if (!this.hit) {
-      this.collisionWith = Utils.checkForCollisionWithObjects(this.direction, this.xPos, this.yPos, this.width, this.height, this.game.staticObjects);
+      this.collisionWith = Utils.checkForCollisionWithObjects(
+        this.direction,
+        this.xPos,
+        this.yPos,
+        this.width,
+        this.height,
+        this.game.staticObjects
+      );
     }
   }
 
@@ -184,7 +288,12 @@ export abstract class Bullet {
   }
 
   protected handleDrawImage(context: CanvasRenderingContext2D) {
-    !this.hit && this.image && context.drawImage(this.image, this.xPos, this.yPos);
+    // !this.hit &&
+    //   this.image &&
+    //   context.drawImage(this.image, this.xPos, this.yPos);
+    if (!this.hit && this.image) {
+      context.drawImage(this.image, this.xPos, this.yPos);
+    }
   }
 
   protected checkForTanksHit(bulletHitZone: BulletHitZone, tanks: Tank[]) {
@@ -209,11 +318,26 @@ export abstract class Bullet {
   }
 
   getCollisionZone() {
-    return new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height);
+    return new ElementCollisionZone(
+      { x: this.xPos, y: this.yPos },
+      this.width,
+      this.height
+    );
   }
 
   processHit() {
     this.hit = true;
   }
-}
 
+  private handleTanksHits(tanks: Tank[]) {
+    this.checkForTanksHit(
+      new ElementCollisionZone(
+        { x: this.xPos, y: this.yPos },
+        this.width,
+        this.height
+      ),
+      tanks
+      //this.game.players.getActivePlayersTanks()
+    );
+  }
+}

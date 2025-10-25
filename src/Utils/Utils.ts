@@ -1,5 +1,13 @@
-import { Bullet } from '../Classes/Bullet/Bullet';
-import { BoardElementType, CollisionZone, Direction, MaterialType, StaticDrawable, StaticObjectsRecipe, WallCoordinates } from '../Types/Types';
+import { Bullet } from "../Classes/Bullet/Bullet";
+import type {
+  BoardElementType,
+  CollisionZone,
+  Direction,
+  MaterialType,
+  StaticDrawable,
+  StaticObjectsRecipe,
+  WallCoordinates,
+} from "../Types/Types";
 
 export class Utils {
   static checkForCollisionWithObjects(
@@ -8,20 +16,25 @@ export class Utils {
     yPos: number,
     width: number,
     height: number,
-    staticObjects: StaticDrawable[],
+    staticObjects: StaticDrawable[]
   ) {
     const collisions: StaticDrawable[] = [];
-    if (direction === 'Forwards') {
+    if (direction === "Forwards") {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
-        if (xPos + 0 < collisionZone.B.x && xPos + width - 0 > collisionZone.A.x && yPos >= collisionZone.A.y && yPos <= collisionZone.D.y) {
+        if (
+          xPos + 0 < collisionZone.B.x &&
+          xPos + width - 0 > collisionZone.A.x &&
+          yPos >= collisionZone.A.y &&
+          yPos <= collisionZone.D.y
+        ) {
           collisions.push(staticObjects[i]);
         }
       }
       return collisions;
     }
 
-    if (direction === 'Backwards') {
+    if (direction === "Backwards") {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
         if (
@@ -36,17 +49,22 @@ export class Utils {
       return collisions;
     }
 
-    if (direction === 'Left') {
+    if (direction === "Left") {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
-        if (yPos + 0 < collisionZone.D.y && yPos + height - 0 > collisionZone.A.y && xPos <= collisionZone.D.x && xPos >= collisionZone.A.x) {
+        if (
+          yPos + 0 < collisionZone.D.y &&
+          yPos + height - 0 > collisionZone.A.y &&
+          xPos <= collisionZone.D.x &&
+          xPos >= collisionZone.A.x
+        ) {
           collisions.push(staticObjects[i]);
         }
       }
       return collisions;
     }
 
-    if (direction === 'Right') {
+    if (direction === "Right") {
       for (let i = 0; i < staticObjects.length; i++) {
         const collisionZone = staticObjects[i].getCollisionZone();
         if (
@@ -70,24 +88,24 @@ export class Utils {
     width: number,
     height: number,
     boardWidth: number,
-    boardHeight: number,
+    boardHeight: number
   ) {
-    if (direction === 'Forwards') {
+    if (direction === "Forwards") {
       if (yPos <= 4) {
         return true;
       }
     }
-    if (direction === 'Backwards') {
+    if (direction === "Backwards") {
       if (yPos + height >= boardHeight - 4) {
         return true;
       }
     }
-    if (direction === 'Left') {
+    if (direction === "Left") {
       if (xPos <= 20) {
         return true;
       }
     }
-    if (direction === 'Right') {
+    if (direction === "Right") {
       if (xPos + width >= boardWidth - 40) {
         return true;
       }
@@ -101,7 +119,10 @@ export class Utils {
     });
   }
 
-  static removeDestroyedElement<T extends StaticDrawable | Bullet>(array: Array<T>, id: string) {
+  static removeDestroyedElement<T extends StaticDrawable | Bullet>(
+    array: Array<T>,
+    id: string
+  ) {
     const elementIndex = array.findIndex((element) => {
       return element.id! === id;
     });
@@ -166,7 +187,12 @@ export class Utils {
     return null;
   }*/
 
-  static getPrecisionHitPlace(collisionZone: CollisionZone, direction: Direction, coordinates: WallCoordinates[], textureSize: number) {
+  static getPrecisionHitPlace(
+    collisionZone: CollisionZone,
+    direction: Direction,
+    coordinates: WallCoordinates[],
+    textureSize: number
+  ) {
     for (let i = 0; i < coordinates.length; i++) {
       if (
         coordinates[i] &&
@@ -175,17 +201,17 @@ export class Utils {
         coordinates[i]!.y <= collisionZone.C.y &&
         coordinates[i]!.y + textureSize >= collisionZone.A.y
       ) {
-        if (direction === 'Forwards') {
+        if (direction === "Forwards") {
           return { x: collisionZone.A.x + 1, y: collisionZone.A.y };
         }
-        if (direction === 'Backwards') {
+        if (direction === "Backwards") {
           return { x: collisionZone.C.x + 1, y: collisionZone.C.y };
         }
 
-        if (direction === 'Left') {
+        if (direction === "Left") {
           return { x: collisionZone.A.x, y: collisionZone.A.y + 1 };
         }
-        if (direction === 'Right') {
+        if (direction === "Right") {
           return { x: collisionZone.B.x, y: collisionZone.B.y + 1 };
         }
       }
@@ -198,7 +224,7 @@ export class Utils {
     xPos: number,
     yPos: number,
     layoutType: BoardElementType,
-    eagleBorder: boolean = false,
+    eagleBorder: boolean = false
   ): StaticObjectsRecipe {
     return {
       material,
@@ -213,4 +239,3 @@ export class Utils {
     return a + (b - a) * t;
   }
 }
-

@@ -1,8 +1,7 @@
-import styled from 'styled-components';
-import { StyledTheme } from '../../../GlobalStyles/theme';
+import styled from "styled-components";
 
 const EdgePanel = styled.div`
-  background-color: ${(props: StyledTheme) => props.theme.colors.darkerGray};
+  background-color: ${({ theme }) => theme.colors.darkerGray};
 `;
 
 export const TopEdgePanel = styled(EdgePanel)`

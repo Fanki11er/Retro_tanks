@@ -1,5 +1,6 @@
-import { v4 as uuidv4 } from 'uuid';
-import {
+import { v4 as uuidv4 } from "uuid";
+import { Coordinates } from "../../Types/Types";
+import type {
   AmmunitionType,
   BoardElementType,
   WallRecipe,
@@ -8,9 +9,8 @@ import {
   StaticDrawable,
   WallCoordinates,
   MaterialType,
-  Coordinates,
-} from '../../Types/Types';
-import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
+} from "../../Types/Types";
+import { ElementCollisionZone } from "../ElementCollisionZone/ElementCollisionZone";
 
 export abstract class Wall implements StaticDrawable {
   public id;
@@ -19,25 +19,44 @@ export abstract class Wall implements StaticDrawable {
   protected abstract materialType: MaterialType;
   protected coordinates: WallCoordinates[];
   protected collisionZone;
-  public changed = false;
+  public changed = true;
   protected numberOfElements;
   public isDestroyed = false;
+  protected xPos: number;
+  protected yPos: number;
+  size: number;
+  protected wallRecipe: WallRecipe;
+  protected type: BoardElementType;
+  protected textureSize: number;
+  protected eagleBorder: boolean;
 
   constructor(
-    protected xPos: number,
-    protected yPos: number,
+    xPos: number,
+    yPos: number,
     size: number,
-    protected wallRecipe: WallRecipe,
-    protected type: BoardElementType,
-    protected textureSize: number,
-    protected eagleBorder: boolean,
+    wallRecipe: WallRecipe,
+    type: BoardElementType,
+    textureSize: number,
+    eagleBorder: boolean
   ) {
     this.id = uuidv4();
-    this.width = this.type === 'Horizontally' || this.type === 'Full' ? size : size / 2;
-    this.height = this.type === 'Vertically' || this.type === 'Full' ? size : size / 2;
+    this.xPos = xPos;
+    this.yPos = yPos;
+    this.size = size;
+    this.wallRecipe = wallRecipe;
+    this.type = type;
+    this.textureSize = textureSize;
+    this.eagleBorder = eagleBorder;
+    this.width = type === "Horizontally" || type === "Full" ? size : size / 2;
+    this.height = type === "Vertically" || type === "Full" ? size : size / 2;
     this.coordinates = [];
-    this.collisionZone = new ElementCollisionZone({ x: xPos, y: yPos }, this.width, this.height);
-    this.numberOfElements = ((this.width / textureSize) * this.height) / textureSize;
+    this.collisionZone = new ElementCollisionZone(
+      { x: xPos, y: yPos },
+      this.width,
+      this.height
+    );
+    this.numberOfElements =
+      ((this.width / textureSize) * this.height) / textureSize;
     this.createArray(size / textureSize, size / textureSize, textureSize);
   }
 
@@ -47,7 +66,11 @@ export abstract class Wall implements StaticDrawable {
     const parts = this.getParts();
     for (let i = 0; i < this.coordinates.length; i++) {
       if (this.coordinates[i]) {
-        ctx.drawImage(this.getRowFromRecipe(row, column - 1), this.coordinates[i]!.x, this.coordinates[i]!.y);
+        ctx.drawImage(
+          this.getRowFromRecipe(row, column - 1),
+          this.coordinates[i]!.x,
+          this.coordinates[i]!.y
+        );
         column++;
         if (column % (parts + 1) === 0) {
           column = 1;
@@ -69,7 +92,7 @@ export abstract class Wall implements StaticDrawable {
 
   protected createArray(rows: number, columns: number, textureSize: number) {
     switch (this.type) {
-      case 'Full': {
+      case "Full": {
         for (let i = 0; i < rows; i++) {
           for (let j = 0; j < columns; j++) {
             const x = this.xPos + j * textureSize;
@@ -79,7 +102,7 @@ export abstract class Wall implements StaticDrawable {
         }
         break;
       }
-      case 'Vertically': {
+      case "Vertically": {
         for (let i = 0; i < rows; i++) {
           for (let j = 0; j < columns / 2; j++) {
             const x = this.xPos + j * textureSize;
@@ -90,7 +113,7 @@ export abstract class Wall implements StaticDrawable {
         break;
       }
 
-      case 'Horizontally': {
+      case "Horizontally": {
         for (let i = 0; i < rows / 2; i++) {
           for (let j = 0; j < columns; j++) {
             const x = this.xPos + j * textureSize;
@@ -111,11 +134,18 @@ export abstract class Wall implements StaticDrawable {
     return this.collisionZone.getCollisionZone();
   }
 
-  public processHit(ammunitionType: AmmunitionType, collisionZone: CollisionZone, yPos: number) {
-    if ((this.materialType === 'Brick' && ammunitionType === 'Standard') || ammunitionType === 'Heavy') {
+  public processHit(
+    ammunitionType: AmmunitionType,
+    collisionZone: CollisionZone
+    // yPos: number
+  ) {
+    if (
+      (this.materialType === "Brick" && ammunitionType === "Standard") ||
+      ammunitionType === "Heavy"
+    ) {
       this.deleteParts(collisionZone);
     }
-    if (this.materialType === 'Concrete' && ammunitionType === 'Heavy') {
+    if (this.materialType === "Concrete" && ammunitionType === "Heavy") {
       this.deleteParts(collisionZone);
     }
 
@@ -123,7 +153,7 @@ export abstract class Wall implements StaticDrawable {
       this.isDestroyed = true;
       return this.id;
     }
-    return '';
+    return "";
   }
 
   protected deleteParts(collisionZone: CollisionZone) {
@@ -146,7 +176,10 @@ export abstract class Wall implements StaticDrawable {
     }
   }
 
-  public getPrecisionHitPlace(collisionZone: CollisionZone, direction: Direction) {
+  public getPrecisionHitPlace(
+    collisionZone: CollisionZone,
+    direction: Direction
+  ) {
     for (let i = 0; i < this.coordinates.length; i++) {
       if (
         this.coordinates[i] &&
@@ -155,17 +188,17 @@ export abstract class Wall implements StaticDrawable {
         this.coordinates[i]!.y <= collisionZone.C.y &&
         this.coordinates[i]!.y + this.textureSize >= collisionZone.A.y
       ) {
-        if (direction === 'Forwards') {
+        if (direction === "Forwards") {
           return { x: collisionZone.A.x + 1, y: collisionZone.A.y };
         }
-        if (direction === 'Backwards') {
+        if (direction === "Backwards") {
           return { x: collisionZone.C.x + 1, y: collisionZone.C.y };
         }
 
-        if (direction === 'Left') {
+        if (direction === "Left") {
           return { x: collisionZone.A.x, y: collisionZone.A.y + 1 };
         }
-        if (direction === 'Right') {
+        if (direction === "Right") {
           return { x: collisionZone.B.x, y: collisionZone.B.y + 1 };
         }
       }
@@ -180,8 +213,11 @@ export abstract class Wall implements StaticDrawable {
     return this.textureSize;
   }
 
-  public getPrecisionCollisionPlace(collisionZone: CollisionZone, direction: Direction) {
-    if (direction === 'Forwards') {
+  public getPrecisionCollisionPlace(
+    collisionZone: CollisionZone,
+    direction: Direction
+  ) {
+    if (direction === "Forwards") {
       for (let i = 0; i < this.coordinates.length; i++) {
         if (
           this.coordinates[i] &&
@@ -194,7 +230,7 @@ export abstract class Wall implements StaticDrawable {
         }
       }
     }
-    if (direction === 'Backwards') {
+    if (direction === "Backwards") {
       for (let i = 0; i < this.coordinates.length; i++) {
         if (
           this.coordinates[i] &&
@@ -207,7 +243,7 @@ export abstract class Wall implements StaticDrawable {
         }
       }
     }
-    if (direction === 'Left') {
+    if (direction === "Left") {
       for (let i = 0; i < this.coordinates.length; i++) {
         if (
           this.coordinates[i] &&
@@ -220,7 +256,7 @@ export abstract class Wall implements StaticDrawable {
         }
       }
     }
-    if (direction === 'Right') {
+    if (direction === "Right") {
       for (let i = 0; i < this.coordinates.length; i++) {
         if (
           this.coordinates[i] &&
@@ -251,6 +287,8 @@ export abstract class Wall implements StaticDrawable {
     return this.materialType;
   }
 
-  protected abstract getRowFromRecipe(row: number, column: number): HTMLImageElement;
+  protected abstract getRowFromRecipe(
+    row: number,
+    column: number
+  ): HTMLImageElement;
 }
-

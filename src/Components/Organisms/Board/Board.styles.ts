@@ -1,5 +1,4 @@
-import styled from 'styled-components';
-import { StyledTheme } from '../../../GlobalStyles/theme';
+import styled from "styled-components";
 
 export const BoardWrapper = styled.div`
   display: grid;
@@ -11,12 +10,12 @@ export const BoardWrapper = styled.div`
   justify-self: center;
   transform: scale(0.85);
 
-  @media screen and (${(props: StyledTheme) => props.theme.devices.small}) {
+  @media screen and (${({ theme }) => theme.devices.small}) {
     transform: scale(1);
     grid-column: 2/3;
     grid-row: 1/2;
   }
-  @media screen and (${(props: StyledTheme) => props.theme.devices.medium}) {
+  @media screen and (${({ theme }) => theme.devices.medium}) {
     transform: scale(1.6);
     grid-column: 1/2;
     grid-row: 1/2;

@@ -1,10 +1,9 @@
-import styled from 'styled-components';
-import { StyledTheme } from '../../../GlobalStyles/theme';
+import styled from "styled-components";
 
 export const DirectionControlPanelWrapper = styled.section`
   width: 100%;
   height: 150px;
-  background-color: ${(props: StyledTheme) => props.theme.colors.darkBlue};
+  background-color: ${({ theme }) => theme.colors.darkBlue};
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -13,12 +12,12 @@ export const DirectionControlPanelWrapper = styled.section`
   grid-row: 2/3;
   justify-self: flex-end;
 
-  @media screen and (${(props: StyledTheme) => props.theme.devices.small}) {
+  @media screen and (${({ theme }) => theme.devices.small}) {
     grid-column: 3/4;
     grid-row: 1/2;
   }
 
-  @media screen and (${(props: StyledTheme) => props.theme.devices.medium}) {
+  @media screen and (${({ theme }) => theme.devices.medium}) {
     display: none;
   }
 `;
@@ -37,4 +36,3 @@ export const EdgeRow = styled.div`
   justify-content: center;
   align-items: center;
 `;
-

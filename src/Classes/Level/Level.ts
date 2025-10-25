@@ -1,4 +1,7 @@
-import { TankTypes, /*LevelRecipe,*/ StaticDrawable } from '../../Types/Types';
+import type {
+  TankTypes,
+  /*LevelRecipe,*/ StaticDrawable,
+} from "../../Types/Types";
 //import { Tank } from '../Tank/Tank';
 
 export class Level {
@@ -6,4 +9,3 @@ export class Level {
   enemyTanks: TankTypes[] = [];
   //constructor(levelRecipe: LevelRecipe) {}
 }
-

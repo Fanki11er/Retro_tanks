@@ -1,35 +1,37 @@
-import { Direction } from '../../Types/Types';
+import type { Direction } from "../../Types/Types";
 
 export class ChangeDirectionTextures {
   forwardDirectionTextures: HTMLImageElement[] = [];
   backwardDirectionTextures: HTMLImageElement[] = [];
   leftDirectionTextures: HTMLImageElement[] = [];
   rightDirectionTextures: HTMLImageElement[] = [];
+  public textureSize: number;
 
-  constructor(public textureSize: number) {}
+  constructor(textureSize: number) {
+    this.textureSize = textureSize;
+  }
 
   addTextures(textureSrc: string, direction: Direction) {
     const image = new Image();
     image.src = textureSrc;
 
     switch (direction) {
-      case 'Forwards': {
+      case "Forwards": {
         this.forwardDirectionTextures.push(image);
         break;
       }
-      case 'Backwards': {
+      case "Backwards": {
         this.backwardDirectionTextures.push(image);
         break;
       }
-      case 'Left': {
+      case "Left": {
         this.leftDirectionTextures.push(image);
         break;
       }
-      case 'Right': {
+      case "Right": {
         this.rightDirectionTextures.push(image);
         break;
       }
     }
   }
 }
-

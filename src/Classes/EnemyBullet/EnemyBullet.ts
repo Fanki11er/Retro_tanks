@@ -1,22 +1,23 @@
-import { BulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { AmmunitionType, Direction, Owner } from '../../Types/Types';
-import { Bullet } from '../Bullet/Bullet';
-import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
-import { Game } from '../Game/Game';
+import { Bullet } from "../Bullet/Bullet";
+import { Game } from "../Game/Game";
+import { BulletTextures } from "../../Textures/BulletTextures/BulletTextures";
+import type { AmmunitionType, Direction, Owner } from "../../Types/Types";
+import { ElementCollisionZone } from "../ElementCollisionZone/ElementCollisionZone";
 
 export class EnemyBullet extends Bullet {
   constructor(
-    protected xPos: number,
-    protected yPos: number,
-    protected width: number,
-    protected height: number,
-    protected direction: Direction,
-    protected textures: BulletTextures,
-    protected ammunitionType: AmmunitionType = 'Standard',
-    protected owner: Owner = '',
-    protected game: Game,
+    xPos: number,
+    yPos: number,
+    width: number,
+    height: number,
+    direction: Direction,
+    textures: BulletTextures,
+    ammunitionType: AmmunitionType = "Standard",
+    owner: Owner = "",
+    game: Game
   ) {
-    super(xPos, yPos, width, height, direction, textures, ammunitionType, owner, game);
+    super(xPos, yPos, width, height, direction, textures, owner, game);
+    this.ammunitionType = ammunitionType;
   }
 
   public draw(context: CanvasRenderingContext2D) {
@@ -24,15 +25,19 @@ export class EnemyBullet extends Bullet {
 
     this.handleTanksHits();
     this.handleStaticObjectHit();
+
     this.handleExplosion();
     this.handleDrawImage(context);
   }
 
   private handleTanksHits() {
     this.checkForTanksHit(
-      new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
-      this.game.players.getActivePlayersTanks(),
+      new ElementCollisionZone(
+        { x: this.xPos, y: this.yPos },
+        this.width,
+        this.height
+      ),
+      this.game.players.getActivePlayersTanks()
     );
   }
 }
-

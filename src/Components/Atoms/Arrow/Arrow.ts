@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import { ReactComponent as Arrow } from "../../../assets/icons/Arrow.svg";
+import Arrow from "../../../assets/icons/Arrow.svg";
 
-export const ArrowUp = styled(Arrow)`
+export const ArrowUp = styled.img`
   transform-origin: center;
 `;
 export const ArrowDown = styled(ArrowUp)`

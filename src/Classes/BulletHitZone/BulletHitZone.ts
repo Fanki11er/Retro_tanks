@@ -1,4 +1,5 @@
-import { CollisionZone, Coordinates } from '../../Types/Types';
+import type { CollisionZone } from "../../Types/Types";
+import { Coordinates } from "../../Types/Types";
 
 export class BulletHitZone {
   A: Coordinates;
@@ -6,11 +7,29 @@ export class BulletHitZone {
   C: Coordinates;
   D: Coordinates;
 
-  constructor(startCoordinates: Coordinates, translateX: number, translateY: number, resizeWidth: number, resizeHeight: number) {
-    this.A = new Coordinates(startCoordinates.x - resizeWidth / 2 + translateX, startCoordinates.y - resizeHeight / 2 + translateY);
-    this.B = new Coordinates(startCoordinates.x + resizeWidth / 2 + translateX, this.A.y + translateY);
-    this.C = new Coordinates(this.A.x, startCoordinates.y + resizeHeight / 2 + translateY);
-    this.D = new Coordinates(startCoordinates.x + resizeWidth / 2 + translateX, startCoordinates.y + resizeHeight / 2 + translateY);
+  constructor(
+    startCoordinates: Coordinates,
+    translateX: number,
+    translateY: number,
+    resizeWidth: number,
+    resizeHeight: number
+  ) {
+    this.A = new Coordinates(
+      startCoordinates.x - resizeWidth / 2 + translateX,
+      startCoordinates.y - resizeHeight / 2 + translateY
+    );
+    this.B = new Coordinates(
+      startCoordinates.x + resizeWidth / 2 + translateX,
+      this.A.y + translateY
+    );
+    this.C = new Coordinates(
+      this.A.x,
+      startCoordinates.y + resizeHeight / 2 + translateY
+    );
+    this.D = new Coordinates(
+      startCoordinates.x + resizeWidth / 2 + translateX,
+      startCoordinates.y + resizeHeight / 2 + translateY
+    );
   }
 
   getCollisionZone() {
@@ -22,4 +41,3 @@ export class BulletHitZone {
     } as CollisionZone;
   }
 }
-

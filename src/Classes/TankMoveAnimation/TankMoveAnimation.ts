@@ -1,5 +1,5 @@
-import { Direction } from '../../Types/Types';
-import { ChangeDirectionTextures } from '../ChangeDirectionTextures/ChangeDirectionTextures';
+import type { Direction } from "../../Types/Types";
+import { ChangeDirectionTextures } from "../ChangeDirectionTextures/ChangeDirectionTextures";
 
 export class TankMoveAnimation {
   private index: number = 0;
@@ -10,7 +10,7 @@ export class TankMoveAnimation {
   }
 
   setImage(direction: Direction, isMoving: boolean, delay: number) {
-    let image = this.switchImage(direction);
+    const image = this.switchImage(direction);
 
     this.counter += 1;
     if (this.counter % delay === 0 && isMoving) {
@@ -19,8 +19,13 @@ export class TankMoveAnimation {
     return image;
   }
 
-  setImageSpecialTank(direction: Direction, isMoving: boolean, delay: number, isSpecial: boolean) {
-    let image = this.switchImage(direction);
+  setImageSpecialTank(
+    direction: Direction,
+    isMoving: boolean,
+    delay: number,
+    isSpecial: boolean
+  ) {
+    const image = this.switchImage(direction);
 
     this.counter += 1;
     if (isSpecial) {
@@ -45,19 +50,19 @@ export class TankMoveAnimation {
 
   private switchImage(direction: Direction) {
     switch (direction) {
-      case 'Forwards': {
+      case "Forwards": {
         this.reset(this.textures.forwardDirectionTextures.length);
         return this.textures.forwardDirectionTextures[this.index];
       }
-      case 'Backwards': {
+      case "Backwards": {
         this.reset(this.textures.backwardDirectionTextures.length);
         return this.textures.backwardDirectionTextures[this.index];
       }
-      case 'Left': {
+      case "Left": {
         this.reset(this.textures.leftDirectionTextures.length);
         return this.textures.leftDirectionTextures[this.index];
       }
-      case 'Right': {
+      case "Right": {
         this.reset(this.textures.rightDirectionTextures.length);
         return this.textures.rightDirectionTextures[this.index];
       }
@@ -71,4 +76,3 @@ export class TankMoveAnimation {
     this.textures = textures;
   }
 }
-

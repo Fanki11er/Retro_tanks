@@ -1,6 +1,6 @@
-import { TankTypesTextures } from '../../Types/Types';
-import { enemyFastTankTextures } from './EnemyFastTankTextures';
-import { enemySmallTankTextures } from './EnemySmallTankTextures';
+import type { TankTypesTextures } from "../../Types/Types";
+import { enemyFastTankTextures } from "./EnemyFastTankTextures";
+import { enemySmallTankTextures } from "./EnemySmallTankTextures";
 
 const enemyTankTextures: TankTypesTextures = {
   Small: enemySmallTankTextures,
@@ -9,4 +9,3 @@ const enemyTankTextures: TankTypesTextures = {
 };
 
 export { enemyTankTextures };
-

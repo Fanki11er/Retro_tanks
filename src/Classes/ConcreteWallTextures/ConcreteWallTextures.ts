@@ -1,6 +1,6 @@
-import ConcreteWallImage from '../../assets/images/Concrete/Concrete_wall_texture.png';
+import ConcreteWallImage from "../../assets/images/Concrete/Concrete_wall_texture.png";
 
-import { WallRecipe } from '../../Types/Types';
+import type { WallRecipe } from "../../Types/Types";
 
 class ConcreteTextures {
   elementTexture: HTMLImageElement;
@@ -18,4 +18,3 @@ export const concreteWallRecipe = {
   elementSize: 24,
   1: [concreteTextures.elementTexture],
 } as WallRecipe;
-

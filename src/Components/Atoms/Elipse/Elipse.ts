@@ -1,8 +1,7 @@
-import styled from 'styled-components';
-import { ReactComponent as Ellipse } from '../../../assets/icons/Ellipse.svg';
+import styled from "styled-components";
+import Ellipse from "../../../assets/icons/Ellipse.svg";
 
-export const StyledEllipse = styled(Ellipse)`
+export const StyledEllipse = styled.img`
   width: 100%;
   height: 40%;
 `;
-

@@ -1,4 +1,5 @@
-import { CollisionZone, Coordinates } from '../../Types/Types';
+import { Coordinates } from "../../Types/Types";
+import type { CollisionZone } from "../../Types/Types";
 
 export class ElementCollisionZone {
   A: Coordinates;
@@ -22,4 +23,3 @@ export class ElementCollisionZone {
     } as CollisionZone;
   }
 }
-

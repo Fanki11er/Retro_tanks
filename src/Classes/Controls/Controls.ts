@@ -1,15 +1,15 @@
-import { Direction } from '../../Types/Types';
+import type { Direction } from "../../Types/Types";
 
 export class Controls {
   move;
   direction: Direction;
   constructor() {
-    this.direction = 'Forwards';
+    this.direction = "Forwards";
     this.move = false;
   }
 
   public setDirection(direction: Direction) {
-    if (direction !== 'None') {
+    if (direction !== "None") {
       this.direction = direction;
       this.move = true;
       return;
@@ -64,4 +64,3 @@ export class Controls {
       }
     }
   }*/
-

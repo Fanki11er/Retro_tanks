@@ -1,11 +1,14 @@
-import { Owner } from '../../Types/Types';
-import { PlayerTank } from '../PlayerTank/PlayerTank';
+import type { Owner } from "../../Types/Types";
+import { PlayerTank } from "../PlayerTank/PlayerTank";
 
 export class Player {
   public playerTank: PlayerTank | null = null;
   private playerLivesLeft = 3;
   private playerScore = 0;
-  constructor(private owner: Owner) {}
+  private owner: Owner;
+  constructor(owner: Owner) {
+    this.owner = owner;
+  }
   getPlayerLivesLeft() {
     return this.playerLivesLeft;
   }
@@ -26,4 +29,3 @@ export class Player {
     return false;
   }
 }
-

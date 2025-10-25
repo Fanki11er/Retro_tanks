@@ -1,31 +1,34 @@
-import { bulletTextures } from '../../Textures/BulletTextures/BulletTextures';
-import { Owner, TankTypes, TankTypesTextures } from '../../Types/Types';
-
-import { Game } from '../Game/Game';
-import { PlayerBullet } from '../PlayerBullet/PlayerBullet';
-import { Tank } from '../Tank/Tank';
+import { bulletTextures } from "../../Textures/BulletTextures/BulletTextures";
+import type { Owner, TankTypes, TankTypesTextures } from "../../Types/Types";
+import { Bullet } from "../Bullet/Bullet";
+import { Game } from "../Game/Game";
+import { Tank } from "../Tank/Tank";
 
 export class PlayerTank extends Tank {
+  private owner: Owner;
   constructor(
-    public xPos: number,
-    public yPos: number,
-    protected width: number,
-    protected height: number,
-    public textures: TankTypesTextures,
-    protected tankType: TankTypes,
-    protected owner: Owner,
-    protected game: Game,
+    xPos: number,
+    yPos: number,
+    width: number,
+    height: number,
+    textures: TankTypesTextures,
+    tankType: TankTypes,
+    owner: Owner,
+    game: Game
   ) {
-    super(xPos, yPos, width, height, textures, (tankType = 'Small'), game);
+    super(xPos, yPos, width, height, textures, (tankType = "Small"), game);
     this.madeIndestructible(4);
     this.spawn(2.5);
+    this.owner = owner;
   }
 
   update() {
     this.handleCollisionsWithBorders();
     this.handleCollisionsWithFindings();
     this.handleCollisionsWithOtherTanks(this.game.enemyTanks);
-    this.handleCollisionsWithOtherTanks(this.game.players.getActivePlayersTanks());
+    this.handleCollisionsWithOtherTanks(
+      this.game.players.getActivePlayersTanks()
+    );
     this.handleCollisionsWithStaticObjects();
     this.handleImageChange();
     //this.tankSensor.update();
@@ -46,18 +49,34 @@ export class PlayerTank extends Tank {
   }
 
   protected selectImage(animationSpeed: number) {
-    return this.moveAnimation.setImage(this.controls.direction, this.controls.move, animationSpeed);
+    return this.moveAnimation.setImage(
+      this.controls.direction,
+      this.controls.move,
+      animationSpeed
+    );
   }
 
   fire() {
     if (!this.isLoading && !this.isSpawning) {
       const { x, y } = this.setPositionOfBullet(4);
-      this.game.bullets.push(new PlayerBullet(x, y, 2, 2, this.controls.direction, bulletTextures, 'Standard', this.owner, this.game));
+      this.game.bullets.push(
+        new Bullet(
+          x,
+          y,
+          2,
+          2,
+          this.controls.direction,
+          bulletTextures,
+          this.owner,
+          this.game,
+          "PlayerBullet"
+        )
+      );
       this.isLoading = true;
-      this.isLoading &&
-        setTimeout(() => {
-          this.isLoading = false;
-        }, this.reloadTime * 1000);
+      //this.isLoading &&
+      setTimeout(() => {
+        this.isLoading = false;
+      }, this.reloadTime * 1000);
     }
   }
   handleCollisionsWithFindings() {
@@ -74,7 +93,7 @@ export class PlayerTank extends Tank {
     }
   }
 
-  public processHit(hitBy: Owner): void {
+  public processHit(/*hitBy: Owner*/): void {
     this.handleExplosion();
     this.handleDestruction();
   }
@@ -87,8 +106,8 @@ export class PlayerTank extends Tank {
 
   updateTankType() {
     switch (this.tankType) {
-      case 'Small': {
-        this.tankType = 'Medium';
+      case "Small": {
+        this.tankType = "Medium";
         this.reloadTime = 0.4;
         this.speed = 0.4;
         //! on last level change ammunition type
@@ -112,4 +131,3 @@ export class PlayerTank extends Tank {
     return this.owner;
   }
 }
-

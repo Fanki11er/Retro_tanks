@@ -1,22 +1,28 @@
-import { ThemeConsumer } from 'styled-components';
-import { levels } from '../../Levels/Levels';
-import { enemyTankTextures } from '../../Textures/EnemyTankTextures/EnemyTankTextures';
-import { smallExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
-import { findingsTextures } from '../../Textures/FindingsTextures/FindingsTextures';
-import { player1TankTextures } from '../../Textures/TanksTextures/TanksTextures';
-import { DestroyedBy, FindingsTypes, LevelRecipe, Owner, StaticDrawable, TankTypes } from '../../Types/Types';
-import { Bullet } from '../Bullet/Bullet';
-import { Curtin } from '../Curtin/Curtin';
-import { EnemyTank } from '../EnemyTank/EnemyTank';
-import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
-import { Finding } from '../Finding/Finding';
-import { GameInfoCanvas } from '../GameInfoCanvas/GameInfoCanvas';
-import { GameOverAnimation } from '../GameOverAnimation/GameOverAnimation';
-import { Players } from '../Players/Players';
-import { PlayerTank } from '../PlayerTank/PlayerTank';
-import { StaticElementsCanvas } from '../StaticElementsCanvas/StaticElementsCanvas';
-import { Value } from '../Value/Value';
+import { levels } from "../../Levels/Levels";
+import { enemyTankTextures } from "../../Textures/EnemyTankTextures/EnemyTankTextures";
+import { smallExplosionTextures } from "../../Textures/ExplosionTextures/ExplosionTextures";
+import { findingsTextures } from "../../Textures/FindingsTextures/FindingsTextures";
+import { player1TankTextures } from "../../Textures/TanksTextures/TanksTextures";
+import type {
+  DestroyedBy,
+  FindingsTypes,
+  LevelRecipe,
+  Owner,
+  StaticDrawable,
+  TankTypes,
+} from "../../Types/Types";
+import { Curtin } from "../Curtin/Curtin";
+import { EnemyTank } from "../EnemyTank/EnemyTank";
+import { ExplosionAnimationFrames } from "../ExplosionAnimationFrames/ExplosionAnimationFrames";
+import { Finding } from "../Finding/Finding";
+import { GameInfoCanvas } from "../GameInfoCanvas/GameInfoCanvas";
+import { GameOverAnimation } from "../GameOverAnimation/GameOverAnimation";
+import { Players } from "../Players/Players";
+import { PlayerTank } from "../PlayerTank/PlayerTank";
+import { StaticElementsCanvas } from "../StaticElementsCanvas/StaticElementsCanvas";
+import { Value } from "../Value/Value";
 
+import { Bullet } from "../Bullet/Bullet";
 export class Game {
   gameStatus;
   bullets: Bullet[] = [];
@@ -34,7 +40,14 @@ export class Game {
   values: Value[] = [];
   destroyedEnemyTanksList: DestroyedBy[] = [];
   findings: Finding[] = [];
-  findingsList: FindingsTypes[] = ['Tank', 'Grenade', 'Helmet', 'Stopwatch', 'Shovel', 'Star'];
+  findingsList: FindingsTypes[] = [
+    "Tank",
+    "Grenade",
+    "Helmet",
+    "Stopwatch",
+    "Shovel",
+    "Star",
+  ];
   timeBlockade = false;
 
   learnIteration = 0;
@@ -47,7 +60,7 @@ export class Game {
   constructor(players: 1 | 2, levels: LevelRecipe[]) {
     this.levelsRecipe = levels;
     this.players = new Players(players);
-    this.gameStatus = 'Ready';
+    this.gameStatus = "Ready";
   }
 
   startGame() {
@@ -58,52 +71,57 @@ export class Game {
 
     setTimeout(() => {
       this.curtin.isBlocked = false;
-      this.handlePlayerTankSpawn('player1');
+      this.handlePlayerTankSpawn("player1");
       // ! What if we have two players
       this.addNewEnemyTank();
       this.handleEnemyTankSpawn();
     }, 1000);
     //!!! Uncomment this line for enemy tanks learning
-    this.learnEnemyTanks();
+    //this.learnEnemyTanks();
     //!!
-    this.gameStatus = 'Started';
+    this.gameStatus = "Started";
   }
 
   renderGame(renderCtx: CanvasRenderingContext2D) {
-    renderCtx?.clearRect(0, 0, 372, 320);
-    if (this.gameStatus === 'Ready') {
+    renderCtx.clearRect(0, 0, 372, 320);
+    if (this.gameStatus === "Ready") {
       this.startGame();
     }
 
-    if (this.gameStatus === 'Started' || this.gameStatus === 'ShowingResults') {
-      renderCtx && this.curtin.drawCurtin(renderCtx, 1, this.currentLevelNumber + 1);
+    if (this.gameStatus === "Started" || this.gameStatus === "ShowingResults") {
+      this.curtin.drawCurtin(renderCtx, 1, this.currentLevelNumber + 1);
     }
     if (this.checkForGameOver()) {
-      this.gameStatus = 'GameOver';
-      renderCtx && this.gameOverAnimation.animate(renderCtx, 5);
+      this.gameStatus = "GameOver";
+      this.gameOverAnimation.animate(renderCtx, 5);
     }
+
     this.handleBulletsHit();
 
-    renderCtx && this.gameInfo.draw(renderCtx);
-    renderCtx && this.staticObjectsCanvas && this.staticObjectsCanvas.draw(renderCtx);
+    this.gameInfo.draw(renderCtx);
+    this.staticObjectsCanvas?.draw(renderCtx);
 
-    this.players.player1?.playerTank && renderCtx && this.players.player1.playerTank.draw(renderCtx);
-    renderCtx && this.renderEnemyTanks(renderCtx);
-    renderCtx && this.renderBullets(renderCtx);
-    renderCtx && this.renderExplosions(renderCtx);
-    renderCtx && this.renderValues(renderCtx);
-    renderCtx && this.renderFindings(renderCtx);
+    //this.players.player1?.playerTank && this.players.player1.playerTank.draw(renderCtx);
+
+    if (this.players.player1?.playerTank) {
+      this.players.player1.playerTank.draw(renderCtx);
+    }
+
+    this.renderEnemyTanks(renderCtx);
+    this.renderBullets(renderCtx);
+    this.renderExplosions(renderCtx);
+    this.renderValues(renderCtx);
+    this.renderFindings(renderCtx);
   }
 
   renderBullets(renderCtx: CanvasRenderingContext2D) {
-    renderCtx &&
-      this.bullets.forEach((bullet) => {
-        bullet.draw(renderCtx);
-      });
+    this.bullets.forEach((bullet) => {
+      bullet.draw(renderCtx);
+    });
   }
   renderExplosions(renderCtx: CanvasRenderingContext2D) {
     for (let i = 0; i < this.explosions.length; i++) {
-      renderCtx && this.explosions[i].animateFrames(renderCtx);
+      this.explosions[i].animateFrames(renderCtx);
       if (this.explosions[i].animationEnded) {
         this.explosions.splice(i, 1);
         i--;
@@ -138,7 +156,10 @@ export class Game {
 
         this.values.push(new Value(value, xPos, yPos + 12, 0.2, 2.5));
         this.handleAddPlayerScore(isTakenBy, value);
-        this.handleProcessRewardFromFinding(isTakenBy, this.findings[i].getType());
+        this.handleProcessRewardFromFinding(
+          isTakenBy,
+          this.findings[i].getType()
+        );
         this.findings.splice(i, 1);
         i++;
       } else if (this.findings[i].getTimeIsOut()) {
@@ -161,7 +182,9 @@ export class Game {
 
   private addNewEnemyTank() {
     const index = Math.floor(Math.random() * this.enemyTanksList.length);
-    const { x: xPos, y: yPos } = this.getSpawnCoordinates(Math.floor(Math.random() * 3));
+    const { x: xPos, y: yPos } = this.getSpawnCoordinates(
+      Math.floor(Math.random() * 3)
+    );
     this.enemyTanks.push(
       new EnemyTank(
         xPos,
@@ -172,8 +195,8 @@ export class Game {
         this.enemyTanksList[index],
         this.ShouldBeSpecial(this.enemyTanksList),
         this.timeBlockade,
-        this,
-      ),
+        this
+      )
     );
     //!! Comment next line when enemy tanks are learning
     //this.enemyTanksList.splice(index, 1);
@@ -206,13 +229,29 @@ export class Game {
   }
 
   private handleGameInfoUpdate() {
-    this.gameInfo.update(this.enemyTanksList.length, this.players, this.currentLevelNumber + 1);
+    this.gameInfo.update(
+      this.enemyTanksList.length,
+      this.players,
+      this.currentLevelNumber + 1
+    );
   }
 
   handlePlayerTankSpawn(owner: Owner) {
     if (owner && this.players[`${owner}`]) {
-      if (this.players[`${owner}`]!.getPlayerLivesLeft() > 0 && !this.players[`${owner}`]!.playerTank)
-        this.players[`${owner}`]!.playerTank = new PlayerTank(116, 292, 20, 20, player1TankTextures, 'Small', owner, this);
+      if (
+        this.players[`${owner}`]!.getPlayerLivesLeft() > 0 &&
+        !this.players[`${owner}`]!.playerTank
+      )
+        this.players[`${owner}`]!.playerTank = new PlayerTank(
+          116,
+          292,
+          20,
+          20,
+          player1TankTextures,
+          "Small",
+          owner,
+          this
+        );
       this.players[`${owner}`]?.modifyPlayerLivesLeft(-1);
       this.handleGameInfoUpdate();
     }
@@ -246,7 +285,13 @@ export class Game {
       if (this.bullets[i].getIsDestroyed()) {
         const { x: xPos, y: yPos } = this.bullets[i].getExplosionPosition();
         this.explosions.push(
-          new ExplosionAnimationFrames(smallExplosionTextures.animationTexture, smallExplosionTextures.textureSize, 20, xPos, yPos),
+          new ExplosionAnimationFrames(
+            smallExplosionTextures.animationTexture,
+            smallExplosionTextures.textureSize,
+            20,
+            xPos,
+            yPos
+          )
         );
         this.bullets.splice(i, 1);
         i--;
@@ -267,56 +312,107 @@ export class Game {
     const xPos = Math.floor(Math.random() * 300 + 4);
     const yPos = Math.floor(Math.random() * 240 + 20);
     switch (this.findingsList[index]) {
-      case 'Tank': {
-        this.findings.push(new Finding(this.findingsList[index], xPos, yPos, findingsTextures.tankFindingTexture, 24));
+      case "Tank": {
+        this.findings.push(
+          new Finding(
+            this.findingsList[index],
+            xPos,
+            yPos,
+            findingsTextures.tankFindingTexture,
+            24
+          )
+        );
         break;
       }
-      case 'Grenade': {
-        this.findings.push(new Finding(this.findingsList[index], xPos, yPos, findingsTextures.grenadeFindingTexture, 24));
+      case "Grenade": {
+        this.findings.push(
+          new Finding(
+            this.findingsList[index],
+            xPos,
+            yPos,
+            findingsTextures.grenadeFindingTexture,
+            24
+          )
+        );
         break;
       }
-      case 'Helmet': {
-        this.findings.push(new Finding(this.findingsList[index], xPos, yPos, findingsTextures.helmetFindingTexture, 24));
+      case "Helmet": {
+        this.findings.push(
+          new Finding(
+            this.findingsList[index],
+            xPos,
+            yPos,
+            findingsTextures.helmetFindingTexture,
+            24
+          )
+        );
         break;
       }
-      case 'Stopwatch': {
-        this.findings.push(new Finding(this.findingsList[index], xPos, yPos, findingsTextures.stopwatchFindingTexture, 24));
+      case "Stopwatch": {
+        this.findings.push(
+          new Finding(
+            this.findingsList[index],
+            xPos,
+            yPos,
+            findingsTextures.stopwatchFindingTexture,
+            24
+          )
+        );
         break;
       }
-      case 'Shovel': {
-        this.findings.push(new Finding(this.findingsList[index], xPos, yPos, findingsTextures.shovelFindingTexture, 24));
+      case "Shovel": {
+        this.findings.push(
+          new Finding(
+            this.findingsList[index],
+            xPos,
+            yPos,
+            findingsTextures.shovelFindingTexture,
+            24
+          )
+        );
         break;
       }
-      case 'Star': {
-        this.findings.push(new Finding(this.findingsList[index], xPos, yPos, findingsTextures.starFindingTexture, 24));
+      case "Star": {
+        this.findings.push(
+          new Finding(
+            this.findingsList[index],
+            xPos,
+            yPos,
+            findingsTextures.starFindingTexture,
+            24
+          )
+        );
         break;
       }
     }
   }
 
-  private handleProcessRewardFromFinding(owner: Owner, findingType: FindingsTypes) {
+  private handleProcessRewardFromFinding(
+    owner: Owner,
+    findingType: FindingsTypes
+  ) {
     switch (findingType) {
-      case 'Tank': {
+      case "Tank": {
         this.handleAddPlayerLive(owner);
         break;
       }
-      case 'Grenade': {
+      case "Grenade": {
         this.handleDestroyAllEnemyTanks();
         break;
       }
-      case 'Helmet': {
+      case "Helmet": {
         this.handleMakePlayerIndestructible(owner);
         break;
       }
-      case 'Stopwatch': {
+      case "Stopwatch": {
         this.handleBlockAllEnemyTanks(6);
         break;
       }
-      case 'Shovel': {
+      case "Shovel": {
         this.handleArmorEagle(6);
         break;
       }
-      case 'Star': {
+      case "Star": {
         this.handlePlayerTankUpdate(owner);
         break;
       }
@@ -325,7 +421,7 @@ export class Game {
 
   private handleDestroyAllEnemyTanks() {
     this.enemyTanks.forEach((enemyTank) => {
-      enemyTank.processHit('');
+      enemyTank.processHit("");
     });
   }
 
@@ -365,10 +461,19 @@ export class Game {
     if (this.staticObjectsCanvas?.isEagleDestroyed) {
       return true;
     }
-    if (this.players.player1 && this.players.player1.isPlayerDestroyed() && !this.players.player2) {
+    if (
+      this.players.player1 &&
+      this.players.player1.isPlayerDestroyed() &&
+      !this.players.player2
+    ) {
       return true;
     }
-    if (this.players.player1 && this.players.player1.isPlayerDestroyed() && this.players.player2 && this.players.player2.isPlayerDestroyed()) {
+    if (
+      this.players.player1 &&
+      this.players.player1.isPlayerDestroyed() &&
+      this.players.player2 &&
+      this.players.player2.isPlayerDestroyed()
+    ) {
       return true;
     }
     return false;
@@ -386,7 +491,13 @@ export class Game {
     let score = 0;
     score =
       this.enemyTanks
-        .find((tank) => tank.brain.getBrainScore() === Math.max(...this.enemyTanks.map((tank) => tank.brain.getBrainScore())))
+        .find(
+          (tank) =>
+            tank.brain.getBrainScore() ===
+            Math.max(
+              ...this.enemyTanks.map((tank) => tank.brain.getBrainScore())
+            )
+        )
         ?.brain.saveBrain() || 0;
 
     if (score > this.bestResult) {
@@ -399,11 +510,11 @@ export class Game {
     if (this.learnIteration >= 15 && this.bestResult < 3) {
       this.bestResult = 0;
       this.learnIteration = 0;
-      localStorage.removeItem('BestBrain');
+      localStorage.removeItem("BestBrain");
     }
 
-    console.log('Score: ', this.bestResult);
-    console.log('Iteration: ', this.learnIteration);
+    console.log("Score: ", this.bestResult);
+    console.log("Iteration: ", this.learnIteration);
   }
 
   resetGame() {
@@ -419,4 +530,3 @@ export class Game {
     this.findingsList = [];
   }
 }
-

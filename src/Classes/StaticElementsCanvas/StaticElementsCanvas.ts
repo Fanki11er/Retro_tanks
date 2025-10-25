@@ -1,40 +1,68 @@
-import { brickWallRecipe } from '../../Textures/BrickWall/BrickWallTexture';
-import { StaticDrawable } from '../../Types/Types';
-import { Utils } from '../../Utils/Utils';
-import { BrickWall } from '../BrickWall/BrickWall';
-import { ConcreteWall } from '../ConcreteWall/ConcreteWall';
-import { concreteWallRecipe } from '../ConcreteWallTextures/ConcreteWallTextures';
-import { Eagle } from '../Eagle/Eagle';
-import { Game } from '../Game/Game';
-import { Wall } from '../Wall/Wall';
+import { brickWallRecipe } from "../../Textures/BrickWall/BrickWallTexture";
+import type { StaticDrawable } from "../../Types/Types";
+import { Utils } from "../../Utils/Utils";
+import { BrickWall } from "../BrickWall/BrickWall";
+import { ConcreteWall } from "../ConcreteWall/ConcreteWall";
+import { concreteWallRecipe } from "../ConcreteWallTextures/ConcreteWallTextures";
+import { Eagle } from "../Eagle/Eagle";
+import { Game } from "../Game/Game";
+import { Wall } from "../Wall/Wall";
 
 export class StaticElementsCanvas {
   canvas;
   canvasCtx;
   staticObjects: StaticDrawable[];
   isEagleDestroyed = false;
+  private game: Game;
 
-  constructor(public width: number, public height: number, private game: Game) {
-    this.canvas = document.createElement('canvas');
+  constructor(width: number, height: number, game: Game) {
+    this.canvas = document.createElement("canvas");
     this.canvas.width = width;
     this.canvas.height = height;
-    this.canvasCtx = this.canvas.getContext('2d');
-    this.staticObjects = this.game.staticObjects;
+    this.game = game;
+    this.canvasCtx = this.canvas.getContext("2d");
+    this.staticObjects = game.staticObjects;
   }
 
   createStaticObjects() {
     const { eagle } = this.game.levelsRecipe[this.game.currentLevelNumber];
-    this.staticObjects.push(new Eagle(eagle.xPos, eagle.yPos, eagle.size, this.game.explosions));
-    for (let i = 0; i < this.game.levelsRecipe[this.game.currentLevelNumber].staticObjectsRecipe.length; i++) {
-      const { material, xPos, yPos, layoutType, eagleBorder } = this.game.levelsRecipe[this.game.currentLevelNumber].staticObjectsRecipe[i];
-      if (material === 'Brick') {
+    this.staticObjects.push(
+      new Eagle(eagle.xPos, eagle.yPos, eagle.size, this.game.explosions)
+    );
+    for (
+      let i = 0;
+      i <
+      this.game.levelsRecipe[this.game.currentLevelNumber].staticObjectsRecipe
+        .length;
+      i++
+    ) {
+      const { material, xPos, yPos, layoutType, eagleBorder } =
+        this.game.levelsRecipe[this.game.currentLevelNumber]
+          .staticObjectsRecipe[i];
+      if (material === "Brick") {
         this.staticObjects.push(
-          new BrickWall(xPos, yPos, brickWallRecipe.elementSize, brickWallRecipe, layoutType, brickWallRecipe.textureSize, eagleBorder),
+          new BrickWall(
+            xPos,
+            yPos,
+            brickWallRecipe.elementSize,
+            brickWallRecipe,
+            layoutType,
+            brickWallRecipe.textureSize,
+            eagleBorder
+          )
         );
       }
-      if (material === 'Concrete') {
+      if (material === "Concrete") {
         this.staticObjects.push(
-          new ConcreteWall(xPos, yPos, concreteWallRecipe.elementSize, concreteWallRecipe, layoutType, concreteWallRecipe.textureSize, eagleBorder),
+          new ConcreteWall(
+            xPos,
+            yPos,
+            concreteWallRecipe.elementSize,
+            concreteWallRecipe,
+            layoutType,
+            concreteWallRecipe.textureSize,
+            eagleBorder
+          )
         );
       }
     }
@@ -55,12 +83,25 @@ export class StaticElementsCanvas {
     this.canvasCtx?.clearRect(20, 4, 312, 312);
     if (this.canvasCtx) {
       for (let i = 0; i < this.staticObjects.length; i++) {
-        if (this.staticObjects[i].isDestroyed && this.staticObjects[i].id !== 'Eagle' && !this.staticObjects[i].getIsEagleBorder()) {
-          Utils.removeDestroyedElement(this.staticObjects, this.staticObjects[i].id);
-        } else if (this.staticObjects[i].isDestroyed && this.staticObjects[i].id === 'Eagle') {
+        if (
+          this.staticObjects[i].isDestroyed &&
+          this.staticObjects[i].id !== "Eagle" &&
+          !this.staticObjects[i].getIsEagleBorder()
+        ) {
+          Utils.removeDestroyedElement(
+            this.staticObjects,
+            this.staticObjects[i].id
+          );
+        } else if (
+          this.staticObjects[i].isDestroyed &&
+          this.staticObjects[i].id === "Eagle"
+        ) {
           this.isEagleDestroyed = true;
         }
-        this.staticObjects[i] && this.staticObjects[i].draw(this.canvasCtx);
+        //this.staticObjects[i] && this.staticObjects[i].draw(this.canvasCtx);
+        if (this.staticObjects[i]) {
+          this.staticObjects[i].draw(this.canvasCtx);
+        }
       }
     }
   }
@@ -91,7 +132,15 @@ export class StaticElementsCanvas {
         this.staticObjects.splice(
           index,
           1,
-          new ConcreteWall(xPos, yPos, concreteWallRecipe.elementSize, concreteWallRecipe, type, concreteWallRecipe.textureSize, true),
+          new ConcreteWall(
+            xPos,
+            yPos,
+            concreteWallRecipe.elementSize,
+            concreteWallRecipe,
+            type,
+            concreteWallRecipe.textureSize,
+            true
+          )
         );
       }
     });
@@ -107,11 +156,18 @@ export class StaticElementsCanvas {
         this.staticObjects.splice(
           index,
           1,
-          new BrickWall(xPos, yPos, brickWallRecipe.elementSize, brickWallRecipe, type, brickWallRecipe.textureSize, true),
+          new BrickWall(
+            xPos,
+            yPos,
+            brickWallRecipe.elementSize,
+            brickWallRecipe,
+            type,
+            brickWallRecipe.textureSize,
+            true
+          )
         );
       }
     });
     this.update();
   }
 }
-

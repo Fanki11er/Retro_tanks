@@ -1,8 +1,8 @@
-import { useContext } from 'react';
-import { GameContext } from '../../../Providers/GameProvider';
-import { StyledControlButton } from '../../Atoms/ControlButton/ControlButton.styles';
-import { StyledEllipse } from '../../Atoms/Elipse/Elipse';
-import { FireControlPanelWrapper } from './FireControlPanel.styles';
+import { useContext } from "react";
+import { StyledControlButton } from "../../Atoms/ControlButton/ControlButton.styles";
+import { StyledEllipse } from "../../Atoms/Elipse/Elipse";
+import { FireControlPanelWrapper } from "./FireControlPanel.styles";
+import { GameContext } from "../../../contexts/GameContext";
 
 const FireControlPanel = () => {
   const { handleShot } = useContext(GameContext);
@@ -16,4 +16,3 @@ const FireControlPanel = () => {
 };
 
 export default FireControlPanel;
-

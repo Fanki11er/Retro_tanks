@@ -1,11 +1,23 @@
-import { Animation } from '../Animation/Animation';
+import { Animation } from "../Animation/Animation";
 
 export class AnimationFrames extends Animation {
-  constructor(public animationFrames: HTMLImageElement[], public textureSize: number) {
+  public animationFrames: HTMLImageElement[];
+  public textureSize: number;
+  constructor(animationFrames: HTMLImageElement[], textureSize: number) {
     super();
+    this.animationFrames = animationFrames;
+    this.textureSize = textureSize;
   }
-  animateFrames(delay: number, ctx: CanvasRenderingContext2D, xPos: number, yPos: number, termOfStop: boolean, repeats: number) {
-    let image = this.animationFrames[this.index];
+
+  animateFrames(
+    delay: number,
+    ctx: CanvasRenderingContext2D,
+    xPos: number,
+    yPos: number,
+    termOfStop: boolean
+    /*repeats: number*/
+  ) {
+    const image = this.animationFrames[this.index];
     if (termOfStop || this.repeats > 0) {
       ctx.drawImage(image, xPos, yPos, this.textureSize, this.textureSize);
     } else {
@@ -22,4 +34,3 @@ export class AnimationFrames extends Animation {
     }
   }
 }
-

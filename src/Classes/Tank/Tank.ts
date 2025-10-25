@@ -1,15 +1,22 @@
-import { Coordinates, DestroyedBy, Owner, Size, TankTypes, TankTypesTextures } from '../../Types/Types';
-import { Utils } from '../../Utils/Utils';
-import { AnimationFrames } from '../AnimationFrame/AnimationFrame';
-import { Controls } from '../Controls/Controls';
-import { ElementCollisionZone } from '../ElementCollisionZone/ElementCollisionZone';
-import { Game } from '../Game/Game';
-import indestructibleTextures from '../IndestructibleTextures/IndestructibleTextures';
-import spawnPointTextures from '../SpawnPointTextures/SpawnPointTextures';
-import { TankMoveAnimation } from '../TankMoveAnimation/TankMoveAnimation';
-import { v4 as uuidv4 } from 'uuid';
-import { ExplosionAnimationFrames } from '../ExplosionAnimationFrames/ExplosionAnimationFrames';
-import { largeExplosionTextures } from '../../Textures/ExplosionTextures/ExplosionTextures';
+import { Coordinates } from "../../Types/Types";
+import type {
+  DestroyedBy,
+  Owner,
+  Size,
+  TankTypes,
+  TankTypesTextures,
+} from "../../Types/Types";
+import { Utils } from "../../Utils/Utils";
+import { AnimationFrames } from "../AnimationFrame/AnimationFrame";
+import { Controls } from "../Controls/Controls";
+import { ElementCollisionZone } from "../ElementCollisionZone/ElementCollisionZone";
+import { Game } from "../Game/Game";
+import indestructibleTextures from "../IndestructibleTextures/IndestructibleTextures";
+import spawnPointTextures from "../SpawnPointTextures/SpawnPointTextures";
+import { TankMoveAnimation } from "../TankMoveAnimation/TankMoveAnimation";
+import { v4 as uuidv4 } from "uuid";
+import { ExplosionAnimationFrames } from "../ExplosionAnimationFrames/ExplosionAnimationFrames";
+import { largeExplosionTextures } from "../../Textures/ExplosionTextures/ExplosionTextures";
 //import { TankSensor } from '../TankSensor/TankSensor';
 
 export abstract class Tank {
@@ -28,16 +35,22 @@ export abstract class Tank {
   protected moveAnimation;
   protected tankType: TankTypes;
   protected isDestroyed: DestroyedBy | null = null;
+  public xPos: number;
+  public yPos: number;
+  protected width: number;
+  protected height: number;
+  protected textures: TankTypesTextures;
+  protected game: Game;
   //protected tankSensor: TankSensor;
 
   constructor(
-    public xPos: number,
-    public yPos: number,
-    protected width: number,
-    protected height: number,
+    xPos: number,
+    yPos: number,
+    width: number,
+    height: number,
     textures: TankTypesTextures,
     tankType: TankTypes,
-    protected game: Game,
+    game: Game
   ) {
     this.id = uuidv4();
     this.controls = new Controls();
@@ -46,19 +59,46 @@ export abstract class Tank {
     this.isLoading = false;
     this.isSpawning = true;
     this.tankType = tankType;
-    this.spawnAnimationFrames = new AnimationFrames(spawnPointTextures.animationTexture, spawnPointTextures.textureSize);
-    this.indestructibleAnimationFrames = new AnimationFrames(indestructibleTextures.animationTexture, indestructibleTextures.textureSize);
+    this.spawnAnimationFrames = new AnimationFrames(
+      spawnPointTextures.animationTexture,
+      spawnPointTextures.textureSize
+    );
+    this.indestructibleAnimationFrames = new AnimationFrames(
+      indestructibleTextures.animationTexture,
+      indestructibleTextures.textureSize
+    );
     this.moveAnimation = new TankMoveAnimation(textures[this.tankType]);
+    this.xPos = xPos;
+    this.yPos = yPos;
+    this.width = width;
+    this.height = height;
+    this.textures = textures;
+    this.tankType = tankType;
+    this.game = game;
     //this.tankSensor = new TankSensor(this, this.game);
   }
 
   public draw(context: CanvasRenderingContext2D) {
     if (this.isSpawning) {
-      this.spawnAnimationFrames.animateFrames(20, context, this.xPos, this.yPos, this.isSpawning, 0);
+      this.spawnAnimationFrames.animateFrames(
+        20,
+        context,
+        this.xPos,
+        this.yPos,
+        this.isSpawning
+        /*0*/
+      );
     } else if (!this.isSpawning && this.isIndestructible) {
       this.update();
       context.drawImage(this.image, this.xPos, this.yPos, 20, 20);
-      this.indestructibleAnimationFrames.animateFrames(15, context, this.xPos - 2, this.yPos - 2, this.isIndestructible, 0);
+      this.indestructibleAnimationFrames.animateFrames(
+        15,
+        context,
+        this.xPos - 2,
+        this.yPos - 2,
+        this.isIndestructible
+        /*0*/
+      );
       //this.tankSensor.draw(context);
     } else {
       this.update();
@@ -74,24 +114,38 @@ export abstract class Tank {
   }
 
   protected setPositionOfBullet(bulletWidth: number) {
-    if (this.controls.direction === 'Forwards') {
+    if (this.controls.direction === "Forwards") {
       return new Coordinates(this.xPos + this.width / 2 - 1, this.yPos);
     }
-    if (this.controls.direction === 'Backwards') {
-      return new Coordinates(this.xPos + this.width / 2 - 1, this.yPos + this.height - bulletWidth);
+    if (this.controls.direction === "Backwards") {
+      return new Coordinates(
+        this.xPos + this.width / 2 - 1,
+        this.yPos + this.height - bulletWidth
+      );
     }
-    if (this.controls.direction === 'Left') {
+    if (this.controls.direction === "Left") {
       return new Coordinates(this.xPos, this.yPos + this.height / 2 - 1);
     }
-    if (this.controls.direction === 'Right') {
-      return new Coordinates(this.xPos + this.width - bulletWidth, this.yPos + this.height / 2 - 1);
+    if (this.controls.direction === "Right") {
+      return new Coordinates(
+        this.xPos + this.width - bulletWidth,
+        this.yPos + this.height / 2 - 1
+      );
     }
     return new Coordinates(-20, -20);
   }
 
   protected handleCollisionsWithBorders() {
     this.isBlockedBy = false;
-    this.isBlockedBy = Utils.checkForCollisionWithBorders(this.controls.direction, this.xPos, this.yPos, this.width, this.height, 372, 320);
+    this.isBlockedBy = Utils.checkForCollisionWithBorders(
+      this.controls.direction,
+      this.xPos,
+      this.yPos,
+      this.width,
+      this.height,
+      372,
+      320
+    );
   }
 
   protected handleCollisionsWithStaticObjects() {
@@ -102,14 +156,18 @@ export abstract class Tank {
         this.yPos,
         this.width,
         this.height,
-        this.game.staticObjects,
+        this.game.staticObjects
       );
       if (collisionWith.length) {
         for (let i = 0; i < collisionWith.length; i++) {
           if (!this.isBlockedBy) {
             this.isBlockedBy = !!collisionWith[i].getPrecisionCollisionPlace(
-              new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height),
-              this.controls.direction,
+              new ElementCollisionZone(
+                { x: this.xPos, y: this.yPos },
+                this.width,
+                this.height
+              ),
+              this.controls.direction
             );
           }
         }
@@ -125,28 +183,28 @@ export abstract class Tank {
 
   protected handleImageChange() {
     const image = this.selectImage(this.moveAnimationSpeed);
-    if (this.controls.direction === 'Forwards') {
+    if (this.controls.direction === "Forwards") {
       this.setImage(image);
       if (!this.isBlockedBy && this.controls.move) {
         this.yPos -= this.speed;
       }
       return;
     }
-    if (this.controls.direction === 'Backwards') {
+    if (this.controls.direction === "Backwards") {
       this.setImage(image);
       if (!this.isBlockedBy && this.controls.move) {
         this.yPos += this.speed;
       }
       return;
     }
-    if (this.controls.direction === 'Left') {
+    if (this.controls.direction === "Left") {
       this.setImage(image);
       if (!this.isBlockedBy && this.controls.move) {
         this.xPos -= this.speed;
       }
       return;
     }
-    if (this.controls.direction === 'Right') {
+    if (this.controls.direction === "Right") {
       this.setImage(image);
       if (!this.isBlockedBy && this.controls.move) {
         this.xPos += this.speed;
@@ -160,8 +218,12 @@ export abstract class Tank {
       if (tanks[i].id === this.id) {
         continue;
       }
-      const collisionZone = new ElementCollisionZone({ x: tanks[i].xPos, y: tanks[i].yPos }, tanks[i].width, tanks[i].height);
-      if (this.controls.direction === 'Forwards') {
+      const collisionZone = new ElementCollisionZone(
+        { x: tanks[i].xPos, y: tanks[i].yPos },
+        tanks[i].width,
+        tanks[i].height
+      );
+      if (this.controls.direction === "Forwards") {
         if (
           this.xPos + 0.5 < collisionZone.B.x &&
           this.xPos + this.width - 0.5 > collisionZone.A.x &&
@@ -171,7 +233,7 @@ export abstract class Tank {
           return true;
         }
       }
-      if (this.controls.direction === 'Backwards') {
+      if (this.controls.direction === "Backwards") {
         if (
           this.xPos + 0.5 < collisionZone.B.x &&
           this.xPos + this.width - 0.5 > collisionZone.A.x &&
@@ -182,7 +244,7 @@ export abstract class Tank {
         }
       }
 
-      if (this.controls.direction === 'Left') {
+      if (this.controls.direction === "Left") {
         if (
           this.yPos + 0.5 < collisionZone.D.y &&
           this.yPos + this.height - 0.5 > collisionZone.A.y &&
@@ -192,7 +254,7 @@ export abstract class Tank {
           return true;
         }
       }
-      if (this.controls.direction === 'Right') {
+      if (this.controls.direction === "Right") {
         if (
           this.yPos + 0.5 < collisionZone.D.y &&
           this.yPos + this.height - 0.5 > collisionZone.A.y &&
@@ -207,11 +269,23 @@ export abstract class Tank {
   }
 
   protected handleExplosion() {
-    this.game.explosions.push(new ExplosionAnimationFrames(largeExplosionTextures.animationTexture, 30, 20, this.xPos - 4, this.yPos - 4));
+    this.game.explosions.push(
+      new ExplosionAnimationFrames(
+        largeExplosionTextures.animationTexture,
+        30,
+        20,
+        this.xPos - 4,
+        this.yPos - 4
+      )
+    );
   }
 
   getCollisionZone() {
-    return new ElementCollisionZone({ x: this.xPos, y: this.yPos }, this.width, this.height);
+    return new ElementCollisionZone(
+      { x: this.xPos, y: this.yPos },
+      this.width,
+      this.height
+    );
   }
 
   getIsDestroyed() {
@@ -246,4 +320,3 @@ export abstract class Tank {
   protected abstract spawn(time: number): void;
   protected abstract selectImage(animationSpeed: number): HTMLImageElement;
 }
-

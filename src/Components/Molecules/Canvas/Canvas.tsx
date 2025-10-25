@@ -1,6 +1,6 @@
-import { useContext, useEffect, useRef } from 'react';
-import { StyledCanvas } from './Canvas.styles';
-import { GameContext } from '../../../Providers/GameProvider';
+import { useContext, useEffect, useRef } from "react";
+import { StyledCanvas } from "./Canvas.styles";
+import { GameContext } from "../../../contexts/GameContext";
 
 const Canvas = () => {
   const { game } = useContext(GameContext);
@@ -9,9 +9,11 @@ const Canvas = () => {
 
   useEffect(() => {
     if (canvasRef.current) {
-      const renderCtx = canvasRef.current.getContext('2d');
+      const renderCtx = canvasRef.current.getContext("2d");
       const animate = () => {
-        renderCtx && game.renderGame(renderCtx);
+        if (renderCtx) {
+          game.renderGame(renderCtx);
+        }
 
         requestAnimationFrame(animate);
       };
@@ -24,4 +26,3 @@ const Canvas = () => {
 };
 
 export default Canvas;
-
