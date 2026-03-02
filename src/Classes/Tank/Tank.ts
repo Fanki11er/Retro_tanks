@@ -23,7 +23,7 @@ export abstract class Tank {
   protected id;
   controls;
   protected speed = 0.4;
-  protected reloadTime = 0.5;
+  protected reloadTime = 0.2;
   protected moveAnimationSpeed = 15;
   protected image;
   protected isBlockedBy;
@@ -50,7 +50,7 @@ export abstract class Tank {
     height: number,
     textures: TankTypesTextures,
     tankType: TankTypes,
-    game: Game
+    game: Game,
   ) {
     this.id = uuidv4();
     this.controls = new Controls();
@@ -61,11 +61,11 @@ export abstract class Tank {
     this.tankType = tankType;
     this.spawnAnimationFrames = new AnimationFrames(
       spawnPointTextures.animationTexture,
-      spawnPointTextures.textureSize
+      spawnPointTextures.textureSize,
     );
     this.indestructibleAnimationFrames = new AnimationFrames(
       indestructibleTextures.animationTexture,
-      indestructibleTextures.textureSize
+      indestructibleTextures.textureSize,
     );
     this.moveAnimation = new TankMoveAnimation(textures[this.tankType]);
     this.xPos = xPos;
@@ -85,7 +85,7 @@ export abstract class Tank {
         context,
         this.xPos,
         this.yPos,
-        this.isSpawning
+        this.isSpawning,
         /*0*/
       );
     } else if (!this.isSpawning && this.isIndestructible) {
@@ -96,7 +96,7 @@ export abstract class Tank {
         context,
         this.xPos - 2,
         this.yPos - 2,
-        this.isIndestructible
+        this.isIndestructible,
         /*0*/
       );
       //this.tankSensor.draw(context);
@@ -120,7 +120,7 @@ export abstract class Tank {
     if (this.controls.direction === "Backwards") {
       return new Coordinates(
         this.xPos + this.width / 2 - 1,
-        this.yPos + this.height - bulletWidth
+        this.yPos + this.height - bulletWidth,
       );
     }
     if (this.controls.direction === "Left") {
@@ -129,7 +129,7 @@ export abstract class Tank {
     if (this.controls.direction === "Right") {
       return new Coordinates(
         this.xPos + this.width - bulletWidth,
-        this.yPos + this.height / 2 - 1
+        this.yPos + this.height / 2 - 1,
       );
     }
     return new Coordinates(-20, -20);
@@ -144,7 +144,7 @@ export abstract class Tank {
       this.width,
       this.height,
       372,
-      320
+      320,
     );
   }
 
@@ -156,7 +156,7 @@ export abstract class Tank {
         this.yPos,
         this.width,
         this.height,
-        this.game.staticObjects
+        this.game.staticObjects,
       );
       if (collisionWith.length) {
         for (let i = 0; i < collisionWith.length; i++) {
@@ -165,9 +165,9 @@ export abstract class Tank {
               new ElementCollisionZone(
                 { x: this.xPos, y: this.yPos },
                 this.width,
-                this.height
+                this.height,
               ),
-              this.controls.direction
+              this.controls.direction,
             );
           }
         }
@@ -187,28 +187,28 @@ export abstract class Tank {
       this.setImage(image);
       if (!this.isBlockedBy && this.controls.move) {
         this.yPos -= this.speed;
-      }
+      } else this.yPos += 0;
       return;
     }
     if (this.controls.direction === "Backwards") {
       this.setImage(image);
       if (!this.isBlockedBy && this.controls.move) {
         this.yPos += this.speed;
-      }
+      } else this.yPos += 0;
       return;
     }
     if (this.controls.direction === "Left") {
       this.setImage(image);
       if (!this.isBlockedBy && this.controls.move) {
         this.xPos -= this.speed;
-      }
+      } else this.xPos -= 0;
       return;
     }
     if (this.controls.direction === "Right") {
       this.setImage(image);
       if (!this.isBlockedBy && this.controls.move) {
         this.xPos += this.speed;
-      }
+      } else this.xPos += 0;
       return;
     }
   }
@@ -221,7 +221,7 @@ export abstract class Tank {
       const collisionZone = new ElementCollisionZone(
         { x: tanks[i].xPos, y: tanks[i].yPos },
         tanks[i].width,
-        tanks[i].height
+        tanks[i].height,
       );
       if (this.controls.direction === "Forwards") {
         if (
@@ -275,8 +275,8 @@ export abstract class Tank {
         30,
         20,
         this.xPos - 4,
-        this.yPos - 4
-      )
+        this.yPos - 4,
+      ),
     );
   }
 
@@ -284,7 +284,7 @@ export abstract class Tank {
     return new ElementCollisionZone(
       { x: this.xPos, y: this.yPos },
       this.width,
-      this.height
+      this.height,
     );
   }
 

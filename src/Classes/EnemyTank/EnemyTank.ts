@@ -10,6 +10,8 @@ export class EnemyTank extends Tank {
   brain: Brain;
   private isSpecial: boolean;
   private timeBlockade: boolean;
+  private reloadTimeout: NodeJS.Timeout | null = null;
+
   constructor(
     xPos: number,
     yPos: number,
@@ -19,7 +21,7 @@ export class EnemyTank extends Tank {
     tankType: TankTypes,
     isSpecial: boolean,
     timeBlockade: boolean,
-    game: Game
+    game: Game,
   ) {
     super(xPos, yPos, width, height, textures, tankType, game);
     this.controls.direction = "Backwards";
@@ -32,11 +34,11 @@ export class EnemyTank extends Tank {
 
   public update() {
     if (!this.timeBlockade) {
-      this.brain.update();
-      this.handleCollisionsWithOtherTanks(
-        this.game.players.getActivePlayersTanks()
-      );
       this.handleImageChange();
+      this.brain.update();
+      // this.handleCollisionsWithOtherTanks(
+      //   this.game.players.getActivePlayersTanks(),
+      // );
     }
   }
 
@@ -46,16 +48,19 @@ export class EnemyTank extends Tank {
     setTimeout(() => {
       this.isSpawning = false;
       this.isIndestructible = false;
-      this.controls.move = true; //!Temporary
-      this.fire(); //! Temporary
+      this.controls.move = true;
+      this.reloadTimeout = setTimeout(() => {
+        this.fire();
+      }, Math.random() * 1000);
     }, time * 1000);
   }
+
   protected selectImage(animationSpeed: number) {
     return this.moveAnimation.setImageSpecialTank(
       this.controls.direction,
       this.controls.move,
       animationSpeed,
-      this.isSpecial
+      this.isSpecial,
     );
   }
 
@@ -72,14 +77,18 @@ export class EnemyTank extends Tank {
           bulletTextures,
           "",
           this.game,
-          "EnemyBullet"
-        )
+          "EnemyBullet",
+        ),
       );
       this.isLoading = true;
       //this.isLoading &&
-      setTimeout(() => {
-        this.isLoading = false;
-      }, this.reloadTime * 1000);
+      this.reloadTimeout = setTimeout(
+        () => {
+          this.isLoading = false;
+          this.fire();
+        },
+        this.reloadTime * Math.random() * 2000 + 1000,
+      );
     }
   }
 
@@ -98,13 +107,17 @@ export class EnemyTank extends Tank {
   }
 
   private handleDestruction() {
+    if (this.reloadTimeout) {
+      clearTimeout(this.reloadTimeout);
+      this.reloadTimeout = null;
+    }
     if (this.isSpecial) {
       this.game.generateFinding();
     }
     this.handleExplosion();
     if (this.isDestroyed?.destroyedBy) {
       this.game.values.push(
-        new Value(this.getValue(), this.xPos, this.yPos + 12, 1, 2.5)
+        new Value(this.getValue(), this.xPos, this.yPos + 12, 1, 2.5),
       );
       this.game.destroyedEnemyTanksList.push(this.isDestroyed);
     }
@@ -126,10 +139,16 @@ export class EnemyTank extends Tank {
       }
     }
   }
+
   setTankSpeed() {
     switch (this.tankType) {
       case "Fast": {
-        this.speed = 0.5;
+        this.speed = 0.4;
+        break;
+        //!! 0,5
+      }
+      default: {
+        this.speed = 0.2;
       }
     }
   }

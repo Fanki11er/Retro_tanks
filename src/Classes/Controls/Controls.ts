@@ -16,6 +16,14 @@ export class Controls {
     }
     this.move = false;
   }
+
+  public setStopTank() {
+    this.move = false;
+  }
+
+  public setMoveTank() {
+    this.move = true;
+  }
 }
 
 /*

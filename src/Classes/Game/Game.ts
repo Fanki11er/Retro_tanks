@@ -3,13 +3,14 @@ import { enemyTankTextures } from "../../Textures/EnemyTankTextures/EnemyTankTex
 import { smallExplosionTextures } from "../../Textures/ExplosionTextures/ExplosionTextures";
 import { findingsTextures } from "../../Textures/FindingsTextures/FindingsTextures";
 import { player1TankTextures } from "../../Textures/TanksTextures/TanksTextures";
-import type {
-  DestroyedBy,
-  FindingsTypes,
-  LevelRecipe,
-  Owner,
-  StaticDrawable,
-  TankTypes,
+import {
+  Coordinates,
+  type DestroyedBy,
+  type FindingsTypes,
+  type LevelRecipe,
+  type Owner,
+  type StaticDrawable,
+  type TankTypes,
 } from "../../Types/Types";
 import { Curtin } from "../Curtin/Curtin";
 import { EnemyTank } from "../EnemyTank/EnemyTank";
@@ -23,6 +24,7 @@ import { StaticElementsCanvas } from "../StaticElementsCanvas/StaticElementsCanv
 import { Value } from "../Value/Value";
 
 import { Bullet } from "../Bullet/Bullet";
+import { ElementCollisionZone } from "../ElementCollisionZone/ElementCollisionZone";
 export class Game {
   gameStatus;
   bullets: Bullet[] = [];
@@ -52,6 +54,8 @@ export class Game {
 
   learnIteration = 0;
   bestResult = 0;
+
+  drawEnemyTanksSensors = false;
   //!!!!!!!! Try to make renderer object which will be render things instead canvas
 
   //!! Get height and width from the constructor
@@ -91,6 +95,7 @@ export class Game {
     if (this.gameStatus === "Started" || this.gameStatus === "ShowingResults") {
       this.curtin.drawCurtin(renderCtx, 1, this.currentLevelNumber + 1);
     }
+
     if (this.checkForGameOver()) {
       this.gameStatus = "GameOver";
       this.gameOverAnimation.animate(renderCtx, 5);
@@ -132,7 +137,9 @@ export class Game {
   renderEnemyTanks(renderCtx: CanvasRenderingContext2D) {
     this.enemyTanks.forEach((enemyTank) => {
       enemyTank.draw(renderCtx);
-      enemyTank.brain.drawSensors(renderCtx);
+      if (this.drawEnemyTanksSensors) {
+        enemyTank.brain.drawSensors(renderCtx);
+      }
     });
   }
 
@@ -158,7 +165,7 @@ export class Game {
         this.handleAddPlayerScore(isTakenBy, value);
         this.handleProcessRewardFromFinding(
           isTakenBy,
-          this.findings[i].getType()
+          this.findings[i].getType(),
         );
         this.findings.splice(i, 1);
         i++;
@@ -173,18 +180,48 @@ export class Game {
 
   private handleEnemyTankSpawn() {
     setInterval(() => {
-      if (this.enemyTanksList.length && this.enemyTanks.length < 3) {
-        //!!!! 4
+      if (this.enemyTanksList.length && this.enemyTanks.length < 4) {
         this.addNewEnemyTank();
       }
     }, 5000);
   }
 
+  private checkSpawnPointIsBlocked(x: number, y: number) {
+    const spawnPointCollisionZone = new ElementCollisionZone(
+      new Coordinates(x, y),
+      22,
+      22,
+    );
+    const tanks = [...this.enemyTanks, ...this.players.getActivePlayersTanks()];
+
+    for (const tank of tanks) {
+      const tankCollisionZone = tank.getCollisionZone();
+
+      if (
+        spawnPointCollisionZone.A.x < tankCollisionZone.B.x &&
+        spawnPointCollisionZone.B.x > tankCollisionZone.A.x &&
+        spawnPointCollisionZone.A.y < tankCollisionZone.C.y &&
+        spawnPointCollisionZone.C.y > tankCollisionZone.A.y
+      ) {
+        return true; // Spawn point is blocked
+      }
+    }
+
+    return false; // Spawn point is not blocked
+  }
+
   private addNewEnemyTank() {
     const index = Math.floor(Math.random() * this.enemyTanksList.length);
-    const { x: xPos, y: yPos } = this.getSpawnCoordinates(
-      Math.floor(Math.random() * 3)
-    );
+
+    let xPos: number;
+    let yPos: number;
+
+    do {
+      const { x, y } = this.getSpawnCoordinates(Math.floor(Math.random() * 3));
+      xPos = x;
+      yPos = y;
+    } while (this.checkSpawnPointIsBlocked(xPos, yPos));
+
     this.enemyTanks.push(
       new EnemyTank(
         xPos,
@@ -195,11 +232,11 @@ export class Game {
         this.enemyTanksList[index],
         this.ShouldBeSpecial(this.enemyTanksList),
         this.timeBlockade,
-        this
-      )
+        this,
+      ),
     );
-    //!! Comment next line when enemy tanks are learning
-    //this.enemyTanksList.splice(index, 1);
+
+    this.enemyTanksList.splice(index, 1);
     this.handleGameInfoUpdate();
   }
 
@@ -232,7 +269,7 @@ export class Game {
     this.gameInfo.update(
       this.enemyTanksList.length,
       this.players,
-      this.currentLevelNumber + 1
+      this.currentLevelNumber + 1,
     );
   }
 
@@ -250,7 +287,7 @@ export class Game {
           player1TankTextures,
           "Small",
           owner,
-          this
+          this,
         );
       this.players[`${owner}`]?.modifyPlayerLivesLeft(-1);
       this.handleGameInfoUpdate();
@@ -290,8 +327,8 @@ export class Game {
             smallExplosionTextures.textureSize,
             20,
             xPos,
-            yPos
-          )
+            yPos,
+          ),
         );
         this.bullets.splice(i, 1);
         i--;
@@ -319,8 +356,8 @@ export class Game {
             xPos,
             yPos,
             findingsTextures.tankFindingTexture,
-            24
-          )
+            24,
+          ),
         );
         break;
       }
@@ -331,8 +368,8 @@ export class Game {
             xPos,
             yPos,
             findingsTextures.grenadeFindingTexture,
-            24
-          )
+            24,
+          ),
         );
         break;
       }
@@ -343,8 +380,8 @@ export class Game {
             xPos,
             yPos,
             findingsTextures.helmetFindingTexture,
-            24
-          )
+            24,
+          ),
         );
         break;
       }
@@ -355,8 +392,8 @@ export class Game {
             xPos,
             yPos,
             findingsTextures.stopwatchFindingTexture,
-            24
-          )
+            24,
+          ),
         );
         break;
       }
@@ -367,8 +404,8 @@ export class Game {
             xPos,
             yPos,
             findingsTextures.shovelFindingTexture,
-            24
-          )
+            24,
+          ),
         );
         break;
       }
@@ -379,8 +416,8 @@ export class Game {
             xPos,
             yPos,
             findingsTextures.starFindingTexture,
-            24
-          )
+            24,
+          ),
         );
         break;
       }
@@ -389,7 +426,7 @@ export class Game {
 
   private handleProcessRewardFromFinding(
     owner: Owner,
-    findingType: FindingsTypes
+    findingType: FindingsTypes,
   ) {
     switch (findingType) {
       case "Tank": {
@@ -478,44 +515,44 @@ export class Game {
     }
     return false;
   }
+  //!!!!!!!!!!!!!!!!!!!!!
+  // learnEnemyTanks() {
+  //   setInterval(() => {
+  //     this.saveBestBrain();
+  //     this.enemyTanks = [];
+  //     //this.staticObjectsCanvas?.resetStaticObjects();
+  //   }, 20000);
+  // }
 
-  learnEnemyTanks() {
-    setInterval(() => {
-      this.saveBestBrain();
-      this.enemyTanks = [];
-      //this.staticObjectsCanvas?.resetStaticObjects();
-    }, 20000);
-  }
+  // saveBestBrain() {
+  //   let score = 0;
+  //   score =
+  //     this.enemyTanks
+  //       .find(
+  //         (tank) =>
+  //           tank.brain.getBrainScore() ===
+  //           Math.max(
+  //             ...this.enemyTanks.map((tank) => tank.brain.getBrainScore()),
+  //           ),
+  //       )
+  //       ?.brain.saveBrain() || 0;
 
-  saveBestBrain() {
-    let score = 0;
-    score =
-      this.enemyTanks
-        .find(
-          (tank) =>
-            tank.brain.getBrainScore() ===
-            Math.max(
-              ...this.enemyTanks.map((tank) => tank.brain.getBrainScore())
-            )
-        )
-        ?.brain.saveBrain() || 0;
+  //   if (score > this.bestResult) {
+  //     this.bestResult += score;
+  //     this.learnIteration = 0;
+  //   } else {
+  //     this.learnIteration++;
+  //   }
 
-    if (score > this.bestResult) {
-      this.bestResult += score;
-      this.learnIteration = 0;
-    } else {
-      this.learnIteration++;
-    }
+  //   if (this.learnIteration > 3 && this.bestResult < 100) {
+  //     this.bestResult = 0;
+  //     this.learnIteration = 0;
+  //     localStorage.removeItem("BestBrain");
+  //   }
 
-    if (this.learnIteration >= 15 && this.bestResult < 3) {
-      this.bestResult = 0;
-      this.learnIteration = 0;
-      localStorage.removeItem("BestBrain");
-    }
-
-    console.log("Score: ", this.bestResult);
-    console.log("Iteration: ", this.learnIteration);
-  }
+  //   console.log("Score: ", this.bestResult);
+  //   console.log("Iteration: ", this.learnIteration);
+  // }
 
   resetGame() {
     this.bullets = [];

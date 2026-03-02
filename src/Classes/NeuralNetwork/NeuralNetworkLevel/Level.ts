@@ -13,6 +13,7 @@ export class NeuralNetworkLevel {
     for (let i = 0; i < inputCount; i++) {
       this.weights[i] = new Array(outputCount);
     }
+
     NeuralNetworkLevel.randomize(this);
   }
 
@@ -45,4 +46,3 @@ export class NeuralNetworkLevel {
     return level.outputsArray;
   }
 }
-
