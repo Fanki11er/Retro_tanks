@@ -42,7 +42,7 @@ export class Bullet {
     textures: BulletTextures,
     owner: Owner,
     game: Game,
-    bulletsType: "PlayerBullet" | "EnemyBullet"
+    bulletsType: "PlayerBullet" | "EnemyBullet",
   ) {
     this.xPos = xPos;
     this.yPos = yPos;
@@ -180,11 +180,11 @@ export class Bullet {
         new ElementCollisionZone(
           { x: this.xPos, y: this.yPos },
           this.width,
-          this.height
+          this.height,
         ),
         this.direction,
         this.collisionWith[0].getInnerCoordinates(),
-        this.collisionWith[0].getTextureSize()
+        this.collisionWith[0].getTextureSize(),
       );
 
       if (hitCoordinates) {
@@ -197,7 +197,7 @@ export class Bullet {
             0,
             2,
             22,
-            10
+            10,
           ).getCollisionZone();
           elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
         } else if (this.direction === "Backwards") {
@@ -206,7 +206,7 @@ export class Bullet {
             0,
             -2,
             22,
-            10
+            10,
           ).getCollisionZone();
           elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
         } else if (this.direction === "Left") {
@@ -215,7 +215,7 @@ export class Bullet {
             2,
             0,
             10,
-            22
+            22,
           ).getCollisionZone();
           elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
         } else if (this.direction === "Right") {
@@ -224,7 +224,7 @@ export class Bullet {
             -2,
             0,
             10,
-            22
+            22,
           ).getCollisionZone();
           elementsInExplosionRange = this.checkForExplosionRange(bulletHitZone);
         } else {
@@ -233,20 +233,20 @@ export class Bullet {
             0,
             0,
             6,
-            22
+            22,
           ).getCollisionZone();
         }
 
         for (let i = 0; i < elementsInExplosionRange.length; i++) {
           const collisionElementIndex = Utils.findHitElementIndex(
             elementsInExplosionRange[i].id,
-            this.game.staticObjects
+            this.game.staticObjects,
           );
           if (collisionElementIndex >= 0) {
             this.game.staticObjects[collisionElementIndex].processHit(
               this.ammunitionType,
               bulletHitZone,
-              this.yPos
+              this.yPos,
             );
           }
         }
@@ -266,7 +266,7 @@ export class Bullet {
         this.width,
         this.height,
         372,
-        320
+        320,
       );
     }
     if (!this.hit) {
@@ -276,7 +276,7 @@ export class Bullet {
         this.yPos,
         this.width,
         this.height,
-        this.game.staticObjects
+        this.game.staticObjects,
       );
     }
   }
@@ -321,7 +321,7 @@ export class Bullet {
     return new ElementCollisionZone(
       { x: this.xPos, y: this.yPos },
       this.width,
-      this.height
+      this.height,
     );
   }
 
@@ -334,9 +334,9 @@ export class Bullet {
       new ElementCollisionZone(
         { x: this.xPos, y: this.yPos },
         this.width,
-        this.height
+        this.height,
       ),
-      tanks
+      tanks,
       //this.game.players.getActivePlayersTanks()
     );
   }

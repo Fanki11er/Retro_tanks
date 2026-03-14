@@ -36,9 +36,6 @@ export class EnemyTank extends Tank {
     if (!this.timeBlockade) {
       this.handleImageChange();
       this.brain.update();
-      // this.handleCollisionsWithOtherTanks(
-      //   this.game.players.getActivePlayersTanks(),
-      // );
     }
   }
 
@@ -65,7 +62,7 @@ export class EnemyTank extends Tank {
   }
 
   fire() {
-    if (!this.isLoading && !this.isSpawning) {
+    if (!this.isLoading && !this.isSpawning && !this.timeBlockade) {
       const { x, y } = this.setPositionOfBullet(4);
       this.game.bullets.push(
         new Bullet(
@@ -81,7 +78,7 @@ export class EnemyTank extends Tank {
         ),
       );
       this.isLoading = true;
-      //this.isLoading &&
+
       this.reloadTimeout = setTimeout(
         () => {
           this.isLoading = false;
@@ -99,11 +96,16 @@ export class EnemyTank extends Tank {
     }
   }
 
-  setIsTimeBlocked(time: number) {
-    this.timeBlockade = true;
-    setTimeout(() => {
-      this.timeBlockade = false;
-    }, time * 1000);
+  setIsTimeBlocked(isBlockedByTime: boolean) {
+    this.timeBlockade = isBlockedByTime;
+
+    if (isBlockedByTime === false) {
+      this.fire();
+    }
+
+    if (isBlockedByTime && this.reloadTimeout) {
+      clearTimeout(this.reloadTimeout);
+    }
   }
 
   private handleDestruction() {

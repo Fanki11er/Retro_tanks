@@ -124,12 +124,12 @@ export abstract class Tank {
       );
     }
     if (this.controls.direction === "Left") {
-      return new Coordinates(this.xPos, this.yPos + this.height / 2 - 1);
+      return new Coordinates(this.xPos, this.yPos + this.height / 2 - 2);
     }
     if (this.controls.direction === "Right") {
       return new Coordinates(
         this.xPos + this.width - bulletWidth,
-        this.yPos + this.height / 2 - 1,
+        this.yPos + this.height / 2 - 2,
       );
     }
     return new Coordinates(-20, -20);
@@ -308,6 +308,10 @@ export abstract class Tank {
 
   setIsBlockedBy(isBlockedBy: boolean) {
     this.isBlockedBy = isBlockedBy;
+  }
+
+  getIsIndestructible() {
+    return this.isIndestructible;
   }
 
   getId() {

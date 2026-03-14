@@ -14,7 +14,7 @@ export class PlayerTank extends Tank {
     textures: TankTypesTextures,
     tankType: TankTypes,
     owner: Owner,
-    game: Game
+    game: Game,
   ) {
     super(xPos, yPos, width, height, textures, (tankType = "Small"), game);
     this.madeIndestructible(4);
@@ -27,7 +27,7 @@ export class PlayerTank extends Tank {
     this.handleCollisionsWithFindings();
     this.handleCollisionsWithOtherTanks(this.game.enemyTanks);
     this.handleCollisionsWithOtherTanks(
-      this.game.players.getActivePlayersTanks()
+      this.game.players.getActivePlayersTanks(),
     );
     this.handleCollisionsWithStaticObjects();
     this.handleImageChange();
@@ -52,7 +52,7 @@ export class PlayerTank extends Tank {
     return this.moveAnimation.setImage(
       this.controls.direction,
       this.controls.move,
-      animationSpeed
+      animationSpeed,
     );
   }
 
@@ -69,8 +69,8 @@ export class PlayerTank extends Tank {
           bulletTextures,
           this.owner,
           this.game,
-          "PlayerBullet"
-        )
+          "PlayerBullet",
+        ),
       );
       this.isLoading = true;
       //this.isLoading &&
@@ -94,8 +94,10 @@ export class PlayerTank extends Tank {
   }
 
   public processHit(/*hitBy: Owner*/): void {
-    this.handleExplosion();
-    this.handleDestruction();
+    if (!this.isIndestructible) {
+      this.handleExplosion();
+      this.handleDestruction();
+    }
   }
 
   updateTank() {

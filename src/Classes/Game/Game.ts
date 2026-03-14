@@ -25,6 +25,7 @@ import { Value } from "../Value/Value";
 
 import { Bullet } from "../Bullet/Bullet";
 import { ElementCollisionZone } from "../ElementCollisionZone/ElementCollisionZone";
+import { PlayerResults } from "../PlayerResults/PlayerResults";
 export class Game {
   gameStatus;
   bullets: Bullet[] = [];
@@ -32,6 +33,7 @@ export class Game {
   players: Players;
   staticObjectsCanvas: StaticElementsCanvas | null = null;
   curtin = new Curtin(372, 320);
+  playerResults = new PlayerResults(372, 320);
   gameOverAnimation = new GameOverAnimation(150, 320);
   currentLevelNumber: number = 0;
   gameInfo = new GameInfoCanvas(372, 320);
@@ -52,9 +54,6 @@ export class Game {
   ];
   timeBlockade = false;
 
-  learnIteration = 0;
-  bestResult = 0;
-
   drawEnemyTanksSensors = false;
   //!!!!!!!! Try to make renderer object which will be render things instead canvas
 
@@ -64,7 +63,8 @@ export class Game {
   constructor(players: 1 | 2, levels: LevelRecipe[]) {
     this.levelsRecipe = levels;
     this.players = new Players(players);
-    this.gameStatus = "Ready";
+    //this.gameStatus = "Ready";
+    this.gameStatus = "GameOver";
   }
 
   startGame() {
@@ -80,9 +80,7 @@ export class Game {
       this.addNewEnemyTank();
       this.handleEnemyTankSpawn();
     }, 1000);
-    //!!! Uncomment this line for enemy tanks learning
-    //this.learnEnemyTanks();
-    //!!
+
     this.gameStatus = "Started";
   }
 
@@ -97,26 +95,37 @@ export class Game {
     }
 
     if (this.checkForGameOver()) {
-      this.gameStatus = "GameOver";
-      this.gameOverAnimation.animate(renderCtx, 5);
+      const animationEnded = this.gameOverAnimation.animate(renderCtx, 5);
+      if (animationEnded && this.gameStatus !== "GameOver") {
+        this.gameStatus = "GameOver";
+        //this.resetGame();
+        //Show results screen
+        //Show game over screen
+      }
     }
 
-    this.handleBulletsHit();
+    if (this.gameStatus === "GameOver") {
+      this.playerResults.drawPlayerResults(
+        renderCtx,
+        0,
+        this.currentLevelNumber + 1,
+      );
+    } else {
+      this.handleBulletsHit();
 
-    this.gameInfo.draw(renderCtx);
-    this.staticObjectsCanvas?.draw(renderCtx);
+      this.gameInfo.draw(renderCtx);
+      this.staticObjectsCanvas?.draw(renderCtx);
 
-    //this.players.player1?.playerTank && this.players.player1.playerTank.draw(renderCtx);
+      if (this.players.player1?.playerTank) {
+        this.players.player1.playerTank.draw(renderCtx);
+      }
 
-    if (this.players.player1?.playerTank) {
-      this.players.player1.playerTank.draw(renderCtx);
+      this.renderEnemyTanks(renderCtx);
+      this.renderBullets(renderCtx);
+      this.renderExplosions(renderCtx);
+      this.renderValues(renderCtx);
+      this.renderFindings(renderCtx);
     }
-
-    this.renderEnemyTanks(renderCtx);
-    this.renderBullets(renderCtx);
-    this.renderExplosions(renderCtx);
-    this.renderValues(renderCtx);
-    this.renderFindings(renderCtx);
   }
 
   renderBullets(renderCtx: CanvasRenderingContext2D) {
@@ -203,11 +212,11 @@ export class Game {
         spawnPointCollisionZone.A.y < tankCollisionZone.C.y &&
         spawnPointCollisionZone.C.y > tankCollisionZone.A.y
       ) {
-        return true; // Spawn point is blocked
+        return true;
       }
     }
 
-    return false; // Spawn point is not blocked
+    return false;
   }
 
   private addNewEnemyTank() {
@@ -474,14 +483,20 @@ export class Game {
       this.players[`${owner}`]?.playerTank?.madeIndestructible(10);
     }
   }
+
+  private setAllEnemyTanksTimeBlockade(blockedByTime: boolean) {
+    this.enemyTanks.forEach((enemyTank) => {
+      enemyTank.setIsTimeBlocked(blockedByTime);
+    });
+  }
+
   private handleBlockAllEnemyTanks(time: number) {
     this.timeBlockade = true;
     setTimeout(() => {
       this.timeBlockade = false;
+      this.setAllEnemyTanksTimeBlockade(false);
     }, time * 1000);
-    this.enemyTanks.forEach((enemyTank) => {
-      enemyTank.setIsTimeBlocked(time);
-    });
+    this.setAllEnemyTanksTimeBlockade(true);
   }
 
   private handleArmorEagle(time: number) {

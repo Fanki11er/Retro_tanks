@@ -13,11 +13,11 @@ export class GameOverAnimation {
 
   animate(canvasCtx: CanvasRenderingContext2D, delay: number) {
     if (canvasCtx) {
-      canvasCtx.fillStyle = 'rgba(181, 49, 33, 1)';
+      canvasCtx.fillStyle = "rgba(181, 49, 33, 1)";
       canvasCtx.font = `bold 16px Arial`;
-      canvasCtx.globalCompositeOperation = 'overlay';
-      canvasCtx.fillText('GAME', this.xPos, this.yPos - this.offset, 50);
-      canvasCtx.fillText('OVER', this.xPos, this.secondYPos - this.offset, 50);
+      canvasCtx.globalCompositeOperation = "overlay";
+      canvasCtx.fillText("GAME", this.xPos, this.yPos - this.offset, 50);
+      canvasCtx.fillText("OVER", this.xPos, this.secondYPos - this.offset, 50);
       this.counter++;
       if (this.counter % delay === 0 && !this.animationEnded) {
         this.offset += 1;
@@ -26,6 +26,6 @@ export class GameOverAnimation {
         this.animationEnded = true;
       }
     }
+    return this.animationEnded;
   }
 }
-
