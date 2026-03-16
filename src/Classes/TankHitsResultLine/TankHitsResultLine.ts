@@ -1,5 +1,6 @@
 import type { PlayerResults } from "../PlayerResults/PlayerResults";
 import resultsArrowImage from "../../assets/images/Results/ResultsArrow.png";
+import type { TankTypes } from "../../Types/Types";
 
 const white = "rgba(255, 255, 255, 1)";
 
@@ -8,68 +9,62 @@ export class TankHitsResultLine {
   private pointsAnimationCounter = 0;
   private pointsAnimationEnded = false;
   private pointsAnimationDelay = 100;
-  private firstLineYPosition: number;
-  private lineHeight: number;
+  private lineYPosition: number;
+  private resultsLineNumber: number;
   private tankImage: HTMLImageElement;
   private playerResultsBoard: PlayerResults;
   private pointsPerTank: number;
   private pointsCounter = 0;
   private destroyedTanksCounter = 0;
   private resultsArrowImage: HTMLImageElement;
+  private tankType: TankTypes;
 
   constructor(
-    firstLineYPosition: number,
-    lineHeight: number,
+    lineYPosition: number,
+    tankType: TankTypes,
     pointsPerTank: number,
     tankImage: HTMLImageElement,
     playerResultsBoard: PlayerResults,
+    resultsLineNumber: number,
   ) {
-    this.firstLineYPosition = firstLineYPosition;
-    this.lineHeight = lineHeight;
+    this.lineYPosition = lineYPosition;
     this.pointsPerTank = pointsPerTank;
+    this.tankType = tankType;
+    this.resultsLineNumber = resultsLineNumber;
     this.playerResultsBoard = playerResultsBoard;
     this.tankImage = tankImage;
     this.resultsArrowImage = new Image();
     this.resultsArrowImage.src = resultsArrowImage;
   }
 
-  draw(canvasCtx: CanvasRenderingContext2D, lineNumber: number) {
-    this.animateTanksHitsResultLine(canvasCtx, lineNumber, this.tankImage);
+  draw(canvasCtx: CanvasRenderingContext2D, tanksDestroyed: number) {
+    this.animateTanksHitsResultLine(canvasCtx, this.tankImage);
     this.drawAnimatedPointsFromTanksHits(
       canvasCtx,
-      lineNumber,
-      1,
-      5,
+      this.resultsLineNumber,
+      tanksDestroyed, //!! get number of tanks destroyed from the game and pass it here
       this.pointsPerTank,
     );
-    this.drawAnimatedHitTanksNumber(canvasCtx, lineNumber, 1);
+    this.drawAnimatedHitTanksNumber(canvasCtx, this.resultsLineNumber);
   }
 
   private animateTanksHitsResultLine(
     canvasCtx: CanvasRenderingContext2D,
-    lineNumber: number,
     tankImage: HTMLImageElement,
   ) {
     canvasCtx.drawImage(
       this.resultsArrowImage,
       180,
-      this.firstLineYPosition + (lineNumber - 1) * this.lineHeight - 13,
+      this.lineYPosition - 13,
       12,
       12,
     );
 
-    canvasCtx.drawImage(
-      tankImage,
-      196,
-      this.firstLineYPosition + (lineNumber - 1) * this.lineHeight - 18,
-      22,
-      22,
-    );
+    canvasCtx.drawImage(tankImage, 196, this.lineYPosition - 18, 22, 22);
   }
 
   private drawAnimatedPointsFromTanksHits(
     canvasCtx: CanvasRenderingContext2D,
-    canvasLineNumber: number,
     pointsLineNumber: number,
     tanksDestroyed: number,
     pointsPerTank: number,
@@ -77,11 +72,26 @@ export class TankHitsResultLine {
     const currentAnimatedPointsLineNumber =
       this.playerResultsBoard.getCurrentAnimatedPointsLineNumber();
     const pointsPlaceholder = `  `;
+    let pointsTextOffset = 0;
 
     const fontSize = 12;
     canvasCtx.globalCompositeOperation = "overlay";
     canvasCtx.fillStyle = white;
     canvasCtx.font = `${fontSize}px ${this.font}`;
+
+    const pointsText =
+      currentAnimatedPointsLineNumber === pointsLineNumber ||
+      this.pointsAnimationEnded
+        ? `${this.pointsCounter} PTS`
+        : `${pointsPlaceholder} PTS`;
+    pointsTextOffset = canvasCtx.measureText(pointsText).width;
+
+    canvasCtx.fillText(
+      pointsText,
+      145 - pointsTextOffset,
+      this.lineYPosition,
+      100,
+    );
 
     if (
       currentAnimatedPointsLineNumber === pointsLineNumber &&
@@ -89,36 +99,24 @@ export class TankHitsResultLine {
     ) {
       this.pointsAnimationCounter += 1;
       if (this.pointsAnimationCounter % this.pointsAnimationDelay === 0) {
-        this.pointsCounter += pointsPerTank;
-        this.destroyedTanksCounter += 1;
         if (this.destroyedTanksCounter >= tanksDestroyed) {
           this.pointsAnimationEnded = true;
           this.playerResultsBoard.setCurrentAnimatedPointsLineNumber(
             currentAnimatedPointsLineNumber + 1,
           );
+          return;
         }
+        this.destroyedTanksCounter += 1;
+        this.pointsCounter += pointsPerTank;
       }
     }
-
-    const pointsText =
-      currentAnimatedPointsLineNumber === pointsLineNumber ||
-      this.pointsAnimationEnded
-        ? `${this.pointsCounter} PTS`
-        : `${pointsPlaceholder} PTS`;
-
-    canvasCtx.fillText(
-      pointsText,
-      65,
-      this.firstLineYPosition + (canvasLineNumber - 1) * this.lineHeight,
-      100,
-    );
   }
 
   private drawAnimatedHitTanksNumber(
     canvasCtx: CanvasRenderingContext2D,
-    canvasLineNumber: number,
     pointsLineNumber: number,
   ) {
+    let numberTextOffset = 0;
     const currentAnimatedPointsLineNumber =
       this.playerResultsBoard.getCurrentAnimatedPointsLineNumber();
     const numberPlaceholder = ` `;
@@ -134,11 +132,17 @@ export class TankHitsResultLine {
         ? `${this.destroyedTanksCounter}`
         : `${numberPlaceholder}`;
 
+    numberTextOffset = canvasCtx.measureText(numberText).width;
+
     canvasCtx.fillText(
       numberText,
-      165,
-      this.firstLineYPosition + (canvasLineNumber - 1) * this.lineHeight,
+      178 - numberTextOffset,
+      this.lineYPosition,
       100,
     );
+  }
+
+  getTankType() {
+    return this.tankType;
   }
 }

@@ -28,4 +28,8 @@ export class Player {
     }
     return false;
   }
+
+  getOwner() {
+    return this.owner;
+  }
 }

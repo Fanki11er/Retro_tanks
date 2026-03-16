@@ -5,6 +5,7 @@ import { Game } from "../Game/Game";
 import { Brain } from "../Brain/Brain";
 import { Value } from "../Value/Value";
 import { Bullet } from "../Bullet/Bullet";
+import { TANKS_SETTINGS } from "../../constants";
 
 export class EnemyTank extends Tank {
   brain: Brain;
@@ -92,6 +93,7 @@ export class EnemyTank extends Tank {
   public processHit(hitBy: Owner): void {
     if (!this.isIndestructible) {
       this.isDestroyed = { type: this.tankType, destroyedBy: hitBy };
+      this.game.addDestroyedEnemyTankValue(hitBy, this.tankType);
       this.handleDestruction();
     }
   }
@@ -128,13 +130,12 @@ export class EnemyTank extends Tank {
   }
 
   getValue() {
-    //!! Make standardized values (enum will be great)
     switch (this.tankType) {
       case "Small": {
-        return 100;
+        return TANKS_SETTINGS.Small.value;
       }
       case "Fast": {
-        return 200;
+        return TANKS_SETTINGS.Fast.value;
       }
       default: {
         return 0;
@@ -145,12 +146,12 @@ export class EnemyTank extends Tank {
   setTankSpeed() {
     switch (this.tankType) {
       case "Fast": {
-        this.speed = 0.4;
+        this.speed = TANKS_SETTINGS.Fast.speed;
         break;
         //!! 0,5
       }
       default: {
-        this.speed = 0.2;
+        this.speed = TANKS_SETTINGS.Small.speed;
       }
     }
   }

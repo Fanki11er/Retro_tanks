@@ -26,6 +26,7 @@ import { Value } from "../Value/Value";
 import { Bullet } from "../Bullet/Bullet";
 import { ElementCollisionZone } from "../ElementCollisionZone/ElementCollisionZone";
 import { PlayerResults } from "../PlayerResults/PlayerResults";
+import { TANKS_SETTINGS } from "../../constants";
 export class Game {
   gameStatus;
   bullets: Bullet[] = [];
@@ -33,7 +34,7 @@ export class Game {
   players: Players;
   staticObjectsCanvas: StaticElementsCanvas | null = null;
   curtin = new Curtin(372, 320);
-  playerResults = new PlayerResults(372, 320);
+  playerResultsScreen = new PlayerResults(372, 320, this);
   gameOverAnimation = new GameOverAnimation(150, 320);
   currentLevelNumber: number = 0;
   gameInfo = new GameInfoCanvas(372, 320);
@@ -53,7 +54,6 @@ export class Game {
     "Star",
   ];
   timeBlockade = false;
-
   drawEnemyTanksSensors = false;
   //!!!!!!!! Try to make renderer object which will be render things instead canvas
 
@@ -63,8 +63,8 @@ export class Game {
   constructor(players: 1 | 2, levels: LevelRecipe[]) {
     this.levelsRecipe = levels;
     this.players = new Players(players);
-    //this.gameStatus = "Ready";
-    this.gameStatus = "GameOver";
+    this.gameStatus = "Ready";
+    //this.gameStatus = "GameOver";
   }
 
   startGame() {
@@ -105,10 +105,11 @@ export class Game {
     }
 
     if (this.gameStatus === "GameOver") {
-      this.playerResults.drawPlayerResults(
+      this.playerResultsScreen.drawPlayerResults(
         renderCtx,
-        0,
         this.currentLevelNumber + 1,
+        this.players.player1?.getPlayerScore() || 0,
+        this.destroyedEnemyTanksList,
       );
     } else {
       this.handleBulletsHit();
@@ -529,6 +530,17 @@ export class Game {
       return true;
     }
     return false;
+  }
+
+  addDestroyedEnemyTankValue(destroyedBy: Owner, tankType: TankTypes) {
+    const value = TANKS_SETTINGS[tankType].value;
+    if (destroyedBy) {
+      this.players[destroyedBy]?.addPlayerScore(value);
+    }
+  }
+
+  getDestroyedEnemyTanksList() {
+    return this.destroyedEnemyTanksList;
   }
   //!!!!!!!!!!!!!!!!!!!!!
   // learnEnemyTanks() {

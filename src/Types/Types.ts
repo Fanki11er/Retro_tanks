@@ -1,19 +1,30 @@
-import { ChangeDirectionTextures } from '../Classes/ChangeDirectionTextures/ChangeDirectionTextures';
+import { ChangeDirectionTextures } from "../Classes/ChangeDirectionTextures/ChangeDirectionTextures";
 
-export type Direction = 'Forwards' | 'Left' | 'Right' | 'Backwards' | 'None';
-export type SensorDirection = 'forward' | 'left' | 'right' | 'backward';
+export type Direction = "Forwards" | "Left" | "Right" | "Backwards" | "None";
+export type SensorDirection = "forward" | "left" | "right" | "backward";
 
-export type BoardElementType = 'Full' | 'Horizontally' | 'Vertically';
+export type BoardElementType = "Full" | "Horizontally" | "Vertically";
 
-export type MaterialType = 'Brick' | 'Concrete' | 'Eagle';
+export type MaterialType = "Brick" | "Concrete" | "Eagle";
 
-export type TankTypes = 'Small' | 'Fast' | 'Medium';
+export type TankTypes = "Small" | "Fast" | "Power" | "Armor";
 
-export type Owner = 'player1' | 'player2' | '';
+export type Owner = "player1" | "player2" | "";
 
-export type FindingsTypes = 'Tank' | 'Grenade' | 'Helmet' | 'Stopwatch' | 'Shovel' | 'Star';
+export type FindingsTypes =
+  | "Tank"
+  | "Grenade"
+  | "Helmet"
+  | "Stopwatch"
+  | "Shovel"
+  | "Star";
 
-export type SensorReding = 'forwardReading' | 'leftReading' | 'rightReading' | 'backwardReading' | 'heightReading';
+export type SensorReding =
+  | "forwardReading"
+  | "leftReading"
+  | "rightReading"
+  | "backwardReading"
+  | "heightReading";
 export class Coordinates {
   x;
   y;
@@ -48,14 +59,21 @@ export interface StaticDrawable {
   id: string;
   changed: boolean;
   isDestroyed: boolean;
-  processHit: (ammunitionType: AmmunitionType, collisionZone: CollisionZone, yPos: number) => string;
-  getPrecisionCollisionPlace: (collisionZone: CollisionZone, direction: Direction) => WallCoordinates;
+  processHit: (
+    ammunitionType: AmmunitionType,
+    collisionZone: CollisionZone,
+    yPos: number,
+  ) => string;
+  getPrecisionCollisionPlace: (
+    collisionZone: CollisionZone,
+    direction: Direction,
+  ) => WallCoordinates;
   getIsEagleBorder: () => boolean;
   getMaterialType: () => MaterialType;
   getCoordinates: () => Coordinates;
 }
 
-export type AmmunitionType = 'Standard' | 'Heavy';
+export type AmmunitionType = "Standard" | "Heavy";
 export type WallCoordinates = Coordinates | null;
 
 export type WallRecipe = {
@@ -86,7 +104,7 @@ export type EagleRecipe = {
 
 export type TankTypesTextures = {
   Small: ChangeDirectionTextures;
-  Medium: ChangeDirectionTextures;
+  Power: ChangeDirectionTextures;
   Fast: ChangeDirectionTextures;
+  Armor: ChangeDirectionTextures;
 };
-

@@ -1,17 +1,19 @@
 import smallEnemyTankImage from "../../assets/images/Tanks/EnemyTanks/Enemy_small_tank_1_forward.png";
+import fastEnemyTankImage from "../../assets/images/Tanks/EnemyTanks/Enemy_fast_tank_1_forward.png";
+import { TANKS_SETTINGS } from "../../constants";
 import { TankHitsResultLine } from "../TankHitsResultLine/TankHitsResultLine";
+import type { Game } from "../Game/Game";
+import type { DestroyedBy, Owner } from "../../Types/Types";
 
 const orange = "rgba(255, 96, 2, 1)";
 const yellow = "rgba(255, 255, 111, 1)";
 const white = "rgba(255, 255, 255, 1)";
 
-const smallEnemyTankImag = new Image();
-smallEnemyTankImag.src = smallEnemyTankImage;
-smallEnemyTankImag.width = 22;
-smallEnemyTankImag.height = 22;
 export class PlayerResults {
   currentAnimatedPointsLineNumber = 1;
   animationEnded = false;
+  private nextStepCounter = 0;
+  private nextStepDelay = 1000;
   //offset = 0;
   //isClosed = true;
   //isBlocked = true;
@@ -20,18 +22,13 @@ export class PlayerResults {
   private font = `"Press Start 2P", system-ui`;
   public width: number;
   public height: number;
-  private tankHitsResultLines: TankHitsResultLine[] = [
-    new TankHitsResultLine(
-      this.firstLineYPosition,
-      this.lineHeight,
-      100,
-      smallEnemyTankImag,
-      this,
-    ),
-  ];
-  constructor(width: number, height: number) {
+  private tankHitsResultLines: TankHitsResultLine[] = [];
+  private game: Game;
+  constructor(width: number, height: number, game: Game) {
     this.width = width;
     this.height = height;
+    this.game = game;
+    this.generateTankHitsResultLines(5);
   }
 
   getCurrentAnimatedPointsLineNumber() {
@@ -42,15 +39,22 @@ export class PlayerResults {
     this.currentAnimatedPointsLineNumber = lineNumber;
   }
 
+  private getTotalDestroyedTanksCount(
+    destroyedTanks: DestroyedBy[],
+    player: Owner,
+  ) {
+    return destroyedTanks.filter((tank) => tank.destroyedBy === player).length;
+  }
+
   drawPlayerResults(
     canvasCtx: CanvasRenderingContext2D,
-    delay: number,
     stage: number,
+    playerScore: number,
+    destroyedTanks: DestroyedBy[],
   ) {
     if (canvasCtx) {
       canvasCtx.clearRect(0, 0, this.width, this.height);
       canvasCtx.fillStyle = "rgba(0, 0, 0, 1)";
-      //canvasCtx.fillRect(0, 0, this.width, this.height / 2 - this.offset);
 
       this.drawHighScoreText(canvasCtx, 1);
 
@@ -58,18 +62,15 @@ export class PlayerResults {
       this.drawHighScoreResultNumber(canvasCtx, 20000, 1);
       this.drawStageNumber(canvasCtx, stage, 2);
       this.drawFirstPlayerColumn(canvasCtx, 3);
-      this.drawFirstPlayerResult(canvasCtx, 3500, 4);
-      this.drawPlayerTanksHits(canvasCtx, 5);
-
-      //   if (!this.isBlocked && this.isClosed) {
-      //     this.openCurtin(delay);
-      //   }
-      //   if (!this.isBlocked && !this.isClosed) {
-      //     this.closeCurtin(delay);
-      //   }
-      //   if (this.isClosed && this.isBlocked) {
-      //     this.drawStageText(canvasCtx, stage);
-      //   }
+      this.drawFirstPlayerResult(canvasCtx, playerScore, 4); //!! Total points
+      this.drawPlayerTanksHits(canvasCtx);
+      this.drawHorizontalLine(canvasCtx, 270);
+      this.drawTotalDestroyedTanks(
+        canvasCtx,
+        this.getTotalDestroyedTanksCount(destroyedTanks, "player1"),
+        this.currentAnimatedPointsLineNumber,
+        285,
+      );
     }
   }
 
@@ -161,55 +162,126 @@ export class PlayerResults {
     );
   }
 
-  private drawPlayerTanksHits(
-    canvasCtx: CanvasRenderingContext2D,
-    startLineNumber: number,
-  ) {
+  private drawPlayerTanksHits(canvasCtx: CanvasRenderingContext2D) {
     this.tankHitsResultLines.forEach((line) => {
-      line.draw(canvasCtx, startLineNumber);
+      const tankType = line.getTankType();
+      const destroyedTanks = this.game.getDestroyedEnemyTanksList();
+      const destroyedTanksOfType = destroyedTanks.filter(
+        (tank) => tank.type === tankType,
+      ).length;
+
+      line.draw(canvasCtx, destroyedTanksOfType);
     });
-    // this.animateTanksHitsResultLine(
-    //   canvasCtx,
-    //   startLineNumber,
-    //   500,
-    //   smallEnemyTankImag,
-    // );
   }
 
-  //   private openCurtin(delay: number) {
-  //     this.counter += 1;
-  //     if (this.counter % delay === 0) {
-  //       this.offset += 2;
-  //     }
-  //     if (this.offset >= this.height / 2) {
-  //       this.isBlocked = true;
-  //       this.isClosed = false;
-  //     }
-  //   }
+  private generateTankHitsResultLines(startLineNumber: number) {
+    const IMAGE_SIZE = 22;
+    let nextIndex = 0;
+    const lineNumber = startLineNumber - 1;
 
-  //   private closeCurtin(delay: number) {
-  //     this.counter += 1;
-  //     if (this.counter % delay === 0) {
-  //       this.offset -= 2;
-  //     }
-  //     if (this.offset <= this.height / 2) {
-  //       this.isBlocked = true;
-  //       this.isClosed = true;
-  //     }
-  //   }
+    const smallEnemyTankImg = new Image();
+    smallEnemyTankImg.src = smallEnemyTankImage;
+    smallEnemyTankImg.width = IMAGE_SIZE;
+    smallEnemyTankImg.height = IMAGE_SIZE;
 
-  //   private drawStageText(canvasCtx: CanvasRenderingContext2D, stage: number) {
-  //     const stageInfoText = `Stage ${stage}`;
-  //     const fontSize = 20;
-  //     canvasCtx.globalCompositeOperation = "overlay";
-  //     canvasCtx.fillStyle = "black";
-  //     canvasCtx.font = `bold ${fontSize}px Arial`;
-  //     const textMetrics = canvasCtx.measureText(stageInfoText);
-  //     canvasCtx.fillText(
-  //       stageInfoText,
-  //       this.width / 2 - textMetrics.width / 2,
-  //       this.height / 2 + fontSize / 2,
-  //       100
-  //     );
-  //   }
+    nextIndex = this.tankHitsResultLines.push(
+      new TankHitsResultLine(
+        this.firstLineYPosition +
+          (lineNumber + nextIndex) * this.lineHeight +
+          10,
+        "Small",
+        TANKS_SETTINGS.Small.value,
+        smallEnemyTankImg,
+        this,
+        1,
+      ),
+    );
+
+    const fastEnemyTankImg = new Image();
+    fastEnemyTankImg.src = fastEnemyTankImage;
+    fastEnemyTankImg.width = IMAGE_SIZE;
+    fastEnemyTankImg.height = IMAGE_SIZE;
+
+    nextIndex = this.tankHitsResultLines.push(
+      new TankHitsResultLine(
+        this.firstLineYPosition +
+          (lineNumber + nextIndex) * this.lineHeight +
+          20,
+        "Fast",
+        TANKS_SETTINGS.Fast.value,
+        fastEnemyTankImg,
+        this,
+        2,
+      ),
+    );
+
+    nextIndex = this.tankHitsResultLines.push(
+      new TankHitsResultLine(
+        this.firstLineYPosition +
+          (lineNumber + nextIndex) * this.lineHeight +
+          35,
+        "Power",
+        TANKS_SETTINGS.Fast.value, //!! Temporary
+        fastEnemyTankImg, //!! Temporary
+        this,
+        3,
+      ),
+    );
+
+    this.tankHitsResultLines.push(
+      new TankHitsResultLine(
+        this.firstLineYPosition +
+          (lineNumber + nextIndex) * this.lineHeight +
+          50,
+        "Armor",
+        TANKS_SETTINGS.Fast.value, //!! Temporary
+        fastEnemyTankImg, //!! Temporary
+        this,
+        4,
+      ),
+    );
+  }
+
+  private drawHorizontalLine(
+    canvasCtx: CanvasRenderingContext2D,
+    yPosition: number,
+  ) {
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(155, yPosition);
+    canvasCtx.lineTo(250, yPosition);
+    canvasCtx.strokeStyle = white;
+    canvasCtx.lineWidth = 4;
+    canvasCtx.stroke();
+  }
+
+  private drawTotalDestroyedTanks(
+    canvasCtx: CanvasRenderingContext2D,
+    destroyedTanks: number,
+    currentAnimatedLineNumber: number,
+    yPosition: number,
+  ) {
+    const lineNumber = 5;
+    const destroyedTanksText = `TOTAL ${destroyedTanks}`;
+    const fontSize = 12;
+    const numberPlaceholder = "TOTAL";
+    const resultText =
+      currentAnimatedLineNumber === lineNumber
+        ? destroyedTanksText
+        : numberPlaceholder;
+    canvasCtx.globalCompositeOperation = "overlay";
+    canvasCtx.fillStyle = white;
+    canvasCtx.font = `${fontSize}px ${this.font}`;
+
+    canvasCtx.fillText(resultText, 84, yPosition, 100);
+
+    if (
+      this.currentAnimatedPointsLineNumber === lineNumber &&
+      !this.animationEnded
+    ) {
+      this.nextStepCounter += 1;
+      if (this.nextStepCounter % this.nextStepDelay === 0) {
+        this.animationEnded = true;
+      }
+    }
+  }
 }
