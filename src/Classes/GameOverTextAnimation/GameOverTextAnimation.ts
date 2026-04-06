@@ -1,4 +1,8 @@
-export class GameOverAnimation {
+import { theme } from "../../GlobalStyles/theme";
+
+const { red } = theme.colors;
+
+export class GameOverTextAnimation {
   counter = 0;
   animationEnded = false;
   xPos;
@@ -13,8 +17,7 @@ export class GameOverAnimation {
 
   animate(canvasCtx: CanvasRenderingContext2D, delay: number) {
     if (canvasCtx) {
-      canvasCtx.fillStyle = "rgba(181, 49, 33, 1)";
-      canvasCtx.font = `bold 16px Arial`;
+      canvasCtx.fillStyle = red;
       canvasCtx.globalCompositeOperation = "overlay";
       canvasCtx.fillText("GAME", this.xPos, this.yPos - this.offset, 50);
       canvasCtx.fillText("OVER", this.xPos, this.secondYPos - this.offset, 50);
@@ -27,5 +30,11 @@ export class GameOverAnimation {
       }
     }
     return this.animationEnded;
+  }
+
+  reset() {
+    this.counter = 0;
+    this.animationEnded = false;
+    this.offset = 0;
   }
 }

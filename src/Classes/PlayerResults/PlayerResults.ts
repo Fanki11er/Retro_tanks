@@ -4,10 +4,10 @@ import { TANKS_SETTINGS } from "../../constants";
 import { TankHitsResultLine } from "../TankHitsResultLine/TankHitsResultLine";
 import type { Game } from "../Game/Game";
 import type { DestroyedBy, Owner } from "../../Types/Types";
+import { theme } from "../../GlobalStyles/theme";
 
-const orange = "rgba(255, 96, 2, 1)";
-const yellow = "rgba(255, 255, 111, 1)";
-const white = "rgba(255, 255, 255, 1)";
+const { orange, yellow, white } = theme.colors;
+const { main } = theme.fonts;
 
 export class PlayerResults {
   currentAnimatedPointsLineNumber = 1;
@@ -19,7 +19,7 @@ export class PlayerResults {
   //isBlocked = true;
   private firstLineYPosition = 35;
   private lineHeight = 25;
-  private font = `"Press Start 2P", system-ui`;
+  private font = main;
   public width: number;
   public height: number;
   private tankHitsResultLines: TankHitsResultLine[] = [];
@@ -72,6 +72,7 @@ export class PlayerResults {
         285,
       );
     }
+    return this.animationEnded;
   }
 
   private drawHighScoreText(
@@ -283,5 +284,13 @@ export class PlayerResults {
         this.animationEnded = true;
       }
     }
+  }
+
+  reset() {
+    this.currentAnimatedPointsLineNumber = 1;
+    this.animationEnded = false;
+    this.nextStepCounter = 0;
+    this.tankHitsResultLines = [];
+    this.generateTankHitsResultLines(5);
   }
 }

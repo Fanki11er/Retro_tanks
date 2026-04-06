@@ -105,11 +105,11 @@ export class PlayerTank extends Tank {
       this.moveAnimation.changeTextures(this.textures[this.tankType]);
     }
   }
-
+  //!! Check if its ok
   updateTankType() {
     switch (this.tankType) {
       case "Small": {
-        this.tankType = "Medium";
+        this.tankType = "Fast";
         this.reloadTime = 0.4;
         this.speed = 0.4;
         //! on last level change ammunition type

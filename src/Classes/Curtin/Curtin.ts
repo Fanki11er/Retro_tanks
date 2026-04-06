@@ -14,7 +14,7 @@ export class Curtin {
   drawCurtin(
     canvasCtx: CanvasRenderingContext2D,
     delay: number,
-    stage: number
+    stage: number,
   ) {
     if (canvasCtx) {
       canvasCtx.clearRect(0, 0, this.width, this.height);
@@ -24,7 +24,7 @@ export class Curtin {
         0,
         this.height / 2 + this.offset,
         this.width,
-        this.height / 2 - this.offset
+        this.height / 2 - this.offset,
       );
 
       if (!this.isBlocked && this.isClosed) {
@@ -37,6 +37,7 @@ export class Curtin {
         this.drawStageText(canvasCtx, stage);
       }
     }
+    return this.animationEnded;
   }
 
   private openCurtin(delay: number) {
@@ -47,6 +48,7 @@ export class Curtin {
     if (this.offset >= this.height / 2) {
       this.isBlocked = true;
       this.isClosed = false;
+      this.animationEnded = true;
     }
   }
 
@@ -58,6 +60,7 @@ export class Curtin {
     if (this.offset <= this.height / 2) {
       this.isBlocked = true;
       this.isClosed = true;
+      this.animationEnded = true;
     }
   }
 
@@ -72,7 +75,15 @@ export class Curtin {
       stageInfoText,
       this.width / 2 - textMetrics.width / 2,
       this.height / 2 + fontSize / 2,
-      100
+      100,
     );
+  }
+
+  reset() {
+    this.counter = 0;
+    this.animationEnded = false;
+    this.offset = 0;
+    this.isClosed = true;
+    this.isBlocked = true;
   }
 }

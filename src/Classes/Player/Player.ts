@@ -12,12 +12,21 @@ export class Player {
   getPlayerLivesLeft() {
     return this.playerLivesLeft;
   }
-  modifyPlayerLivesLeft(amount: number) {
-    this.playerLivesLeft += amount;
+
+  subtractPlayerLife() {
+    if (this.playerLivesLeft > 0) {
+      this.playerLivesLeft -= 1;
+    }
   }
+
+  addPlayerLivesLeft() {
+    this.playerLivesLeft += 1;
+  }
+
   getPlayerScore() {
     return this.playerScore;
   }
+
   addPlayerScore(amount: number) {
     this.playerScore += amount;
   }
@@ -31,5 +40,11 @@ export class Player {
 
   getOwner() {
     return this.owner;
+  }
+
+  resetPlayer() {
+    this.playerLivesLeft = 3;
+    this.playerScore = 0;
+    this.playerTank = null;
   }
 }

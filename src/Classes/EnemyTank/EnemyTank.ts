@@ -167,4 +167,11 @@ export class EnemyTank extends Tank {
   getIsBlocked() {
     return this.isBlockedBy;
   }
+
+  clearReloadTimeout() {
+    if (this.reloadTimeout) {
+      clearTimeout(this.reloadTimeout);
+      this.reloadTimeout = null;
+    }
+  }
 }

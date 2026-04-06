@@ -20,3 +20,11 @@ export const TANKS_SETTINGS = {
     bulletSpeed: 0.5,
   },
 };
+
+export const GAME_STATUS = {
+  MENU: "MainMenu",
+  READY: "Ready",
+  CURTIN: "ShowCurtin",
+  STARTED: "Started",
+  GAME_OVER: "GameOver",
+};

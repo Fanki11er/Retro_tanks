@@ -1,4 +1,4 @@
-import { Player } from '../Player/Player';
+import { Player } from "../Player/Player";
 
 export class Players {
   player1: Player | null = null;
@@ -8,9 +8,9 @@ export class Players {
     this.setPlayers(numberOfPlaters);
   }
   private setPlayers(playerNumber: 1 | 2) {
-    this.player1 = new Player('player1');
+    this.player1 = new Player("player1");
     if (playerNumber === 2) {
-      this.player2 = new Player('player2');
+      this.player2 = new Player("player2");
     }
   }
 
@@ -24,5 +24,9 @@ export class Players {
     }
     return playersTanks;
   }
-}
 
+  resetPlayers() {
+    this.player1?.resetPlayer();
+    this.player2?.resetPlayer();
+  }
+}

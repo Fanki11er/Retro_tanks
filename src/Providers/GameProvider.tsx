@@ -4,21 +4,38 @@ import type { Direction } from "../Types/Types";
 import { Game } from "../Classes/Game/Game";
 import { levels } from "../Levels/Levels";
 import { GameContext } from "../contexts/GameContext";
+import { GAME_STATUS } from "../constants";
+
+const { MENU, STARTED } = GAME_STATUS;
 
 const GameProvider = (props: PropsWithChildren) => {
   const { current: game } = useRef(new Game(1, levels));
 
   const handleChangeDirection = useCallback(
     (direction: Direction) => {
-      if (game.players.player1) {
+      if (game.players.player1 && game.gameStatus === STARTED) {
         game.players.player1.playerTank?.controls.setDirection(direction);
       }
+
+      if (game.gameStatus === MENU) {
+        if (direction === "Forwards") {
+          game.mainMenu.moveCursorUp();
+        }
+        if (direction === "Backwards") {
+          game.mainMenu.moveCursorDown();
+        }
+      }
     },
-    [game]
+
+    [game],
   );
   const handleShot = useCallback(() => {
-    if (game.players.player1) {
+    if (game.players.player1 && game.gameStatus === STARTED) {
       game.players.player1.playerTank?.fire();
+    }
+
+    if (game.gameStatus === MENU) {
+      game.mainMenu.selectOption();
     }
   }, [game]);
 
@@ -47,13 +64,16 @@ const GameProvider = (props: PropsWithChildren) => {
         return;
       }
     };
+
     const stopMove = (e: KeyboardEvent) => {
       if (e.key !== " ") {
         handleChangeDirection("None");
       }
     };
+
     window.addEventListener("keydown", (e) => move(e));
     window.addEventListener("keyup", (e) => stopMove(e));
+
     return () => {
       window.removeEventListener("keydown", (e) => move(e));
       window.removeEventListener("keyup", (e) => stopMove(e));
