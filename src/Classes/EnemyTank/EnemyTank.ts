@@ -6,12 +6,14 @@ import { Brain } from "../Brain/Brain";
 import { Value } from "../Value/Value";
 import { Bullet } from "../Bullet/Bullet";
 import { TANKS_SETTINGS } from "../../constants";
+import { Utils } from "../../Utils/Utils";
 
 export class EnemyTank extends Tank {
   brain: Brain;
   private isSpecial: boolean;
   private timeBlockade: boolean;
-  private reloadTimeout: NodeJS.Timeout | null = null;
+  private reloadDelay = 100;
+  //private reloadTimeout: NodeJS.Timeout | null = null;
 
   constructor(
     xPos: number,
@@ -28,7 +30,7 @@ export class EnemyTank extends Tank {
     this.controls.direction = "Backwards";
     this.brain = new Brain(this, game);
     this.setTankSpeed();
-    this.spawn(2.5);
+    this.spawn(400);
     this.isSpecial = isSpecial;
     this.timeBlockade = timeBlockade;
   }
@@ -37,20 +39,40 @@ export class EnemyTank extends Tank {
     if (!this.timeBlockade) {
       this.handleImageChange();
       this.brain.update();
+      this.loadingTimer.update();
     }
   }
 
   protected spawn(time: number) {
     this.isSpawning = true;
     this.isIndestructible = true;
-    setTimeout(() => {
+
+    this.spawnTimer.start(() => {
       this.isSpawning = false;
       this.isIndestructible = false;
       this.controls.move = true;
-      this.reloadTimeout = setTimeout(() => {
-        this.fire();
-      }, Math.random() * 1000);
-    }, time * 1000);
+
+      this.loadingTimer.start(
+        () => {
+          this.fire();
+        },
+        this.reloadTime * Utils.generateRandomNumber(2, 5) + this.reloadDelay,
+        true,
+      );
+
+      // this.reloadTimeout = setTimeout(() => {
+      //   this.fire();
+      // }, Math.random() * 1000);
+    }, time);
+
+    // setTimeout(() => {
+    //   this.isSpawning = false;
+    //   this.isIndestructible = false;
+    //   this.controls.move = true;
+    //   this.reloadTimeout = setTimeout(() => {
+    //     this.fire();
+    //   }, Math.random() * 1000);
+    // }, time * 1000);
   }
 
   protected selectImage(animationSpeed: number) {
@@ -80,13 +102,22 @@ export class EnemyTank extends Tank {
       );
       this.isLoading = true;
 
-      this.reloadTimeout = setTimeout(
+      this.loadingTimer.start(
         () => {
           this.isLoading = false;
           this.fire();
         },
-        this.reloadTime * Math.random() * 2000 + 1000,
+        this.reloadTime * Utils.generateRandomNumber(3, 8) + this.reloadDelay,
+        true,
       );
+
+      // this.reloadTimeout = setTimeout(
+      //   () => {
+      //     this.isLoading = false;
+      //     this.fire();
+      //   },
+      //   this.reloadTime * Math.random() * 2000 + 1000,
+      // );
     }
   }
 
@@ -105,16 +136,16 @@ export class EnemyTank extends Tank {
       this.fire();
     }
 
-    if (isBlockedByTime && this.reloadTimeout) {
-      clearTimeout(this.reloadTimeout);
-    }
+    // if (isBlockedByTime && this.reloadTimeout) {
+    //   clearTimeout(this.reloadTimeout);
+    // }
   }
 
   private handleDestruction() {
-    if (this.reloadTimeout) {
-      clearTimeout(this.reloadTimeout);
-      this.reloadTimeout = null;
-    }
+    // if (this.reloadTimeout) {
+    //   clearTimeout(this.reloadTimeout);
+    //   this.reloadTimeout = null;
+    // }
     if (this.isSpecial) {
       this.game.generateFinding();
     }
@@ -168,10 +199,10 @@ export class EnemyTank extends Tank {
     return this.isBlockedBy;
   }
 
-  clearReloadTimeout() {
-    if (this.reloadTimeout) {
-      clearTimeout(this.reloadTimeout);
-      this.reloadTimeout = null;
-    }
-  }
+  // clearReloadTimeout() {
+  //   if (this.reloadTimeout) {
+  //     clearTimeout(this.reloadTimeout);
+  //     this.reloadTimeout = null;
+  //   }
+  // }
 }

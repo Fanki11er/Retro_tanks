@@ -1,27 +1,29 @@
 import { Coordinates } from "../../Types/Types";
 import type { FindingsTypes, Owner } from "../../Types/Types";
 import { ElementCollisionZone } from "../ElementCollisionZone/ElementCollisionZone";
+import { Timer } from "../Timer/Timer";
 
 export class Finding {
   protected counter = 0;
   protected timeIsOut = false;
   protected showImage = true;
-  protected timeOut;
+  //protected timeOut;
   protected isTakenBy: Owner | "" = "";
   protected value = 500;
-  protected showTime = 8;
+  protected showTime = 1500;
   protected collisionZone;
   protected type: FindingsTypes;
   protected xPos: number;
   protected yPos: number;
   protected image: HTMLImageElement;
   protected size: number;
+  protected showingTimer = new Timer();
   constructor(
     type: FindingsTypes,
     xPos: number,
     yPos: number,
     image: HTMLImageElement,
-    size: number
+    size: number,
   ) {
     this.type = type;
     this.xPos = xPos;
@@ -31,11 +33,16 @@ export class Finding {
     this.collisionZone = new ElementCollisionZone(
       { x: xPos, y: yPos },
       size,
-      size
+      size,
     );
-    this.timeOut = setTimeout(() => {
+
+    this.showingTimer.start(() => {
       this.timeIsOut = true;
-    }, this.showTime * 1000);
+    }, this.showTime);
+
+    // this.timeOut = setTimeout(() => {
+    //   this.timeIsOut = true;
+    // }, this.showTime * 1000);
   }
   draw(ctx: CanvasRenderingContext2D) {
     if (this.counter % 25 === 0) {
@@ -46,11 +53,12 @@ export class Finding {
       ctx.drawImage(this.image, this.xPos, this.yPos, 24, 24);
     }
     this.counter++;
+    this.showingTimer.update();
   }
 
-  protected cancelTimeout() {
-    clearTimeout(this.timeOut);
-  }
+  // protected cancelTimeout() {
+  //   clearTimeout(this.timeOut);
+  // }
 
   getTimeIsOut() {
     return this.timeIsOut;

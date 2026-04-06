@@ -16,7 +16,7 @@ export class Utils {
     yPos: number,
     width: number,
     height: number,
-    staticObjects: StaticDrawable[]
+    staticObjects: StaticDrawable[],
   ) {
     const collisions: StaticDrawable[] = [];
     if (direction === "Forwards") {
@@ -88,7 +88,7 @@ export class Utils {
     width: number,
     height: number,
     boardWidth: number,
-    boardHeight: number
+    boardHeight: number,
   ) {
     if (direction === "Forwards") {
       if (yPos <= 4) {
@@ -121,7 +121,7 @@ export class Utils {
 
   static removeDestroyedElement<T extends StaticDrawable | Bullet>(
     array: Array<T>,
-    id: string
+    id: string,
   ) {
     const elementIndex = array.findIndex((element) => {
       return element.id! === id;
@@ -129,6 +129,10 @@ export class Utils {
     if (elementIndex >= 0) {
       array.splice(elementIndex, 1);
     }
+  }
+
+  static generateRandomNumber(min: number = 1, max: number = 9) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
   /*static getPrecisionCollisionPlace(collisionZone: CollisionZone, direction: Direction, coordinates: WallCoordinates[], textureSize: number) {
@@ -191,7 +195,7 @@ export class Utils {
     collisionZone: CollisionZone,
     direction: Direction,
     coordinates: WallCoordinates[],
-    textureSize: number
+    textureSize: number,
   ) {
     for (let i = 0; i < coordinates.length; i++) {
       if (
@@ -224,7 +228,7 @@ export class Utils {
     xPos: number,
     yPos: number,
     layoutType: BoardElementType,
-    eagleBorder: boolean = false
+    eagleBorder: boolean = false,
   ): StaticObjectsRecipe {
     return {
       material,

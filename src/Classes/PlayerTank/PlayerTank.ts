@@ -3,9 +3,9 @@ import type { Owner, TankTypes, TankTypesTextures } from "../../Types/Types";
 import { Bullet } from "../Bullet/Bullet";
 import { Game } from "../Game/Game";
 import { Tank } from "../Tank/Tank";
-
 export class PlayerTank extends Tank {
   private owner: Owner;
+  private reloadDelay = 50;
   constructor(
     xPos: number,
     yPos: number,
@@ -17,12 +17,14 @@ export class PlayerTank extends Tank {
     game: Game,
   ) {
     super(xPos, yPos, width, height, textures, (tankType = "Small"), game);
-    this.madeIndestructible(4);
-    this.spawn(2.5);
+    this.madeIndestructible(800);
+    this.spawn(400);
     this.owner = owner;
   }
 
   update() {
+    this.isIndestructibleTimeOut.update();
+    this.loadingTimer.update();
     this.handleCollisionsWithBorders();
     this.handleCollisionsWithFindings();
     this.handleCollisionsWithOtherTanks(this.game.enemyTanks);
@@ -36,16 +38,25 @@ export class PlayerTank extends Tank {
 
   madeIndestructible(time: number) {
     this.isIndestructible = true;
-    setTimeout(() => {
+    this.isIndestructibleTimeOut.start(() => {
       this.isIndestructible = false;
-    }, time * 1000);
+    }, time);
+    // setTimeout(() => {
+
+    // setTimeout(() => {
+    //   this.isIndestructible = false;
+    // }, time * 1000);
   }
 
   protected spawn(time: number) {
     this.isSpawning = true;
-    setTimeout(() => {
+    this.spawnTimer.start(() => {
       this.isSpawning = false;
-    }, time * 1000);
+    }, time);
+
+    // setTimeout(() => {
+    //   this.isSpawning = false;
+    // }, time * 1000);
   }
 
   protected selectImage(animationSpeed: number) {
@@ -74,9 +85,13 @@ export class PlayerTank extends Tank {
       );
       this.isLoading = true;
       //this.isLoading &&
-      setTimeout(() => {
+      this.loadingTimer.start(() => {
         this.isLoading = false;
-      }, this.reloadTime * 1000);
+      }, this.reloadTime + this.reloadDelay);
+
+      // setTimeout(() => {
+      //   this.isLoading = false;
+      // }, this.reloadTime * 1000);
     }
   }
   handleCollisionsWithFindings() {
@@ -110,7 +125,7 @@ export class PlayerTank extends Tank {
     switch (this.tankType) {
       case "Small": {
         this.tankType = "Fast";
-        this.reloadTime = 0.4;
+        this.reloadTime = 40;
         this.speed = 0.4;
         //! on last level change ammunition type
 
@@ -123,9 +138,7 @@ export class PlayerTank extends Tank {
   private handleDestruction() {
     if (this.owner) {
       this.game.players[this.owner]!.playerTank = null;
-      setTimeout(() => {
-        this.game.handlePlayerTankSpawn(this.owner);
-      }, 1500);
+      this.game.handlePlayerTankSpawn(this.owner, 600);
     }
   }
 

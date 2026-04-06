@@ -6,6 +6,7 @@ import { ConcreteWall } from "../ConcreteWall/ConcreteWall";
 import { concreteWallRecipe } from "../ConcreteWallTextures/ConcreteWallTextures";
 import { Eagle } from "../Eagle/Eagle";
 import { Game } from "../Game/Game";
+import { Timer } from "../Timer/Timer";
 import { Wall } from "../Wall/Wall";
 
 export class StaticElementsCanvas {
@@ -14,6 +15,7 @@ export class StaticElementsCanvas {
   staticObjects: StaticDrawable[];
   isEagleDestroyed = false;
   private game: Game;
+  private armEagleBordersTimer = new Timer();
 
   constructor(width: number, height: number, game: Game) {
     this.canvas = document.createElement("canvas");
@@ -27,7 +29,7 @@ export class StaticElementsCanvas {
   createStaticObjects() {
     const { eagle } = this.game.levelsRecipe[this.game.currentLevelNumber];
     this.staticObjects.push(
-      new Eagle(eagle.xPos, eagle.yPos, eagle.size, this.game.explosions)
+      new Eagle(eagle.xPos, eagle.yPos, eagle.size, this.game.explosions),
     );
     for (
       let i = 0;
@@ -48,8 +50,8 @@ export class StaticElementsCanvas {
             brickWallRecipe,
             layoutType,
             brickWallRecipe.textureSize,
-            eagleBorder
-          )
+            eagleBorder,
+          ),
         );
       }
       if (material === "Concrete") {
@@ -61,8 +63,8 @@ export class StaticElementsCanvas {
             concreteWallRecipe,
             layoutType,
             concreteWallRecipe.textureSize,
-            eagleBorder
-          )
+            eagleBorder,
+          ),
         );
       }
     }
@@ -80,6 +82,8 @@ export class StaticElementsCanvas {
   }
 
   update() {
+    this.armEagleBordersTimer.update();
+
     this.canvasCtx?.clearRect(20, 4, 312, 312);
     if (this.canvasCtx) {
       for (let i = 0; i < this.staticObjects.length; i++) {
@@ -90,7 +94,7 @@ export class StaticElementsCanvas {
         ) {
           Utils.removeDestroyedElement(
             this.staticObjects,
-            this.staticObjects[i].id
+            this.staticObjects[i].id,
           );
         } else if (
           this.staticObjects[i].isDestroyed &&
@@ -118,9 +122,10 @@ export class StaticElementsCanvas {
 
   handleEagleBordersArmourChange(time: number) {
     this.armEagleBorders();
-    setTimeout(() => {
+
+    this.armEagleBordersTimer.start(() => {
       this.unarmEagleBorders();
-    }, time * 1000);
+    }, time);
   }
 
   private armEagleBorders() {
@@ -139,8 +144,8 @@ export class StaticElementsCanvas {
             concreteWallRecipe,
             type,
             concreteWallRecipe.textureSize,
-            true
-          )
+            true,
+          ),
         );
       }
     });
@@ -163,8 +168,8 @@ export class StaticElementsCanvas {
             brickWallRecipe,
             type,
             brickWallRecipe.textureSize,
-            true
-          )
+            true,
+          ),
         );
       }
     });

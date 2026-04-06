@@ -17,13 +17,14 @@ import { TankMoveAnimation } from "../TankMoveAnimation/TankMoveAnimation";
 import { v4 as uuidv4 } from "uuid";
 import { ExplosionAnimationFrames } from "../ExplosionAnimationFrames/ExplosionAnimationFrames";
 import { largeExplosionTextures } from "../../Textures/ExplosionTextures/ExplosionTextures";
+import { Timer } from "../Timer/Timer";
 //import { TankSensor } from '../TankSensor/TankSensor';
 
 export abstract class Tank {
   protected id;
   controls;
   protected speed = 0.4;
-  protected reloadTime = 0.2;
+  protected reloadTime = 100;
   protected moveAnimationSpeed = 15;
   protected image;
   protected isBlockedBy;
@@ -41,6 +42,9 @@ export abstract class Tank {
   protected height: number;
   protected textures: TankTypesTextures;
   protected game: Game;
+  protected isIndestructibleTimeOut = new Timer();
+  protected spawnTimer = new Timer();
+  protected loadingTimer = new Timer();
   //protected tankSensor: TankSensor;
 
   constructor(
@@ -88,6 +92,7 @@ export abstract class Tank {
         this.isSpawning,
         /*0*/
       );
+      this.spawnTimer.update();
     } else if (!this.isSpawning && this.isIndestructible) {
       this.update();
       context.drawImage(this.image, this.xPos, this.yPos, 20, 20);
