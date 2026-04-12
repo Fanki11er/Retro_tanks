@@ -18,14 +18,22 @@ import { v4 as uuidv4 } from "uuid";
 import { ExplosionAnimationFrames } from "../ExplosionAnimationFrames/ExplosionAnimationFrames";
 import { largeExplosionTextures } from "../../Textures/ExplosionTextures/ExplosionTextures";
 import { Timer } from "../Timer/Timer";
+import {
+  BASIC_RELOAD_TIME,
+  EXPLOSION_ANIMATION_SPEED,
+  INDESTRUCTIBLE_ANIMATION_SPEED,
+  PLAYER_TANK_IMAGE_SIZE,
+  SLOW_TANK_SPEED,
+  SPAWN_ANIMATION_SPEED,
+} from "../../constants";
 //import { TankSensor } from '../TankSensor/TankSensor';
 
 export abstract class Tank {
   protected id;
   controls;
-  protected speed = 0.4;
-  protected reloadTime = 100;
-  protected moveAnimationSpeed = 15;
+  protected speed = SLOW_TANK_SPEED;
+  protected reloadTime = BASIC_RELOAD_TIME;
+  protected moveAnimationSpeed = 1;
   protected image;
   protected isBlockedBy;
   protected isLoading;
@@ -45,7 +53,6 @@ export abstract class Tank {
   protected isIndestructibleTimeOut = new Timer();
   protected spawnTimer = new Timer();
   protected loadingTimer = new Timer();
-  //protected tankSensor: TankSensor;
 
   constructor(
     xPos: number,
@@ -58,19 +65,22 @@ export abstract class Tank {
   ) {
     this.id = uuidv4();
     this.controls = new Controls();
-    this.image = textures.Small.forwardDirectionTextures[0];
+    this.image = textures[tankType].forwardDirectionTextures[0];
     this.isBlockedBy = false;
     this.isLoading = false;
     this.isSpawning = true;
     this.tankType = tankType;
+
     this.spawnAnimationFrames = new AnimationFrames(
       spawnPointTextures.animationTexture,
       spawnPointTextures.textureSize,
     );
+
     this.indestructibleAnimationFrames = new AnimationFrames(
       indestructibleTextures.animationTexture,
       indestructibleTextures.textureSize,
     );
+
     this.moveAnimation = new TankMoveAnimation(textures[this.tankType]);
     this.xPos = xPos;
     this.yPos = yPos;
@@ -82,22 +92,30 @@ export abstract class Tank {
     //this.tankSensor = new TankSensor(this, this.game);
   }
 
-  public draw(context: CanvasRenderingContext2D) {
+  public draw(context: CanvasRenderingContext2D, deltaTime: number) {
     if (this.isSpawning) {
       this.spawnAnimationFrames.animateFrames(
-        20,
+        deltaTime,
+        SPAWN_ANIMATION_SPEED,
         context,
         this.xPos,
         this.yPos,
         this.isSpawning,
         /*0*/
       );
-      this.spawnTimer.update();
+      this.spawnTimer.update(deltaTime);
     } else if (!this.isSpawning && this.isIndestructible) {
-      this.update();
-      context.drawImage(this.image, this.xPos, this.yPos, 20, 20);
+      this.update(deltaTime);
+      context.drawImage(
+        this.image,
+        this.xPos,
+        this.yPos,
+        PLAYER_TANK_IMAGE_SIZE,
+        PLAYER_TANK_IMAGE_SIZE,
+      );
       this.indestructibleAnimationFrames.animateFrames(
-        15,
+        deltaTime,
+        INDESTRUCTIBLE_ANIMATION_SPEED,
         context,
         this.xPos - 2,
         this.yPos - 2,
@@ -106,8 +124,14 @@ export abstract class Tank {
       );
       //this.tankSensor.draw(context);
     } else {
-      this.update();
-      context.drawImage(this.image, this.xPos, this.yPos, 20, 20);
+      this.update(deltaTime);
+      context.drawImage(
+        this.image,
+        this.xPos,
+        this.yPos,
+        PLAYER_TANK_IMAGE_SIZE,
+        PLAYER_TANK_IMAGE_SIZE,
+      );
       //this.tankSensor.draw(context);
     }
   }
@@ -148,8 +172,8 @@ export abstract class Tank {
       this.yPos,
       this.width,
       this.height,
-      372,
-      320,
+      this.game.canvasWidth,
+      this.game.canvasHeight,
     );
   }
 
@@ -186,33 +210,33 @@ export abstract class Tank {
     }
   }
 
-  protected handleImageChange() {
-    const image = this.selectImage(this.moveAnimationSpeed);
+  protected handleImageChange(deltaTime: number) {
+    const image = this.selectImage(deltaTime, this.moveAnimationSpeed);
     if (this.controls.direction === "Forwards") {
       this.setImage(image);
       if (!this.isBlockedBy && this.controls.move) {
-        this.yPos -= this.speed;
+        this.yPos -= this.speed * deltaTime;
       } else this.yPos += 0;
       return;
     }
     if (this.controls.direction === "Backwards") {
       this.setImage(image);
       if (!this.isBlockedBy && this.controls.move) {
-        this.yPos += this.speed;
+        this.yPos += this.speed * deltaTime;
       } else this.yPos += 0;
       return;
     }
     if (this.controls.direction === "Left") {
       this.setImage(image);
       if (!this.isBlockedBy && this.controls.move) {
-        this.xPos -= this.speed;
+        this.xPos -= this.speed * deltaTime;
       } else this.xPos -= 0;
       return;
     }
     if (this.controls.direction === "Right") {
       this.setImage(image);
       if (!this.isBlockedBy && this.controls.move) {
-        this.xPos += this.speed;
+        this.xPos += this.speed * deltaTime;
       } else this.xPos += 0;
       return;
     }
@@ -277,8 +301,8 @@ export abstract class Tank {
     this.game.explosions.push(
       new ExplosionAnimationFrames(
         largeExplosionTextures.animationTexture,
-        30,
-        20,
+        EXPLOSION_ANIMATION_SPEED,
+        PLAYER_TANK_IMAGE_SIZE,
         this.xPos - 4,
         this.yPos - 4,
       ),
@@ -324,8 +348,11 @@ export abstract class Tank {
   }
 
   public abstract fire(): void;
-  public abstract update(): void;
+  public abstract update(deltaTime: number): void;
   public abstract processHit(hitBy: Owner): void;
   protected abstract spawn(time: number): void;
-  protected abstract selectImage(animationSpeed: number): HTMLImageElement;
+  protected abstract selectImage(
+    deltaTime: number,
+    animationSpeed: number,
+  ): HTMLImageElement;
 }

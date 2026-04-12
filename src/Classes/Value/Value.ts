@@ -1,36 +1,29 @@
+import { VALUE_SHOW_DELAY, VALUE_SHOW_TIME } from "../../constants";
 import { Animation } from "../Animation/Animation";
 
 export class Value extends Animation {
   private value: number;
   private xPos: number;
   private yPos: number;
-  private showDelay: number;
-  private time: number;
+  private showDelay = VALUE_SHOW_DELAY;
+  private time = VALUE_SHOW_TIME;
 
-  constructor(
-    value: number,
-    xPos: number,
-    yPos: number,
-    showDelay: number,
-    time: number
-  ) {
+  constructor(value: number, xPos: number, yPos: number) {
     super();
     this.value = value;
     this.xPos = xPos;
     this.yPos = yPos;
-    this.showDelay = showDelay;
-    this.time = time;
   }
-  showValue(ctx: CanvasRenderingContext2D) {
+  showValue(ctx: CanvasRenderingContext2D, deltaTime: number) {
     ctx.globalCompositeOperation = "source-over";
     ctx.fillStyle = "white";
     ctx.font = " 12px Arial";
-    if (this.counter > this.showDelay * 60) {
+    if (this.counter > this.showDelay) {
       ctx.fillText(`${this.value}`, this.xPos, this.yPos);
     }
-    if (this.counter > (this.time + this.showDelay) * 60) {
+    if (this.counter > this.time + this.showDelay) {
       this.animationEnded = true;
     }
-    this.counter++;
+    this.counter += deltaTime;
   }
 }

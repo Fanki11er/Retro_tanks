@@ -9,12 +9,18 @@ export class TankMoveAnimation {
     this.textures = textures;
   }
 
-  setImage(direction: Direction, isMoving: boolean, delay: number) {
+  setImage(
+    direction: Direction,
+    isMoving: boolean,
+    deltaTime: number,
+    delay: number,
+  ) {
     const image = this.switchImage(direction);
 
-    this.counter += 1;
-    if (this.counter % delay === 0 && isMoving) {
+    this.counter += deltaTime;
+    if (this.counter >= delay && isMoving) {
       this.index += 1;
+      this.counter = 0;
     }
     return image;
   }
@@ -22,21 +28,25 @@ export class TankMoveAnimation {
   setImageSpecialTank(
     direction: Direction,
     isMoving: boolean,
+    deltaTime: number,
     delay: number,
-    isSpecial: boolean
+    isSpecial: boolean,
   ) {
     const image = this.switchImage(direction);
 
-    this.counter += 1;
+    this.counter += deltaTime;
     if (isSpecial) {
-      if (this.counter % delay === 0 && isMoving) {
+      if (this.counter >= 0.1 && isMoving) {
         this.index += 1;
-      } else if (this.counter % delay === 0 && !isMoving) {
+        this.counter = 0;
+      } else if (this.counter >= 0.1 && !isMoving) {
         this.index += 3;
+        this.counter = 0;
       }
     } else {
-      if (this.counter % delay === 0 && isMoving) {
+      if (this.counter >= delay && isMoving) {
         this.index += 2;
+        this.counter = 0;
       }
     }
     return image;

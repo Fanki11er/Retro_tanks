@@ -1,3 +1,8 @@
+import {
+  FINDING_BLINKING_INTERVAL,
+  FINDING_BLINKING_START_TIME,
+  FINDING_SHOW_TIME,
+} from "../../constants";
 import { Coordinates } from "../../Types/Types";
 import type { FindingsTypes, Owner } from "../../Types/Types";
 import { ElementCollisionZone } from "../ElementCollisionZone/ElementCollisionZone";
@@ -5,12 +10,13 @@ import { Timer } from "../Timer/Timer";
 
 export class Finding {
   protected counter = 0;
+  protected elapsedTime = 0;
   protected timeIsOut = false;
   protected showImage = true;
   //protected timeOut;
   protected isTakenBy: Owner | "" = "";
   protected value = 500;
-  protected showTime = 1500;
+  protected showTime = FINDING_SHOW_TIME;
   protected collisionZone;
   protected type: FindingsTypes;
   protected xPos: number;
@@ -39,21 +45,22 @@ export class Finding {
     this.showingTimer.start(() => {
       this.timeIsOut = true;
     }, this.showTime);
-
-    // this.timeOut = setTimeout(() => {
-    //   this.timeIsOut = true;
-    // }, this.showTime * 1000);
   }
-  draw(ctx: CanvasRenderingContext2D) {
-    if (this.counter % 25 === 0) {
+  draw(ctx: CanvasRenderingContext2D, deltaTime: number) {
+    this.elapsedTime = this.showingTimer.getCurrentTime();
+    if (
+      this.elapsedTime >= FINDING_BLINKING_START_TIME &&
+      this.counter >= FINDING_BLINKING_INTERVAL
+    ) {
       this.showImage = !this.showImage;
+      this.counter = 0;
     }
     if (this.showImage) {
       ctx.globalCompositeOperation = "source-over";
-      ctx.drawImage(this.image, this.xPos, this.yPos, 24, 24);
+      ctx.drawImage(this.image, this.xPos, this.yPos, this.size, this.size);
     }
-    this.counter++;
-    this.showingTimer.update();
+    this.counter += deltaTime;
+    this.showingTimer.update(deltaTime);
   }
 
   // protected cancelTimeout() {

@@ -1,3 +1,4 @@
+import { EXPLOSION_ANIMATION_SPEED } from "../../constants";
 import { largeExplosionTextures } from "../../Textures/ExplosionTextures/ExplosionTextures";
 import { Coordinates } from "../../Types/Types";
 import type { MaterialType, StaticDrawable } from "../../Types/Types";
@@ -22,7 +23,7 @@ export class Eagle implements StaticDrawable {
     xPos: number,
     yPos: number,
     size: number,
-    explosions: ExplosionAnimationFrames[]
+    explosions: ExplosionAnimationFrames[],
   ) {
     this.id = "Eagle";
     this.width = size;
@@ -32,7 +33,7 @@ export class Eagle implements StaticDrawable {
     this.collisionZone = new ElementCollisionZone(
       { x: xPos, y: yPos },
       this.width,
-      this.height
+      this.height,
     );
     this.xPos = xPos;
     this.yPos = yPos;
@@ -67,10 +68,10 @@ export class Eagle implements StaticDrawable {
       new ExplosionAnimationFrames(
         largeExplosionTextures.animationTexture,
         largeExplosionTextures.textureSize,
-        20,
+        EXPLOSION_ANIMATION_SPEED,
         this.xPos,
-        this.yPos
-      )
+        this.yPos,
+      ),
     );
     this.isDestroyed = true;
     this.changed = true;

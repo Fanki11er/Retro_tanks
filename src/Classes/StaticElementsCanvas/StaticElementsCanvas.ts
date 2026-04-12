@@ -17,29 +17,29 @@ export class StaticElementsCanvas {
   private game: Game;
   private armEagleBordersTimer = new Timer();
 
-  constructor(width: number, height: number, game: Game) {
+  constructor(game: Game) {
     this.canvas = document.createElement("canvas");
-    this.canvas.width = width;
-    this.canvas.height = height;
+    this.canvas.width = game.canvasWidth;
+    this.canvas.height = game.canvasHeight;
     this.game = game;
     this.canvasCtx = this.canvas.getContext("2d");
     this.staticObjects = game.staticObjects;
   }
 
   createStaticObjects() {
-    const { eagle } = this.game.levelsRecipe[this.game.currentLevelNumber];
+    const { eagle } = this.game.levelsRecipe[this.game.getCurrentLevelIndex()];
     this.staticObjects.push(
       new Eagle(eagle.xPos, eagle.yPos, eagle.size, this.game.explosions),
     );
     for (
       let i = 0;
       i <
-      this.game.levelsRecipe[this.game.currentLevelNumber].staticObjectsRecipe
-        .length;
+      this.game.levelsRecipe[this.game.getCurrentLevelIndex()]
+        .staticObjectsRecipe.length;
       i++
     ) {
       const { material, xPos, yPos, layoutType, eagleBorder } =
-        this.game.levelsRecipe[this.game.currentLevelNumber]
+        this.game.levelsRecipe[this.game.getCurrentLevelIndex()]
           .staticObjectsRecipe[i];
       if (material === "Brick") {
         this.staticObjects.push(

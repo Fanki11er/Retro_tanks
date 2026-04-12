@@ -4,20 +4,25 @@ import { smallExplosionTextures } from "../../Textures/ExplosionTextures/Explosi
 import { Coordinates } from "../../Types/Types";
 import type {
   AmmunitionType,
+  BulletType,
   CollisionZone,
   Direction,
+  EnemyTankTypes,
   Owner,
+  PlayerTankTypes,
   StaticDrawable,
+  TankTypes,
 } from "../../Types/Types";
 import { Utils } from "../../Utils/Utils";
 import { BulletHitZone } from "../BulletHitZone/BulletHitZone";
 import { ElementCollisionZone } from "../ElementCollisionZone/ElementCollisionZone";
 import { Game } from "../Game/Game";
 import { Tank } from "../Tank/Tank";
+import { ENEMY_TANKS_SETTINGS, PLAYER_TANKS_SETTINGS } from "../../constants";
 
 export class Bullet {
   protected image: HTMLImageElement | null = null;
-  protected speed;
+  protected speed!: number;
   protected hit = false;
   public id;
   protected collisionWith: StaticDrawable[] = [];
@@ -31,7 +36,7 @@ export class Bullet {
   protected ammunitionType: AmmunitionType = "Standard";
   protected owner: Owner;
   protected game: Game;
-  private bulletType: "PlayerBullet" | "EnemyBullet";
+  private bulletType: BulletType;
 
   constructor(
     xPos: number,
@@ -42,7 +47,8 @@ export class Bullet {
     textures: BulletTextures,
     owner: Owner,
     game: Game,
-    bulletsType: "PlayerBullet" | "EnemyBullet",
+    bulletsType: BulletType,
+    tankType: TankTypes,
   ) {
     this.xPos = xPos;
     this.yPos = yPos;
@@ -53,15 +59,25 @@ export class Bullet {
     this.owner = owner;
     this.game = game;
     this.bulletType = bulletsType;
-
+    this.setBulletSpeedByTankType(tankType, bulletsType);
     this.setImageForDirection();
-    this.speed = 0.7;
-
     this.id = uuidv4();
   }
 
-  public draw(context: CanvasRenderingContext2D) {
-    this.checkForCollisionsWithStaticObjects();
+  private setBulletSpeedByTankType(
+    tankType: TankTypes,
+    bulletType: BulletType,
+  ) {
+    if (bulletType === "PlayerBullet") {
+      this.speed =
+        PLAYER_TANKS_SETTINGS[tankType as PlayerTankTypes].bulletSpeed;
+    } else {
+      this.speed = ENEMY_TANKS_SETTINGS[tankType as EnemyTankTypes].bulletSpeed;
+    }
+  }
+
+  public draw(context: CanvasRenderingContext2D, deltaTime: number) {
+    this.checkForCollisionsWithStaticObjects(deltaTime);
 
     const targetTanks =
       this.bulletType === "PlayerBullet"
@@ -95,22 +111,22 @@ export class Bullet {
     }
   }
 
-  private update() {
+  private update(deltaTime: number) {
     switch (this.direction) {
       case "Forwards": {
-        this.yPos -= this.speed;
+        this.yPos -= this.speed * deltaTime;
         break;
       }
       case "Backwards": {
-        this.yPos += this.speed;
+        this.yPos += this.speed * deltaTime;
         break;
       }
       case "Left": {
-        this.xPos -= this.speed;
+        this.xPos -= this.speed * deltaTime;
         break;
       }
       case "Right": {
-        this.xPos += this.speed;
+        this.xPos += this.speed * deltaTime;
         break;
       }
     }
@@ -254,19 +270,19 @@ export class Bullet {
     }
   }
 
-  protected checkForCollisionsWithStaticObjects() {
+  protected checkForCollisionsWithStaticObjects(deltaTime: number) {
     this.collisionWith = [];
     // !this.hit && this.update();
     if (!this.hit) {
-      this.update();
+      this.update(deltaTime);
       this.hit = Utils.checkForCollisionWithBorders(
         this.direction,
         this.xPos,
         this.yPos,
         this.width,
         this.height,
-        372,
-        320,
+        this.game.canvasWidth,
+        this.game.canvasHeight,
       );
     }
     if (!this.hit) {

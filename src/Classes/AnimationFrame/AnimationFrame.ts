@@ -10,11 +10,12 @@ export class AnimationFrames extends Animation {
   }
 
   animateFrames(
+    deltaTime: number,
     delay: number,
     ctx: CanvasRenderingContext2D,
     xPos: number,
     yPos: number,
-    termOfStop: boolean
+    termOfStop: boolean,
     /*repeats: number*/
   ) {
     const image = this.animationFrames[this.index];
@@ -23,8 +24,8 @@ export class AnimationFrames extends Animation {
     } else {
       this.animationEnded = true;
     }
-    this.counter += 1;
-    if (this.counter % delay === 0) {
+    this.counter += deltaTime;
+    if (this.counter >= delay) {
       this.counter = 0;
       this.index += 1;
       if (this.index === this.animationFrames.length) {

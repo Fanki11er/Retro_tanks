@@ -6,11 +6,13 @@ import { player1TankTextures } from "../../Textures/TanksTextures/TanksTextures"
 import {
   Coordinates,
   type DestroyedBy,
+  type EnemyTankTypes,
   type FindingsTypes,
   type LevelRecipe,
   type Owner,
   type StaticDrawable,
   type TankTypes,
+  type TankTypesTextures,
 } from "../../Types/Types";
 import { Curtin } from "../Curtin/Curtin";
 import { EnemyTank } from "../EnemyTank/EnemyTank";
@@ -25,27 +27,46 @@ import { Value } from "../Value/Value";
 import { Bullet } from "../Bullet/Bullet";
 import { ElementCollisionZone } from "../ElementCollisionZone/ElementCollisionZone";
 import { PlayerResults } from "../PlayerResults/PlayerResults";
-import { GAME_STATUS, TANKS_SETTINGS } from "../../constants";
+import {
+  CANVAS_HEIGHT,
+  CANVAS_WIDTH,
+  ENEMY_TANK_IMAGE_SIZE,
+  ENEMY_TANKS_SETTINGS,
+  ENEMY_TANKS_SPAWN_INTERVAL,
+  EXPLOSION_ANIMATION_SPEED,
+  FINDING_IMAGE_SIZE,
+  GAME_STATUS,
+  PLAYER_TANK_IMAGE_SIZE,
+} from "../../constants";
 import { GameOverScreen } from "../GameOverScreen/GameOverScreen";
 import { MainMenu } from "../MainMenu/MainMenu";
 import { Timer } from "../Timer/Timer";
+import { Renderer } from "../../systems/renderer/Renderer";
 export class Game {
+  private renderCtx: CanvasRenderingContext2D | null = null;
+  private renderer: Renderer | null = null;
+  canvasWidth = CANVAS_WIDTH;
+  canvasHeight = CANVAS_HEIGHT;
   gameStatus: string = GAME_STATUS.MENU;
   bullets: Bullet[] = [];
   staticObjects: StaticDrawable[] = [];
   players: Players;
   staticObjectsCanvas: StaticElementsCanvas | null = null;
-  mainMenu = new MainMenu(372, 320, this);
-  curtin = new Curtin(372, 320);
-  playerResultsScreen = new PlayerResults(372, 320, this);
-  gameOverTextAnimation = new GameOverTextAnimation(150, 320);
-  gameOverScreen = new GameOverScreen(372, 320);
-  currentLevelNumber: number = 0;
-  gameInfo = new GameInfoCanvas(372, 320);
+  mainMenu = new MainMenu(this.canvasWidth, this.canvasHeight, this);
+  curtin = new Curtin(this.canvasWidth, this.canvasHeight);
+  playerResultsScreen = new PlayerResults(
+    this.canvasWidth,
+    this.canvasHeight,
+    this,
+  );
+  gameOverTextAnimation = new GameOverTextAnimation(150, this.canvasHeight);
+  gameOverScreen = new GameOverScreen(this.canvasWidth, this.canvasHeight);
+  private currentLevelIndex: number = 0;
+  gameInfo = new GameInfoCanvas(this.canvasWidth, this.canvasHeight);
   levelsRecipe: LevelRecipe[];
   explosions: ExplosionAnimationFrames[] = [];
   enemyTanks: EnemyTank[] = [];
-  enemyTanksList: TankTypes[] = [];
+  enemyTanksList: EnemyTankTypes[] = [];
   values: Value[] = [];
   destroyedEnemyTanksList: DestroyedBy[] = [];
   findings: Finding[] = [];
@@ -59,6 +80,7 @@ export class Game {
   ];
   timeBlockade = false;
   drawEnemyTanksSensors = false;
+  private lastTime!: number;
   startTimer = new Timer();
   enemyTankSpawnTimer = new Timer();
   blockEnemyTanksTimer = new Timer();
@@ -77,146 +99,52 @@ export class Game {
     this.gameStatus = GAME_STATUS[status];
   }
 
+  initGame(context: CanvasRenderingContext2D) {
+    this.lastTime = performance.now();
+    this.renderCtx = context;
+    this.renderer = new Renderer(this.renderCtx, this);
+    requestAnimationFrame((timestamp) => this.gameLoop(timestamp));
+  }
+
+  private gameLoop(timestamp: number) {
+    const deltaTime = (timestamp - this.lastTime) / 1000; // Convert to seconds
+    this.lastTime = timestamp;
+    this.renderer?.renderGame(deltaTime);
+    requestAnimationFrame((t) => this.gameLoop(t));
+  }
+
   startGame() {
-    this.staticObjectsCanvas = new StaticElementsCanvas(372, 320, this);
+    this.staticObjectsCanvas = new StaticElementsCanvas(this);
     this.staticObjectsCanvas.createStaticObjects();
-    this.enemyTanksList = [...levels[this.currentLevelNumber].enemyTanksList];
+    this.enemyTanksList = [...levels[this.currentLevelIndex].enemyTanksList];
     this.handleGameInfoUpdate();
     this.resetClassesValues();
 
     this.startTimer.start(() => {
       this.curtin.isBlocked = false;
-      this.handlePlayerTankSpawn("player1", 100);
+      this.handlePlayerTankSpawn("player1");
       // ! What if we have two players
       this.addNewEnemyTank();
       this.handleEnemyTankSpawn();
-    }, 1000);
-
-    // setTimeout(() => {
-    //   this.curtin.isBlocked = false;
-    //   this.handlePlayerTankSpawn("player1");
-    //   // ! What if we have two players
-    //   this.addNewEnemyTank();
-    //   this.handleEnemyTankSpawn();
-    // }, 1000);
+    }, 5);
 
     this.gameStatus = GAME_STATUS.CURTIN;
   }
 
-  renderGame(renderCtx: CanvasRenderingContext2D) {
-    this.startTimer.update();
-    this.enemyTankSpawnTimer.update();
-    this.blockEnemyTanksTimer.update();
-    this.playerDestructionTimer.update();
-
-    renderCtx.clearRect(0, 0, 372, 320);
-    if (this.gameStatus === GAME_STATUS.MENU) {
-      this.mainMenu.draw(
-        renderCtx,
-        this.players.player1?.getPlayerScore() || 0,
-        20000,
-      );
-    }
-
-    if (this.gameStatus === GAME_STATUS.READY) {
-      this.startGame();
-    }
-
-    if (this.gameStatus === GAME_STATUS.CURTIN) {
-      const animationEnded = this.curtin.drawCurtin(
-        renderCtx,
-        1,
-        this.currentLevelNumber + 1,
-      );
-
-      if (animationEnded) {
-        this.gameStatus = GAME_STATUS.STARTED;
-      }
-    }
-
-    if (this.checkForGameOver()) {
-      const gameOverTextAnimationEnded = this.gameOverTextAnimation.animate(
-        renderCtx,
-        5,
-      );
-      if (
-        gameOverTextAnimationEnded &&
-        this.gameStatus !== GAME_STATUS.GAME_OVER
-      ) {
-        this.gameStatus = GAME_STATUS.GAME_OVER;
-      }
-      //this.resetGame();
-      //Show results screen
-      //Show game over screen
-      // }
-    }
-
-    if (this.gameStatus === GAME_STATUS.GAME_OVER) {
-      this.handleGameOver(renderCtx);
-    }
-
-    if (this.gameStatus === GAME_STATUS.STARTED) {
-      this.playGame(renderCtx);
-    }
+  getGameStatus() {
+    return this.gameStatus;
   }
 
-  renderBullets(renderCtx: CanvasRenderingContext2D) {
-    this.bullets.forEach((bullet) => {
-      bullet.draw(renderCtx);
-    });
-  }
-  renderExplosions(renderCtx: CanvasRenderingContext2D) {
-    for (let i = 0; i < this.explosions.length; i++) {
-      this.explosions[i].animateFrames(renderCtx);
-      if (this.explosions[i].animationEnded) {
-        this.explosions.splice(i, 1);
-        i--;
-      }
-    }
+  getCurrentLevelNumber() {
+    return this.currentLevelIndex + 1;
   }
 
-  renderEnemyTanks(renderCtx: CanvasRenderingContext2D) {
-    this.enemyTanks.forEach((enemyTank) => {
-      enemyTank.draw(renderCtx);
-      if (this.drawEnemyTanksSensors) {
-        enemyTank.brain.drawSensors(renderCtx);
-      }
-    });
+  getCurrentLevelIndex() {
+    return this.currentLevelIndex;
   }
 
-  renderValues(renderCtx: CanvasRenderingContext2D) {
-    for (let i = 0; i < this.values.length; i++) {
-      if (!this.values[i].animationEnded) {
-        this.values[i].showValue(renderCtx);
-      } else {
-        this.values.splice(i, 1);
-        i--;
-      }
-    }
-  }
-
-  renderFindings(renderCtx: CanvasRenderingContext2D) {
-    for (let i = 0; i < this.findings.length; i++) {
-      if (this.findings[i].getIsTaken()) {
-        const { x: xPos, y: yPos } = this.findings[i].getCoordinates();
-        const value = this.findings[i].getValue();
-        const isTakenBy = this.findings[i].getIsTaken();
-
-        this.values.push(new Value(value, xPos, yPos + 12, 0.2, 2.5));
-        this.handleAddPlayerScore(isTakenBy, value);
-        this.handleProcessRewardFromFinding(
-          isTakenBy,
-          this.findings[i].getType(),
-        );
-        this.findings.splice(i, 1);
-        i++;
-      } else if (this.findings[i].getTimeIsOut()) {
-        this.findings.splice(i, 1);
-        i++;
-      } else {
-        this.findings[i].draw(renderCtx);
-      }
-    }
+  setNextLevelNumber() {
+    this.currentLevelIndex += 1;
   }
 
   private handleEnemyTankSpawn() {
@@ -226,7 +154,7 @@ export class Game {
           this.addNewEnemyTank();
         }
       },
-      2000,
+      ENEMY_TANKS_SPAWN_INTERVAL,
       true,
     );
   }
@@ -239,8 +167,8 @@ export class Game {
   private checkSpawnPointIsBlocked(x: number, y: number) {
     const spawnPointCollisionZone = new ElementCollisionZone(
       new Coordinates(x, y),
-      22,
-      22,
+      ENEMY_TANK_IMAGE_SIZE,
+      ENEMY_TANK_IMAGE_SIZE,
     );
     const tanks = [...this.enemyTanks, ...this.players.getActivePlayersTanks()];
 
@@ -276,8 +204,8 @@ export class Game {
       new EnemyTank(
         xPos,
         yPos,
-        22,
-        22,
+        ENEMY_TANK_IMAGE_SIZE,
+        ENEMY_TANK_IMAGE_SIZE,
         enemyTankTextures,
         this.enemyTanksList[index],
         this.ShouldBeSpecial(this.enemyTanksList),
@@ -319,7 +247,7 @@ export class Game {
     this.gameInfo.update(
       this.enemyTanksList.length,
       this.players,
-      this.currentLevelNumber + 1,
+      this.getCurrentLevelNumber(),
     );
   }
 
@@ -333,10 +261,10 @@ export class Game {
           this.players[`${owner}`]!.playerTank = new PlayerTank(
             116,
             292,
-            20,
-            20,
-            player1TankTextures,
-            "Small",
+            PLAYER_TANK_IMAGE_SIZE,
+            PLAYER_TANK_IMAGE_SIZE,
+            player1TankTextures as TankTypesTextures,
+            0,
             owner,
             this,
           );
@@ -378,7 +306,7 @@ export class Game {
           new ExplosionAnimationFrames(
             smallExplosionTextures.animationTexture,
             smallExplosionTextures.textureSize,
-            20,
+            EXPLOSION_ANIMATION_SPEED,
             xPos,
             yPos,
           ),
@@ -386,12 +314,6 @@ export class Game {
         this.bullets.splice(i, 1);
         i--;
       }
-    }
-  }
-
-  private handleAddPlayerScore(owner: Owner, value: number) {
-    if (owner) {
-      this.players[`${owner}`]?.addPlayerScore(value);
     }
   }
 
@@ -409,7 +331,7 @@ export class Game {
             xPos,
             yPos,
             findingsTextures.tankFindingTexture,
-            24,
+            FINDING_IMAGE_SIZE,
           ),
         );
         break;
@@ -421,7 +343,7 @@ export class Game {
             xPos,
             yPos,
             findingsTextures.grenadeFindingTexture,
-            24,
+            FINDING_IMAGE_SIZE,
           ),
         );
         break;
@@ -433,7 +355,7 @@ export class Game {
             xPos,
             yPos,
             findingsTextures.helmetFindingTexture,
-            24,
+            FINDING_IMAGE_SIZE,
           ),
         );
         break;
@@ -445,7 +367,7 @@ export class Game {
             xPos,
             yPos,
             findingsTextures.stopwatchFindingTexture,
-            24,
+            FINDING_IMAGE_SIZE,
           ),
         );
         break;
@@ -457,7 +379,7 @@ export class Game {
             xPos,
             yPos,
             findingsTextures.shovelFindingTexture,
-            24,
+            FINDING_IMAGE_SIZE,
           ),
         );
         break;
@@ -469,7 +391,7 @@ export class Game {
             xPos,
             yPos,
             findingsTextures.starFindingTexture,
-            24,
+            FINDING_IMAGE_SIZE,
           ),
         );
         break;
@@ -477,10 +399,7 @@ export class Game {
     }
   }
 
-  private handleProcessRewardFromFinding(
-    owner: Owner,
-    findingType: FindingsTypes,
-  ) {
+  handleProcessRewardFromFinding(owner: Owner, findingType: FindingsTypes) {
     switch (findingType) {
       case "Tank": {
         this.handleAddPlayerLive(owner);
@@ -495,11 +414,11 @@ export class Game {
         break;
       }
       case "Stopwatch": {
-        this.handleBlockAllEnemyTanks(1000);
+        this.handleBlockAllEnemyTanks(3);
         break;
       }
       case "Shovel": {
-        this.handleArmorEagle(1000);
+        this.handleArmorEagle(5);
         break;
       }
       case "Star": {
@@ -524,7 +443,7 @@ export class Game {
 
   private handleMakePlayerIndestructible(owner: Owner) {
     if (owner) {
-      this.players[`${owner}`]?.playerTank?.madeIndestructible(1000);
+      this.players[`${owner}`]?.playerTank?.madeIndestructible(3);
     }
   }
 
@@ -542,10 +461,6 @@ export class Game {
       this.setAllEnemyTanksTimeBlockade(false);
     }, time);
 
-    // setTimeout(() => {
-    //   this.timeBlockade = false;
-    //   this.setAllEnemyTanksTimeBlockade(false);
-    // }, time * 1000);
     this.setAllEnemyTanksTimeBlockade(true);
   }
 
@@ -581,8 +496,8 @@ export class Game {
     return false;
   }
 
-  addDestroyedEnemyTankValue(destroyedBy: Owner, tankType: TankTypes) {
-    const value = TANKS_SETTINGS[tankType].value;
+  addDestroyedEnemyTankValue(destroyedBy: Owner, tankType: EnemyTankTypes) {
+    const value = ENEMY_TANKS_SETTINGS[tankType].value;
     if (destroyedBy) {
       this.players[destroyedBy]?.addPlayerScore(value);
     }
@@ -591,46 +506,8 @@ export class Game {
   getDestroyedEnemyTanksList() {
     return this.destroyedEnemyTanksList;
   }
-  //!!!!!!!!!!!!!!!!!!!!!
-  // learnEnemyTanks() {
-  //   setInterval(() => {
-  //     this.saveBestBrain();
-  //     this.enemyTanks = [];
-  //     //this.staticObjectsCanvas?.resetStaticObjects();
-  //   }, 20000);
-  // }
 
-  // saveBestBrain() {
-  //   let score = 0;
-  //   score =
-  //     this.enemyTanks
-  //       .find(
-  //         (tank) =>
-  //           tank.brain.getBrainScore() ===
-  //           Math.max(
-  //             ...this.enemyTanks.map((tank) => tank.brain.getBrainScore()),
-  //           ),
-  //       )
-  //       ?.brain.saveBrain() || 0;
-
-  //   if (score > this.bestResult) {
-  //     this.bestResult += score;
-  //     this.learnIteration = 0;
-  //   } else {
-  //     this.learnIteration++;
-  //   }
-
-  //   if (this.learnIteration > 3 && this.bestResult < 100) {
-  //     this.bestResult = 0;
-  //     this.learnIteration = 0;
-  //     localStorage.removeItem("BestBrain");
-  //   }
-
-  //   console.log("Score: ", this.bestResult);
-  //   console.log("Iteration: ", this.learnIteration);
-  // }
-
-  private resetGame(gameOver: boolean) {
+  resetGame(gameOver: boolean) {
     this.resetGameValues();
     if (gameOver) {
       this.players.resetPlayers();
@@ -640,7 +517,6 @@ export class Game {
   }
 
   private resetGameValues() {
-    //this.enemyTanks.forEach((tank) => tank.clearReloadTimeout());
     this.bullets = [];
     this.staticObjects = [];
     this.staticObjectsCanvas = null;
@@ -651,7 +527,7 @@ export class Game {
     this.destroyedEnemyTanksList = [];
     this.findings = [];
     this.findingsList = [];
-    this.currentLevelNumber = 0;
+    this.currentLevelIndex = 0;
     this.staticObjectsCanvas = null;
   }
 
@@ -660,44 +536,5 @@ export class Game {
     this.gameOverTextAnimation.reset();
     this.gameOverScreen.reset();
     this.playerResultsScreen.reset();
-  }
-
-  private handleGameOver(renderCtx: CanvasRenderingContext2D) {
-    let resultsAnimationEnded = false;
-    let gameOverScreenAnimationEnded = false;
-
-    resultsAnimationEnded = this.playerResultsScreen.drawPlayerResults(
-      renderCtx,
-      this.currentLevelNumber + 1,
-      this.players.player1?.getPlayerScore() || 0,
-      this.destroyedEnemyTanksList,
-    );
-    if (resultsAnimationEnded) {
-      gameOverScreenAnimationEnded = this.gameOverScreen.animate(
-        renderCtx,
-        1000,
-      );
-    }
-
-    if (gameOverScreenAnimationEnded) {
-      this.resetGame(true);
-    }
-  }
-
-  private playGame(renderCtx: CanvasRenderingContext2D) {
-    this.handleBulletsHit();
-
-    this.gameInfo.draw(renderCtx);
-    this.staticObjectsCanvas?.draw(renderCtx);
-
-    if (this.players.player1?.playerTank) {
-      this.players.player1.playerTank.draw(renderCtx);
-    }
-
-    this.renderEnemyTanks(renderCtx);
-    this.renderBullets(renderCtx);
-    this.renderExplosions(renderCtx);
-    this.renderValues(renderCtx);
-    this.renderFindings(renderCtx);
   }
 }

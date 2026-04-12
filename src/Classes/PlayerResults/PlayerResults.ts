@@ -1,6 +1,6 @@
 import smallEnemyTankImage from "../../assets/images/Tanks/EnemyTanks/Enemy_small_tank_1_forward.png";
 import fastEnemyTankImage from "../../assets/images/Tanks/EnemyTanks/Enemy_fast_tank_1_forward.png";
-import { TANKS_SETTINGS } from "../../constants";
+import { ENEMY_TANKS_SETTINGS } from "../../constants";
 import { TankHitsResultLine } from "../TankHitsResultLine/TankHitsResultLine";
 import type { Game } from "../Game/Game";
 import type { DestroyedBy, Owner } from "../../Types/Types";
@@ -191,7 +191,7 @@ export class PlayerResults {
           (lineNumber + nextIndex) * this.lineHeight +
           10,
         "Small",
-        TANKS_SETTINGS.Small.value,
+        ENEMY_TANKS_SETTINGS.Small.value,
         smallEnemyTankImg,
         this,
         1,
@@ -209,7 +209,7 @@ export class PlayerResults {
           (lineNumber + nextIndex) * this.lineHeight +
           20,
         "Fast",
-        TANKS_SETTINGS.Fast.value,
+        ENEMY_TANKS_SETTINGS.Fast.value,
         fastEnemyTankImg,
         this,
         2,
@@ -222,7 +222,7 @@ export class PlayerResults {
           (lineNumber + nextIndex) * this.lineHeight +
           35,
         "Power",
-        TANKS_SETTINGS.Fast.value, //!! Temporary
+        ENEMY_TANKS_SETTINGS.Power.value, //!! Temporary
         fastEnemyTankImg, //!! Temporary
         this,
         3,
@@ -235,7 +235,7 @@ export class PlayerResults {
           (lineNumber + nextIndex) * this.lineHeight +
           50,
         "Armor",
-        TANKS_SETTINGS.Fast.value, //!! Temporary
+        ENEMY_TANKS_SETTINGS.Armor.value, //!! Temporary
         fastEnemyTankImg, //!! Temporary
         this,
         4,

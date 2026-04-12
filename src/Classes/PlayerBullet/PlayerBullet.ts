@@ -1,5 +1,10 @@
 import { BulletTextures } from "../../Textures/BulletTextures/BulletTextures";
-import type { AmmunitionType, Direction, Owner } from "../../Types/Types";
+import type {
+  AmmunitionType,
+  Direction,
+  Owner,
+  TankTypes,
+} from "../../Types/Types";
 import { Bullet } from "../Bullet/Bullet";
 import { ElementCollisionZone } from "../ElementCollisionZone/ElementCollisionZone";
 import { Game } from "../Game/Game";
@@ -14,14 +19,26 @@ export class PlayerBullet extends Bullet {
     textures: BulletTextures,
     ammunitionType: AmmunitionType = "Standard",
     owner: Owner,
-    game: Game
+    game: Game,
+    tankType: TankTypes,
   ) {
-    super(xPos, yPos, width, height, direction, textures, owner, game);
+    super(
+      xPos,
+      yPos,
+      width,
+      height,
+      direction,
+      textures,
+      owner,
+      game,
+      "PlayerBullet",
+      tankType,
+    );
     this.ammunitionType = ammunitionType;
   }
 
-  public draw(context: CanvasRenderingContext2D) {
-    this.checkForCollisionsWithStaticObjects();
+  public draw(context: CanvasRenderingContext2D, deltaTime: number) {
+    this.checkForCollisionsWithStaticObjects(deltaTime);
 
     this.handleEnemyTanksHits();
     this.handleStaticObjectHit();
@@ -35,9 +52,9 @@ export class PlayerBullet extends Bullet {
       new ElementCollisionZone(
         { x: this.xPos, y: this.yPos },
         this.width,
-        this.height
+        this.height,
       ),
-      this.game.enemyTanks
+      this.game.enemyTanks,
     );
   }
 }

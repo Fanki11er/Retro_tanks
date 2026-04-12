@@ -16,7 +16,7 @@ import player1MediumTank1Left from "../../assets/images/Tanks/Player1Tank/Player
 import player1MediumTank2Left from "../../assets/images/Tanks/Player1Tank/Player1_medium_tank_2_left.png";
 import player1MediumTank1Right from "../../assets/images/Tanks/Player1Tank/Player1_medium_tank_1_right.png";
 import player1MediumTank2Right from "../../assets/images/Tanks/Player1Tank/Player1_medium_tank_2_right.png";
-import type { TankTypesTextures } from "../../Types/Types";
+import type { PlayerTankTypesTextures } from "../../Types/Types";
 
 const player1smallTankTextures = new ChangeDirectionTextures(22);
 player1smallTankTextures.addTextures(player1SmallTank1Forward, "Forwards");
@@ -38,10 +38,11 @@ player1MediumTankTextures.addTextures(player1MediumTank2Left, "Left");
 player1MediumTankTextures.addTextures(player1MediumTank1Right, "Right");
 player1MediumTankTextures.addTextures(player1MediumTank2Right, "Right");
 
-const player1TankTextures: TankTypesTextures = {
-  Small: player1smallTankTextures,
-  Medium: player1MediumTankTextures,
-  Fast: player1smallTankTextures,
+const player1TankTextures: PlayerTankTypesTextures = {
+  0: player1smallTankTextures,
+  1: player1MediumTankTextures,
+  2: player1MediumTankTextures,
+  3: player1MediumTankTextures,
 };
 
 export { player1TankTextures };

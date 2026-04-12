@@ -12,7 +12,7 @@ export class ExplosionAnimationFrames extends Animation {
     textureSize: number,
     delay: number,
     xPos: number,
-    yPos: number
+    yPos: number,
   ) {
     super();
     this.animationFrames = animationFrames;
@@ -22,7 +22,7 @@ export class ExplosionAnimationFrames extends Animation {
     this.yPos = yPos;
   }
 
-  animateFrames(ctx: CanvasRenderingContext2D) {
+  animateFrames(ctx: CanvasRenderingContext2D, deltaTime: number) {
     const image = this.animationFrames[this.index];
     if (this.index < this.animationFrames.length) {
       ctx!.globalCompositeOperation = "source-over";
@@ -31,13 +31,13 @@ export class ExplosionAnimationFrames extends Animation {
         this.xPos,
         this.yPos,
         this.textureSize,
-        this.textureSize
+        this.textureSize,
       );
     } else {
       this.animationEnded = true;
     }
-    this.counter += 1;
-    if (this.counter % this.delay === 0) {
+    this.counter += deltaTime;
+    if (this.counter >= this.delay) {
       this.counter = 0;
       this.index += 1;
     }

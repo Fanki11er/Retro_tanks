@@ -1,18 +1,22 @@
 import { Tank } from "../Tank/Tank";
 import { bulletTextures } from "../../Textures/BulletTextures/BulletTextures";
-import type { Owner, TankTypes, TankTypesTextures } from "../../Types/Types";
+import type {
+  EnemyTankTypes,
+  Owner,
+  TankTypesTextures,
+} from "../../Types/Types";
 import { Game } from "../Game/Game";
 import { Brain } from "../Brain/Brain";
 import { Value } from "../Value/Value";
 import { Bullet } from "../Bullet/Bullet";
-import { TANKS_SETTINGS } from "../../constants";
+import { SPAWN_ANIMATION_TIME, ENEMY_TANKS_SETTINGS } from "../../constants";
 import { Utils } from "../../Utils/Utils";
 
 export class EnemyTank extends Tank {
   brain: Brain;
   private isSpecial: boolean;
   private timeBlockade: boolean;
-  private reloadDelay = 100;
+  private reloadDelay = 2;
   //private reloadTimeout: NodeJS.Timeout | null = null;
 
   constructor(
@@ -21,7 +25,7 @@ export class EnemyTank extends Tank {
     width: number,
     height: number,
     textures: TankTypesTextures,
-    tankType: TankTypes,
+    tankType: EnemyTankTypes,
     isSpecial: boolean,
     timeBlockade: boolean,
     game: Game,
@@ -30,16 +34,17 @@ export class EnemyTank extends Tank {
     this.controls.direction = "Backwards";
     this.brain = new Brain(this, game);
     this.setTankSpeed();
-    this.spawn(400);
+    //!!!!!!!!!!!!!!!
+    this.spawn(SPAWN_ANIMATION_TIME);
     this.isSpecial = isSpecial;
     this.timeBlockade = timeBlockade;
   }
 
-  public update() {
+  public update(deltaTime: number) {
     if (!this.timeBlockade) {
-      this.handleImageChange();
+      this.handleImageChange(deltaTime);
       this.brain.update();
-      this.loadingTimer.update();
+      this.loadingTimer.update(deltaTime);
     }
   }
 
@@ -56,7 +61,7 @@ export class EnemyTank extends Tank {
         () => {
           this.fire();
         },
-        this.reloadTime * Utils.generateRandomNumber(2, 5) + this.reloadDelay,
+        this.reloadTime * Utils.generateRandomNumber(1, 3),
         true,
       );
 
@@ -75,10 +80,11 @@ export class EnemyTank extends Tank {
     // }, time * 1000);
   }
 
-  protected selectImage(animationSpeed: number) {
+  protected selectImage(deltaTime: number, animationSpeed: number) {
     return this.moveAnimation.setImageSpecialTank(
       this.controls.direction,
       this.controls.move,
+      deltaTime,
       animationSpeed,
       this.isSpecial,
     );
@@ -98,6 +104,7 @@ export class EnemyTank extends Tank {
           "",
           this.game,
           "EnemyBullet",
+          this.tankType,
         ),
       );
       this.isLoading = true;
@@ -107,7 +114,7 @@ export class EnemyTank extends Tank {
           this.isLoading = false;
           this.fire();
         },
-        this.reloadTime * Utils.generateRandomNumber(3, 8) + this.reloadDelay,
+        this.reloadTime * Utils.generateRandomNumber(2, 4),
         true,
       );
 
@@ -124,7 +131,10 @@ export class EnemyTank extends Tank {
   public processHit(hitBy: Owner): void {
     if (!this.isIndestructible) {
       this.isDestroyed = { type: this.tankType, destroyedBy: hitBy };
-      this.game.addDestroyedEnemyTankValue(hitBy, this.tankType);
+      this.game.addDestroyedEnemyTankValue(
+        hitBy,
+        this.tankType as EnemyTankTypes,
+      );
       this.handleDestruction();
     }
   }
@@ -152,7 +162,7 @@ export class EnemyTank extends Tank {
     this.handleExplosion();
     if (this.isDestroyed?.destroyedBy) {
       this.game.values.push(
-        new Value(this.getValue(), this.xPos, this.yPos + 12, 1, 2.5),
+        new Value(this.getValue(), this.xPos, this.yPos + 12),
       );
       this.game.destroyedEnemyTanksList.push(this.isDestroyed);
     }
@@ -163,10 +173,10 @@ export class EnemyTank extends Tank {
   getValue() {
     switch (this.tankType) {
       case "Small": {
-        return TANKS_SETTINGS.Small.value;
+        return ENEMY_TANKS_SETTINGS.Small.value;
       }
       case "Fast": {
-        return TANKS_SETTINGS.Fast.value;
+        return ENEMY_TANKS_SETTINGS.Fast.value;
       }
       default: {
         return 0;
@@ -177,12 +187,11 @@ export class EnemyTank extends Tank {
   setTankSpeed() {
     switch (this.tankType) {
       case "Fast": {
-        this.speed = TANKS_SETTINGS.Fast.speed;
+        this.speed = ENEMY_TANKS_SETTINGS.Fast.speed;
         break;
-        //!! 0,5
       }
       default: {
-        this.speed = TANKS_SETTINGS.Small.speed;
+        this.speed = ENEMY_TANKS_SETTINGS.Small.speed;
       }
     }
   }
@@ -198,11 +207,4 @@ export class EnemyTank extends Tank {
   getIsBlocked() {
     return this.isBlockedBy;
   }
-
-  // clearReloadTimeout() {
-  //   if (this.reloadTimeout) {
-  //     clearTimeout(this.reloadTimeout);
-  //     this.reloadTimeout = null;
-  //   }
-  // }
 }

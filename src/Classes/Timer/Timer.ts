@@ -13,21 +13,29 @@ export class Timer {
     this.repeat = repeat;
   }
 
+  getCurrentTime() {
+    return this.counter;
+  }
+
   stop() {
     this.isCounting = false;
+    this.counter = 0;
   }
   reset() {
     this.counter = 0;
   }
 
-  update() {
-    if (this.isCounting && this.delay) {
-      this.counter++;
-      if (this.counter % this.delay === 0) {
+  update(deltaTime: number) {
+    if (this.isCounting) {
+      this.counter += deltaTime;
+      if (this.counter >= this.delay) {
         if (!this.repeat) {
           this.stop();
+        } else {
+          this.reset();
+          this.counter = 0;
         }
-        //this.reset();
+
         if (this.timeUpCallback) {
           this.timeUpCallback();
         }

@@ -7,7 +7,11 @@ export type BoardElementType = "Full" | "Horizontally" | "Vertically";
 
 export type MaterialType = "Brick" | "Concrete" | "Eagle";
 
-export type TankTypes = "Small" | "Fast" | "Power" | "Armor";
+export type EnemyTankTypes = "Small" | "Fast" | "Power" | "Armor";
+
+export type PlayerTankTypes = 0 | 1 | 2 | 3;
+
+export type TankTypes = EnemyTankTypes | PlayerTankTypes;
 
 export type Owner = "player1" | "player2" | "";
 
@@ -85,7 +89,7 @@ export type WallRecipe = {
 export type LevelRecipe = {
   staticObjectsRecipe: StaticObjectsRecipe[];
   eagle: EagleRecipe;
-  enemyTanksList: TankTypes[];
+  enemyTanksList: EnemyTankTypes[];
 };
 
 export type StaticObjectsRecipe = {
@@ -102,9 +106,16 @@ export type EagleRecipe = {
   size: number;
 };
 
-export type TankTypesTextures = {
-  Small: ChangeDirectionTextures;
-  Power: ChangeDirectionTextures;
-  Fast: ChangeDirectionTextures;
-  Armor: ChangeDirectionTextures;
+export type EnemyTankTypesTextures = {
+  [K in EnemyTankTypes]: ChangeDirectionTextures;
 };
+
+export type PlayerTankTypesTextures = {
+  [K in PlayerTankTypes]: ChangeDirectionTextures;
+};
+
+export type TankTypesTextures = {
+  [K in TankTypes]: ChangeDirectionTextures;
+};
+
+export type BulletType = "PlayerBullet" | "EnemyBullet";
