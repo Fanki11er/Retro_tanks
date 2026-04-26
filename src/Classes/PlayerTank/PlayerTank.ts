@@ -25,7 +25,6 @@ export class PlayerTank extends Tank {
     game: Game,
   ) {
     super(xPos, yPos, width, height, textures, tankType, game);
-    //!!!!!!!!!!!!!!!!!!!!!!!!
     this.madeIndestructible(5);
     this.spawn(SPAWN_ANIMATION_TIME);
     this.owner = owner;
@@ -95,14 +94,9 @@ export class PlayerTank extends Tank {
         ),
       );
       this.isLoading = true;
-      //this.isLoading &&
       this.loadingTimer.start(() => {
         this.isLoading = false;
       }, this.reloadTime);
-
-      // setTimeout(() => {
-      //   this.isLoading = false;
-      // }, this.reloadTime * 1000);
     }
   }
   handleCollisionsWithFindings() {

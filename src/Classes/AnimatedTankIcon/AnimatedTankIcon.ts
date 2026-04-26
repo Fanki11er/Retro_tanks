@@ -18,8 +18,14 @@ export class AnimatedTankIcon {
     });
   }
 
-  draw(canvasCtx: CanvasRenderingContext2D, xPos: number, yPos: number) {
+  draw(
+    canvasCtx: CanvasRenderingContext2D,
+    deltaTime: number,
+    xPos: number,
+    yPos: number,
+  ) {
     const imagesCount = Object.keys(this.imageManager.images).length;
+    this.counter += deltaTime;
     this.reset(imagesCount);
 
     const imageKey = `tankIcon${this.index}`;
@@ -29,11 +35,10 @@ export class AnimatedTankIcon {
       canvasCtx.drawImage(image, xPos, yPos, image.width, image.height);
     }
 
-    if (this.counter % this.animationSpeed === 0) {
+    if (this.counter >= this.animationSpeed) {
       this.index++;
+      this.counter = 0;
     }
-
-    this.counter++;
   }
 
   private reset(length: number) {

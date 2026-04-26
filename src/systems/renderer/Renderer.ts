@@ -10,10 +10,6 @@ export class Renderer {
   private renderCtx: CanvasRenderingContext2D;
   private game: Game;
 
-  //   private enemyTankSpawnTimer = new Timer();
-  //   private blockEnemyTanksTimer = new Timer();
-  //   private playerDestructionTimer = new Timer();
-
   constructor(renderCtx: CanvasRenderingContext2D, game: Game) {
     this.renderCtx = renderCtx;
     this.game = game;
@@ -29,6 +25,7 @@ export class Renderer {
     if (this.game.getGameStatus() === GAME_STATUS.MENU) {
       this.game.mainMenu.draw(
         this.renderCtx,
+        deltaTime,
         this.game.players.player1?.getPlayerScore() || 0,
         20000,
       );
@@ -41,8 +38,8 @@ export class Renderer {
     if (this.game.getGameStatus() === GAME_STATUS.CURTIN) {
       const animationEnded = this.game.curtin.drawCurtin(
         this.renderCtx,
-        1,
         this.game.getCurrentLevelNumber(),
+        deltaTime,
       );
       //!! Add level number
 
@@ -60,6 +57,8 @@ export class Renderer {
       ) {
         this.game.setGameStatus("GAME_OVER");
       }
+
+      //!!!!
       //this.resetGame();
       //Show results screen
       //Show game over screen
@@ -67,7 +66,7 @@ export class Renderer {
     }
 
     if (this.game.getGameStatus() === GAME_STATUS.GAME_OVER) {
-      this.handleGameOver(this.renderCtx);
+      this.handleGameOver(this.renderCtx, deltaTime);
     }
 
     if (this.game.getGameStatus() === GAME_STATUS.STARTED) {
@@ -75,7 +74,10 @@ export class Renderer {
     }
   }
 
-  private handleGameOver(renderCtx: CanvasRenderingContext2D) {
+  private handleGameOver(
+    renderCtx: CanvasRenderingContext2D,
+    deltaTime: number,
+  ) {
     let resultsAnimationEnded = false;
     let gameOverScreenAnimationEnded = false;
 
@@ -84,6 +86,7 @@ export class Renderer {
       this.game.getCurrentLevelNumber(),
       this.game.players.player1?.getPlayerScore() || 0,
       this.game.destroyedEnemyTanksList,
+      deltaTime,
     );
     if (resultsAnimationEnded) {
       gameOverScreenAnimationEnded = this.game.gameOverScreen.animate(
@@ -166,7 +169,8 @@ export class Renderer {
     this.game.handleBulletsHit();
 
     this.game.gameInfo.draw(this.renderCtx);
-    this.game.staticObjectsCanvas?.draw(this.renderCtx);
+
+    this.game.staticObjectsCanvas?.draw(this.renderCtx, deltaTime);
 
     if (this.game.players.player1?.playerTank) {
       this.game.players.player1.playerTank.draw(this.renderCtx, deltaTime);

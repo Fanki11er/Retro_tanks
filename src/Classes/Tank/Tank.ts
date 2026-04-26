@@ -26,7 +26,6 @@ import {
   SLOW_TANK_SPEED,
   SPAWN_ANIMATION_SPEED,
 } from "../../constants";
-//import { TankSensor } from '../TankSensor/TankSensor';
 
 export abstract class Tank {
   protected id;

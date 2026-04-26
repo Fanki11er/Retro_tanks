@@ -10,13 +10,10 @@ const { orange, yellow, white } = theme.colors;
 const { main } = theme.fonts;
 
 export class PlayerResults {
-  currentAnimatedPointsLineNumber = 1;
-  animationEnded = false;
+  private currentAnimatedPointsLineNumber = 1;
+  private animationEnded = false;
   private nextStepCounter = 0;
   private nextStepDelay = 1000;
-  //offset = 0;
-  //isClosed = true;
-  //isBlocked = true;
   private firstLineYPosition = 35;
   private lineHeight = 25;
   private font = main;
@@ -51,6 +48,7 @@ export class PlayerResults {
     stage: number,
     playerScore: number,
     destroyedTanks: DestroyedBy[],
+    deltaTime: number,
   ) {
     if (canvasCtx) {
       canvasCtx.clearRect(0, 0, this.width, this.height);
@@ -58,12 +56,12 @@ export class PlayerResults {
 
       this.drawHighScoreText(canvasCtx, 1);
 
-      //Todo get number of points from the game and display it here
+      //Todo get number of  High score points from the game and display it here
       this.drawHighScoreResultNumber(canvasCtx, 20000, 1);
       this.drawStageNumber(canvasCtx, stage, 2);
       this.drawFirstPlayerColumn(canvasCtx, 3);
       this.drawFirstPlayerResult(canvasCtx, playerScore, 4); //!! Total points
-      this.drawPlayerTanksHits(canvasCtx);
+      this.drawPlayerTanksHits(canvasCtx, deltaTime);
       this.drawHorizontalLine(canvasCtx, 270);
       this.drawTotalDestroyedTanks(
         canvasCtx,
@@ -163,7 +161,10 @@ export class PlayerResults {
     );
   }
 
-  private drawPlayerTanksHits(canvasCtx: CanvasRenderingContext2D) {
+  private drawPlayerTanksHits(
+    canvasCtx: CanvasRenderingContext2D,
+    deltaTime: number,
+  ) {
     this.tankHitsResultLines.forEach((line) => {
       const tankType = line.getTankType();
       const destroyedTanks = this.game.getDestroyedEnemyTanksList();
@@ -171,7 +172,7 @@ export class PlayerResults {
         (tank) => tank.type === tankType,
       ).length;
 
-      line.draw(canvasCtx, destroyedTanksOfType);
+      line.draw(canvasCtx, destroyedTanksOfType, deltaTime);
     });
   }
 

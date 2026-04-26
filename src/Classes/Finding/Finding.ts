@@ -13,7 +13,6 @@ export class Finding {
   protected elapsedTime = 0;
   protected timeIsOut = false;
   protected showImage = true;
-  //protected timeOut;
   protected isTakenBy: Owner | "" = "";
   protected value = 500;
   protected showTime = FINDING_SHOW_TIME;
@@ -62,10 +61,6 @@ export class Finding {
     this.counter += deltaTime;
     this.showingTimer.update(deltaTime);
   }
-
-  // protected cancelTimeout() {
-  //   clearTimeout(this.timeOut);
-  // }
 
   getTimeIsOut() {
     return this.timeIsOut;

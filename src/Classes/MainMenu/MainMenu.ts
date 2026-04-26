@@ -6,6 +6,12 @@ import tankAnimationPhase1 from "../../Assets/images/Tanks/Player1Tank/Player1_m
 import tankAnimationPhase2 from "../../Assets/images/Tanks/Player1Tank/Player1_medium_tank_2_right.png";
 import { ImageManager } from "../ImageManager/ImageManager";
 import { AnimatedTankIcon } from "../AnimatedTankIcon/AnimatedTankIcon";
+import {
+  PLAYER_TANK_IMAGE_SIZE,
+  TANK_ICON_ANIMATION_SPEED,
+  MAIN_MENU_ANIMATION_SPEED,
+  MAIN_MENU_ANIMATION_TIME,
+} from "../../constants";
 
 const { white } = theme.colors;
 const { main } = theme.fonts;
@@ -20,9 +26,9 @@ export class MainMenu {
   private imageManager = new ImageManager();
   private animatedTankIcon = new AnimatedTankIcon(
     [tankAnimationPhase1, tankAnimationPhase2],
-    20,
-    20,
-    20,
+    PLAYER_TANK_IMAGE_SIZE,
+    PLAYER_TANK_IMAGE_SIZE,
+    TANK_ICON_ANIMATION_SPEED,
   );
   private width: number;
   private height: number;
@@ -30,27 +36,20 @@ export class MainMenu {
   private selectedOptionIndex = 0;
   private animationCounter = 0;
   private isAnimationEnded = false;
-  private animationSpeed: number;
-  private animationDelay: number;
+  private animationTime = MAIN_MENU_ANIMATION_TIME;
+  private animationSpeed = MAIN_MENU_ANIMATION_SPEED;
 
-  constructor(
-    width: number,
-    height: number,
-    game: Game,
-    animationSpeed: number = 3,
-    animationDelay: number = 40,
-  ) {
+  constructor(width: number, height: number, game: Game) {
     this.width = width;
     this.height = height;
     this.game = game;
-    this.animationSpeed = animationSpeed;
-    this.animationDelay = animationDelay;
     this.imageManager.addImage("title", titleImageSrc, 280, 100);
     this.imageManager.addImage("companyLogo", companyLogoSrc, 100, 15);
   }
 
   draw(
     canvasCtx: CanvasRenderingContext2D,
+    deltaTime: number,
     playerScore: number,
     highScore: number,
   ) {
@@ -59,7 +58,7 @@ export class MainMenu {
       canvasCtx.fillStyle = "rgba(0, 0, 0, 1)";
 
       if (!this.isAnimationEnded) {
-        this.animateMenu();
+        this.animateMenu(deltaTime);
       }
 
       const titleImageDimensions =
@@ -85,6 +84,7 @@ export class MainMenu {
       if (this.isAnimationEnded) {
         this.animatedTankIcon.draw(
           canvasCtx,
+          deltaTime,
           105,
           this.firstLineYPosition +
             2 * this.lineHeight +
@@ -318,14 +318,11 @@ export class MainMenu {
     }
   }
 
-  animateMenu() {
+  animateMenu(deltaTime: number) {
     if (this.firstLineYPosition > this.targetFirstLineYPosition) {
-      this.animationCounter++;
-      if (
-        this.animationCounter >= this.animationDelay &&
-        this.animationCounter % this.animationSpeed === 0
-      ) {
-        this.firstLineYPosition -= 1;
+      this.animationCounter += deltaTime;
+      if (this.animationCounter >= this.animationTime) {
+        this.firstLineYPosition -= this.animationSpeed;
       }
     } else {
       this.firstLineYPosition = this.targetFirstLineYPosition;

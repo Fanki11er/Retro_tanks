@@ -28,9 +28,14 @@ export class StaticElementsCanvas {
 
   createStaticObjects() {
     const { eagle } = this.game.levelsRecipe[this.game.getCurrentLevelIndex()];
-    this.staticObjects.push(
-      new Eagle(eagle.xPos, eagle.yPos, eagle.size, this.game.explosions),
+    const eagleObject = new Eagle(
+      eagle.xPos,
+      eagle.yPos,
+      eagle.size,
+      this.game.explosions,
     );
+    this.staticObjects.push(eagleObject);
+    eagleObject.changed = true;
     for (
       let i = 0;
       i <
@@ -42,33 +47,33 @@ export class StaticElementsCanvas {
         this.game.levelsRecipe[this.game.getCurrentLevelIndex()]
           .staticObjectsRecipe[i];
       if (material === "Brick") {
-        this.staticObjects.push(
-          new BrickWall(
-            xPos,
-            yPos,
-            brickWallRecipe.elementSize,
-            brickWallRecipe,
-            layoutType,
-            brickWallRecipe.textureSize,
-            eagleBorder,
-          ),
+        const newWall = new BrickWall(
+          xPos,
+          yPos,
+          brickWallRecipe.elementSize,
+          brickWallRecipe,
+          layoutType,
+          brickWallRecipe.textureSize,
+          eagleBorder,
         );
+        newWall.changed = true;
+        this.staticObjects.push(newWall);
       }
       if (material === "Concrete") {
-        this.staticObjects.push(
-          new ConcreteWall(
-            xPos,
-            yPos,
-            concreteWallRecipe.elementSize,
-            concreteWallRecipe,
-            layoutType,
-            concreteWallRecipe.textureSize,
-            eagleBorder,
-          ),
+        const newWall = new ConcreteWall(
+          xPos,
+          yPos,
+          concreteWallRecipe.elementSize,
+          concreteWallRecipe,
+          layoutType,
+          concreteWallRecipe.textureSize,
+          eagleBorder,
         );
+        newWall.changed = true;
+        this.staticObjects.push(newWall);
       }
     }
-    this.update();
+    //this.update();
   }
 
   resetStaticObjects() {
@@ -76,14 +81,14 @@ export class StaticElementsCanvas {
     this.createStaticObjects();
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D, deltaTime: number) {
+    this.armEagleBordersTimer.update(deltaTime);
     this.checkForChanges();
+
     ctx.drawImage(this.canvas, 0, 0);
   }
 
   update() {
-    this.armEagleBordersTimer.update();
-
     this.canvasCtx?.clearRect(20, 4, 312, 312);
     if (this.canvasCtx) {
       for (let i = 0; i < this.staticObjects.length; i++) {
@@ -134,22 +139,21 @@ export class StaticElementsCanvas {
         const wall = object as Wall;
         const { x: xPos, y: yPos } = wall.getCoordinates();
         const type = wall.getType();
-        this.staticObjects.splice(
-          index,
-          1,
-          new ConcreteWall(
-            xPos,
-            yPos,
-            concreteWallRecipe.elementSize,
-            concreteWallRecipe,
-            type,
-            concreteWallRecipe.textureSize,
-            true,
-          ),
+        const newWall = new ConcreteWall(
+          xPos,
+          yPos,
+          concreteWallRecipe.elementSize,
+          concreteWallRecipe,
+          type,
+          concreteWallRecipe.textureSize,
+          true,
         );
+        newWall.changed = true;
+
+        this.staticObjects.splice(index, 1, newWall);
       }
     });
-    this.update();
+    //this.update();
   }
 
   private unarmEagleBorders() {
@@ -158,21 +162,19 @@ export class StaticElementsCanvas {
         const wall = object as Wall;
         const { x: xPos, y: yPos } = wall.getCoordinates();
         const type = wall.getType();
-        this.staticObjects.splice(
-          index,
-          1,
-          new BrickWall(
-            xPos,
-            yPos,
-            brickWallRecipe.elementSize,
-            brickWallRecipe,
-            type,
-            brickWallRecipe.textureSize,
-            true,
-          ),
+        const newWall = new BrickWall(
+          xPos,
+          yPos,
+          brickWallRecipe.elementSize,
+          brickWallRecipe,
+          type,
+          brickWallRecipe.textureSize,
+          true,
         );
+        newWall.changed = true;
+        this.staticObjects.splice(index, 1, newWall);
       }
     });
-    this.update();
+    //this.update();
   }
 }

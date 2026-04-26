@@ -16,16 +16,35 @@ export const FAST_TANK_SPEED = 100;
 export const BASIC_BULLET_SPEED = 140;
 export const FAST_BULLET_SPEED = 160;
 
+//?? Animation constants
+
 export const INDESTRUCTIBLE_ANIMATION_SPEED = 0.05;
 export const SPAWN_ANIMATION_SPEED = 0.08;
 export const EXPLOSION_ANIMATION_SPEED = 0.08;
+export const TANK_ICON_ANIMATION_SPEED = 0.08;
+
+//?? Value animation constants
 
 export const VALUE_SHOW_TIME = 1;
 export const VALUE_SHOW_DELAY = 0.1;
 
+//?? Finding animation constants
+
 export const FINDING_SHOW_TIME = 7;
 export const FINDING_BLINKING_START_TIME = FINDING_SHOW_TIME * 0.8;
 export const FINDING_BLINKING_INTERVAL = 0.2;
+
+//?? Main menu animation constants
+
+export const MAIN_MENU_ANIMATION_TIME = 2;
+export const MAIN_MENU_ANIMATION_SPEED = 1;
+
+//?? Curtin animation constants
+export const CURTIN_ANIMATION_SPEED = 1;
+export const CORTIN_ANIMATION_DELAY = 2.5;
+
+//?? Results screen animation constants
+export const RESULTS_SCREEN_POINTS_ANIMATION_DELAY = 1;
 
 export const PLAYER_TANKS_SETTINGS = {
   0: {

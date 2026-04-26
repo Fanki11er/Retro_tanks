@@ -16,8 +16,6 @@ export class EnemyTank extends Tank {
   brain: Brain;
   private isSpecial: boolean;
   private timeBlockade: boolean;
-  private reloadDelay = 2;
-  //private reloadTimeout: NodeJS.Timeout | null = null;
 
   constructor(
     xPos: number,
@@ -34,7 +32,6 @@ export class EnemyTank extends Tank {
     this.controls.direction = "Backwards";
     this.brain = new Brain(this, game);
     this.setTankSpeed();
-    //!!!!!!!!!!!!!!!
     this.spawn(SPAWN_ANIMATION_TIME);
     this.isSpecial = isSpecial;
     this.timeBlockade = timeBlockade;
@@ -64,20 +61,7 @@ export class EnemyTank extends Tank {
         this.reloadTime * Utils.generateRandomNumber(1, 3),
         true,
       );
-
-      // this.reloadTimeout = setTimeout(() => {
-      //   this.fire();
-      // }, Math.random() * 1000);
     }, time);
-
-    // setTimeout(() => {
-    //   this.isSpawning = false;
-    //   this.isIndestructible = false;
-    //   this.controls.move = true;
-    //   this.reloadTimeout = setTimeout(() => {
-    //     this.fire();
-    //   }, Math.random() * 1000);
-    // }, time * 1000);
   }
 
   protected selectImage(deltaTime: number, animationSpeed: number) {
@@ -117,19 +101,11 @@ export class EnemyTank extends Tank {
         this.reloadTime * Utils.generateRandomNumber(2, 4),
         true,
       );
-
-      // this.reloadTimeout = setTimeout(
-      //   () => {
-      //     this.isLoading = false;
-      //     this.fire();
-      //   },
-      //   this.reloadTime * Math.random() * 2000 + 1000,
-      // );
     }
   }
 
   public processHit(hitBy: Owner): void {
-    if (!this.isIndestructible) {
+    if (!this.isSpawning) {
       this.isDestroyed = { type: this.tankType, destroyedBy: hitBy };
       this.game.addDestroyedEnemyTankValue(
         hitBy,
@@ -145,17 +121,9 @@ export class EnemyTank extends Tank {
     if (isBlockedByTime === false) {
       this.fire();
     }
-
-    // if (isBlockedByTime && this.reloadTimeout) {
-    //   clearTimeout(this.reloadTimeout);
-    // }
   }
 
   private handleDestruction() {
-    // if (this.reloadTimeout) {
-    //   clearTimeout(this.reloadTimeout);
-    //   this.reloadTimeout = null;
-    // }
     if (this.isSpecial) {
       this.game.generateFinding();
     }

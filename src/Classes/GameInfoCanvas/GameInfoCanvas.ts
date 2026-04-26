@@ -1,3 +1,4 @@
+import { theme } from "../../GlobalStyles/theme";
 import { enemyTankIcon, playerTankIcon, roundFlagIcon } from "../Icon/Icon";
 import { Players } from "../Players/Players";
 
@@ -14,7 +15,6 @@ export class GameInfoCanvas {
     this.canvas.width = width;
     this.canvas.height = height;
     this.canvasCtx = this.canvas.getContext("2d");
-    //this.update(0, );
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -24,12 +24,8 @@ export class GameInfoCanvas {
 
   update(
     enemyTanksLeft: number = 0,
-    //player1LivesLeft: number = 0,
-    //player2LivesLeft: number = 0,
-    //players: number = 1,
     players: Players,
-    roundNumber: number = 0
-    //gameStatus: string = 'Pause',
+    roundNumber: number = 0,
   ) {
     this.canvasCtx?.clearRect(0, 0, this.width, this.height);
     this.drawBorders();
@@ -45,7 +41,7 @@ export class GameInfoCanvas {
 
   private drawBorders() {
     if (this.canvasCtx) {
-      this.canvasCtx.fillStyle = "rgba(127, 127, 127, 1)";
+      this.canvasCtx.fillStyle = theme.colors.darkerGray;
       this.canvasCtx.fillRect(0, 0, this.width, 4);
       this.canvasCtx.fillRect(0, 316, this.width, 4);
       this.canvasCtx.fillRect(0, 0, 20, this.height);
@@ -67,7 +63,7 @@ export class GameInfoCanvas {
           xAxis + xOffset,
           yAxis + yOffset,
           size,
-          size
+          size,
         );
         xOffset += delta;
 
@@ -81,7 +77,7 @@ export class GameInfoCanvas {
 
   private drawPlayerLivesLeft(
     playerLivesLeft: number,
-    secondPlayer: boolean = false
+    secondPlayer: boolean = false,
   ) {
     const text = secondPlayer ? "II P" : " I P";
     const offset = secondPlayer ? 35 : 0;

@@ -1,9 +1,13 @@
+import { CURTIN_ANIMATION_SPEED } from "../../constants";
+import { theme } from "../../GlobalStyles/theme";
+
 export class Curtin {
-  counter = 0;
-  animationEnded = false;
-  offset = 0;
-  isClosed = true;
-  isBlocked = true;
+  private counter = 0;
+  private animationEnded = false;
+  private size = 0;
+  private isClosed = true;
+  private isBlocked = true;
+  private animationSpeed = CURTIN_ANIMATION_SPEED;
   public width: number;
   public height: number;
   constructor(width: number, height: number) {
@@ -13,53 +17,43 @@ export class Curtin {
 
   drawCurtin(
     canvasCtx: CanvasRenderingContext2D,
-    delay: number,
     stage: number,
+    deltaTime: number,
   ) {
     if (canvasCtx) {
       canvasCtx.clearRect(0, 0, this.width, this.height);
-      canvasCtx.fillStyle = "rgba(127, 127, 127, 1)";
-      canvasCtx.fillRect(0, 0, this.width, this.height / 2 - this.offset);
+      canvasCtx.fillStyle = theme.colors.darkerGray;
+      canvasCtx.fillRect(0, 0, this.width, this.height);
+
+      this.drawStageText(canvasCtx, stage);
+      canvasCtx.fillStyle = "rgba(0, 0, 0, 1)";
       canvasCtx.fillRect(
         0,
-        this.height / 2 + this.offset,
+        this.height / 2 - this.size / 2,
         this.width,
-        this.height / 2 - this.offset,
+        this.size,
       );
 
       if (!this.isBlocked && this.isClosed) {
-        this.openCurtin(delay);
-      }
-      if (!this.isBlocked && !this.isClosed) {
-        this.closeCurtin(delay);
-      }
-      if (this.isClosed && this.isBlocked) {
-        this.drawStageText(canvasCtx, stage);
+        this.openCurtin(this.animationSpeed, deltaTime);
       }
     }
     return this.animationEnded;
   }
 
-  private openCurtin(delay: number) {
-    this.counter += 1;
-    if (this.counter % delay === 0) {
-      this.offset += 2;
-    }
-    if (this.offset >= this.height / 2) {
-      this.isBlocked = true;
-      this.isClosed = false;
-      this.animationEnded = true;
-    }
+  unlockCurtin() {
+    this.isBlocked = false;
   }
 
-  private closeCurtin(delay: number) {
-    this.counter += 1;
-    if (this.counter % delay === 0) {
-      this.offset -= 2;
+  private openCurtin(animationSpeed: number, deltaTime: number) {
+    this.counter += deltaTime;
+    if (this.counter >= animationSpeed) {
+      this.size += 2;
     }
-    if (this.offset <= this.height / 2) {
+
+    if (this.size >= this.height) {
       this.isBlocked = true;
-      this.isClosed = true;
+      this.isClosed = false;
       this.animationEnded = true;
     }
   }
@@ -82,7 +76,7 @@ export class Curtin {
   reset() {
     this.counter = 0;
     this.animationEnded = false;
-    this.offset = 0;
+    this.size = 0;
     this.isClosed = true;
     this.isBlocked = true;
   }

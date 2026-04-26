@@ -8,22 +8,6 @@ const Canvas = () => {
   console.log("Canvas rendered");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // useEffect(() => {
-  //   if (canvasRef.current) {
-  //     const renderCtx = canvasRef.current.getContext("2d");
-  //     const animate = () => {
-  //       if (renderCtx) {
-  //         game.renderGame(renderCtx);
-  //         //!! Init game with canvas, move rendering to game class
-  //       }
-
-  //       requestAnimationFrame(animate);
-  //     };
-
-  //     animate();
-  //   }
-  // }, [game]);
-
   useEffect(() => {
     if (canvasRef.current) {
       const renderCtx = canvasRef.current.getContext("2d");

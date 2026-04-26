@@ -30,6 +30,7 @@ import { PlayerResults } from "../PlayerResults/PlayerResults";
 import {
   CANVAS_HEIGHT,
   CANVAS_WIDTH,
+  CORTIN_ANIMATION_DELAY,
   ENEMY_TANK_IMAGE_SIZE,
   ENEMY_TANKS_SETTINGS,
   ENEMY_TANKS_SPAWN_INTERVAL,
@@ -45,6 +46,8 @@ import { Renderer } from "../../systems/renderer/Renderer";
 export class Game {
   private renderCtx: CanvasRenderingContext2D | null = null;
   private renderer: Renderer | null = null;
+  private currentLevelIndex: number = 0;
+  private lastTime!: number;
   canvasWidth = CANVAS_WIDTH;
   canvasHeight = CANVAS_HEIGHT;
   gameStatus: string = GAME_STATUS.MENU;
@@ -61,7 +64,6 @@ export class Game {
   );
   gameOverTextAnimation = new GameOverTextAnimation(150, this.canvasHeight);
   gameOverScreen = new GameOverScreen(this.canvasWidth, this.canvasHeight);
-  private currentLevelIndex: number = 0;
   gameInfo = new GameInfoCanvas(this.canvasWidth, this.canvasHeight);
   levelsRecipe: LevelRecipe[];
   explosions: ExplosionAnimationFrames[] = [];
@@ -80,14 +82,11 @@ export class Game {
   ];
   timeBlockade = false;
   drawEnemyTanksSensors = false;
-  private lastTime!: number;
   startTimer = new Timer();
   enemyTankSpawnTimer = new Timer();
   blockEnemyTanksTimer = new Timer();
   playerDestructionTimer = new Timer();
-  //!!!!!!!! Try to make renderer object which will be render things instead canvas
 
-  //!! Get height and width from the constructor
   //!! Check if all enemy tanks destroyed and finish the round
 
   constructor(players: 1 | 2, levels: LevelRecipe[]) {
@@ -121,12 +120,12 @@ export class Game {
     this.resetClassesValues();
 
     this.startTimer.start(() => {
-      this.curtin.isBlocked = false;
+      this.curtin.unlockCurtin();
       this.handlePlayerTankSpawn("player1");
       // ! What if we have two players
       this.addNewEnemyTank();
       this.handleEnemyTankSpawn();
-    }, 5);
+    }, CORTIN_ANIMATION_DELAY);
 
     this.gameStatus = GAME_STATUS.CURTIN;
   }
@@ -158,11 +157,6 @@ export class Game {
       true,
     );
   }
-  // setInterval(() => {
-  //   if (this.enemyTanksList.length && this.enemyTanks.length < 4) {
-  //     this.addNewEnemyTank();
-  //   }
-  // }, 5000);
 
   private checkSpawnPointIsBlocked(x: number, y: number) {
     const spawnPointCollisionZone = new ElementCollisionZone(
@@ -410,15 +404,15 @@ export class Game {
         break;
       }
       case "Helmet": {
-        this.handleMakePlayerIndestructible(owner);
+        this.handleMakePlayerIndestructible(owner, 10);
         break;
       }
       case "Stopwatch": {
-        this.handleBlockAllEnemyTanks(3);
+        this.handleBlockAllEnemyTanks(10);
         break;
       }
       case "Shovel": {
-        this.handleArmorEagle(5);
+        this.handleArmorEagle(10);
         break;
       }
       case "Star": {
@@ -429,9 +423,9 @@ export class Game {
   }
 
   private handleDestroyAllEnemyTanks() {
-    this.enemyTanks.forEach((enemyTank) => {
-      enemyTank.processHit("");
-    });
+    for (let i = this.enemyTanks.length - 1; i >= 0; i--) {
+      this.enemyTanks[i].processHit("");
+    }
   }
 
   private handleAddPlayerLive(owner: Owner) {
@@ -441,9 +435,9 @@ export class Game {
     }
   }
 
-  private handleMakePlayerIndestructible(owner: Owner) {
+  private handleMakePlayerIndestructible(owner: Owner, time: number) {
     if (owner) {
-      this.players[`${owner}`]?.playerTank?.madeIndestructible(3);
+      this.players[`${owner}`]?.playerTank?.madeIndestructible(time);
     }
   }
 

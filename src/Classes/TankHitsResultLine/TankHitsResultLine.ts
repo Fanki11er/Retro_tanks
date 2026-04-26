@@ -1,6 +1,7 @@
 import type { PlayerResults } from "../PlayerResults/PlayerResults";
 import resultsArrowImage from "../../assets/images/Results/ResultsArrow.png";
 import type { TankTypes } from "../../Types/Types";
+import { RESULTS_SCREEN_POINTS_ANIMATION_DELAY } from "../../constants";
 
 const white = "rgba(255, 255, 255, 1)";
 
@@ -8,7 +9,7 @@ export class TankHitsResultLine {
   private font = `"Press Start 2P", system-ui`;
   private pointsAnimationCounter = 0;
   private pointsAnimationEnded = false;
-  private pointsAnimationDelay = 100;
+  private pointsAnimationDelay = RESULTS_SCREEN_POINTS_ANIMATION_DELAY;
   private lineYPosition: number;
   private resultsLineNumber: number;
   private tankImage: HTMLImageElement;
@@ -37,14 +38,20 @@ export class TankHitsResultLine {
     this.resultsArrowImage.src = resultsArrowImage;
   }
 
-  draw(canvasCtx: CanvasRenderingContext2D, tanksDestroyed: number) {
+  draw(
+    canvasCtx: CanvasRenderingContext2D,
+    tanksDestroyed: number,
+    deltaTime: number,
+  ) {
     this.animateTanksHitsResultLine(canvasCtx, this.tankImage);
     this.drawAnimatedPointsFromTanksHits(
       canvasCtx,
       this.resultsLineNumber,
       tanksDestroyed, //!! get number of tanks destroyed from the game and pass it here
       this.pointsPerTank,
+      deltaTime,
     );
+
     this.drawAnimatedHitTanksNumber(canvasCtx, this.resultsLineNumber);
   }
 
@@ -68,6 +75,7 @@ export class TankHitsResultLine {
     pointsLineNumber: number,
     tanksDestroyed: number,
     pointsPerTank: number,
+    deltaTime: number,
   ) {
     const currentAnimatedPointsLineNumber =
       this.playerResultsBoard.getCurrentAnimatedPointsLineNumber();
@@ -97,8 +105,8 @@ export class TankHitsResultLine {
       currentAnimatedPointsLineNumber === pointsLineNumber &&
       !this.pointsAnimationEnded
     ) {
-      this.pointsAnimationCounter += 1;
-      if (this.pointsAnimationCounter % this.pointsAnimationDelay === 0) {
+      this.pointsAnimationCounter += deltaTime;
+      if (this.pointsAnimationCounter >= this.pointsAnimationDelay) {
         if (this.destroyedTanksCounter >= tanksDestroyed) {
           this.pointsAnimationEnded = true;
           this.playerResultsBoard.setCurrentAnimatedPointsLineNumber(
