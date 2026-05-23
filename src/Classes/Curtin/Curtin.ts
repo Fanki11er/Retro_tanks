@@ -48,7 +48,7 @@ export class Curtin {
   private openCurtin(animationSpeed: number, deltaTime: number) {
     this.counter += deltaTime;
     if (this.counter >= animationSpeed) {
-      this.size += 2;
+      this.size += 3;
     }
 
     if (this.size >= this.height) {

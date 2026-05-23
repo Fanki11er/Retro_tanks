@@ -5,9 +5,9 @@ export const ENEMY_TANK_IMAGE_SIZE = 22;
 export const PLAYER_TANK_IMAGE_SIZE = 20;
 export const FINDING_IMAGE_SIZE = 24;
 export const SPAWN_ANIMATION_TIME = 2;
-export const ENEMY_TANKS_SPAWN_INTERVAL = 5;
+export const ENEMY_TANKS_SPAWN_INTERVAL = 3;
 export const PLAYER_TANK_RESPAWN_TIME = 2;
-export const BASIC_RELOAD_TIME = 0.5;
+export const BASIC_RELOAD_TIME = 0.3;
 
 export const SLOW_TANK_SPEED = 70;
 export const MEDIUM_TANK_SPEED = 85;
@@ -30,18 +30,18 @@ export const VALUE_SHOW_DELAY = 0.1;
 
 //?? Finding animation constants
 
-export const FINDING_SHOW_TIME = 7;
+export const FINDING_SHOW_TIME = 10;
 export const FINDING_BLINKING_START_TIME = FINDING_SHOW_TIME * 0.8;
 export const FINDING_BLINKING_INTERVAL = 0.2;
 
 //?? Main menu animation constants
 
 export const MAIN_MENU_ANIMATION_TIME = 2;
-export const MAIN_MENU_ANIMATION_SPEED = 1;
+export const MAIN_MENU_ANIMATION_SPEED = 0.3;
 
 //?? Curtin animation constants
 export const CURTIN_ANIMATION_SPEED = 1;
-export const CORTIN_ANIMATION_DELAY = 2.5;
+export const CORTIN_ANIMATION_DELAY = 3;
 
 //?? Results screen animation constants
 export const RESULTS_SCREEN_POINTS_ANIMATION_DELAY = 1;
