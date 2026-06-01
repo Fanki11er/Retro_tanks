@@ -1,4 +1,4 @@
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from "styled-components";
 
 export const GlobalStyles = createGlobalStyle`
 
@@ -24,4 +24,3 @@ a, button{
     font-family: Montserrat, sans-serif;
 }
 `;
-
